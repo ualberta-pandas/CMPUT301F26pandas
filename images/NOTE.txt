@@ -1,0 +1,1 @@
+The UI mockup images in this directory are displayed in the wiki of this repo.
