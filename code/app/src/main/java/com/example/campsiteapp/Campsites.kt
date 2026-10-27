@@ -23,7 +23,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +43,11 @@ import androidx.compose.ui.window.Dialog
 class Campsites {
 
 @Composable
-fun CampsitesList() {
+fun CampsitesList(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit
+
+) {
 
 
     var showRegistration by remember { mutableStateOf(false) }
@@ -118,8 +125,15 @@ fun CampsitesList() {
 
         if (showRegistration){
             Dialog(
-              onDismissRequest = { showRegistration = false}
+              onDismissRequest = { onDismissRequest()}
             ){
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -130,6 +144,15 @@ fun CampsitesList() {
                         Text(
                             text = "Add Campsite"
                         )
+
+                        TextButton(
+                            onClick = { onDismissRequest() },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(50)
+                            )
+                        ) { Text("x") }
                     }
 
 
@@ -144,6 +167,7 @@ fun CampsitesList() {
 
                 }
             }
+                }
         }
 
     }
