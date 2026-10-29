@@ -17,9 +17,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val campsiteRepo = CampsiteRepo()
+
         setContent {
             CampsiteAppTheme {
-                Campsites().CampsitesList()
+                Campsites().CampsitesList(
+                    campsites = campsiteRepo.campsites,
+                    onAddCampsite = {campsiteRepo.addCampsite(it)}
+                )
             }
         }
     }
