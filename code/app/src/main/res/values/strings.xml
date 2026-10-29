@@ -1,3 +1,48 @@
 <resources>
     <string name="app_name">campsiteApp</string>
+
+    <!-- Common -->
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="remove">Remove</string>
+    <string name="not_provided">Not provided</string>
+
+    <!-- Admin home -->
+    <string name="admin_title">Admin</string>
+    <string name="browse_campsites">Browse Campsites</string>
+    <string name="browse_profiles">Browse Profiles</string>
+
+    <!-- Campsites -->
+    <string name="campsites_title">Campsites</string>
+    <string name="no_campsites">No campsites.</string>
+    <string name="owned_by">Owned by %1$s</string>
+    <string name="unknown_owner">unknown owner</string>
+    <string name="occupancy_range">%1$d – %2$d people</string>
+    <string name="price_per_night">$%1$s / night</string>
+    <string name="label_location">Location</string>
+    <string name="label_owner">Owner</string>
+    <string name="label_occupancy">Occupancy</string>
+    <string name="label_price">Price</string>
+    <string name="label_description">Description</string>
+    <string name="label_tags">Tags</string>
+    <string name="label_rules">Rules and Cancellation Policy</string>
+    <string name="remove_campsite_title">Remove Campsite</string>
+    <string name="remove_campsite_message">Are you sure you want to remove this campsite listing?</string>
+
+    <!-- Profiles -->
+    <string name="profiles_title">Profiles</string>
+    <string name="no_profiles">No profiles.</string>
+    <string name="view_profile_title">View Profile</string>
+    <string name="profile_not_found">This profile no longer exists.</string>
+    <string name="label_email">Email</string>
+    <string name="label_phone">Phone Number</string>
+    <string name="label_roles">Roles</string>
+    <string name="label_notifications">Notifications</string>
+    <string name="notifications_on">Opted in</string>
+    <string name="notifications_off">Opted out</string>
+    <string name="label_owned_campsites">Campsites owned</string>
+    <string name="remove_profile_title">Remove Profile</string>
+    <string name="remove_profile_message">Are you sure you want to remove this profile?</string>
+    <string name="remove_owner_message">Are you sure you want to remove this profile? The %1$d campsite listing(s) they own will also be removed.</string>
 </resources>
