@@ -49,7 +49,8 @@ class CampsiteRepo {
                 "adates" to campsite.adates,
                 "description" to campsite.description,
                 "tags" to campsite.tags,
-                "rules" to campsite.rules
+                "rules" to campsite.rules,
+                "image" to campsite.image
             )
 
         )

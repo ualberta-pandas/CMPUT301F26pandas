@@ -1,8 +1,11 @@
 package com.example.campsiteapp
 
+import android.app.DatePickerDialog
 import android.app.Dialog
 import android.media.Image
 import android.net.Uri
+import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -61,8 +64,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.Firebase
+import com.google.firebase.storage.StorageMetadata
+import com.google.firebase.storage.storage
+
 import kotlin.contracts.contract
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
+import java.io.DataOutputStream
+import java.util.UUID
+
 
 
 class Campsites {
@@ -78,12 +95,13 @@ class Campsites {
 
 
         var showRegistration by remember { mutableStateOf(false) }
-        var campName by remember { mutableStateOf("") }
+
 
         Column() {
             LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-                    .weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.8f)
 
             ) {
                 itemsIndexed(campsites) { index, campsite ->
@@ -120,7 +138,8 @@ class Campsites {
 
                             Text(
                                 text = "Status",
-                                modifier = Modifier.background(Color.Green)
+                                modifier = Modifier
+                                    .background(Color.Green)
                                     .border(
                                         width = 1.dp,
                                         color = Color.Green,
@@ -131,13 +150,15 @@ class Campsites {
 
                         Spacer(modifier = Modifier.width(80.dp))
 
+                        val url = campsite.image
                         Column() {
-                            Image(
-                                painter = painterResource(
-                                    id = R.drawable.ic_launcher_background
-                                ),
-                                contentDescription = "A cat",
-                                modifier = Modifier.size(120.dp)
+                            AsyncImage(
+                                model = url,
+                                contentDescription = "Campsite image",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentScale = ContentScale.Crop
                             )
                         }
 
@@ -159,339 +180,503 @@ class Campsites {
                 FloatingActionButton(
                     onClick = {
                         showRegistration = true
+
                     }
                 ) { Text(text = "+", fontSize = 20.sp) }
             }
 
+            if (showRegistration){
+                Dialog(
+                    onDismissRequest = {showRegistration= false},
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    )
+                ){
+                    RegisterCampsite(onAddCampsite = onAddCampsite, onDismissRequest= { showRegistration = false })
+                }
+            }
+
         }
-                if (showRegistration) {
-                    Dialog(
-                        onDismissRequest = { showRegistration = false },
-                        properties = DialogProperties(usePlatformDefaultWidth = false)
+
+
+    }
+
+    private suspend fun uploadImage(
+        context: android.content.Context,
+        imageUri: Uri
+    ): String = withContext(Dispatchers.IO) {
+
+        val cloudName = "lgwzmfuq"
+        val uploadPreset = "campsite_upload"
+
+        val mimeType = context.contentResolver.getType(imageUri) ?: "image/jpeg"
+
+        val imageBytes = context.contentResolver
+            .openInputStream(imageUri)
+            ?.use { it.readBytes() }
+            ?: throw Exception("Cannot read image")
+
+        val boundary = "Boundary-${UUID.randomUUID()}"
+
+        val connection = URL(
+            "https://api.cloudinary.com/v1_1/$cloudName/image/upload"
+        ).openConnection() as HttpURLConnection
+
+        try {
+            connection.requestMethod = "POST"
+            connection.doOutput = true
+            connection.setRequestProperty(
+                "Content-Type",
+                "multipart/form-data; boundary=$boundary"
+            )
+
+            DataOutputStream(connection.outputStream).use { output ->
+
+                output.writeBytes("--$boundary\r\n")
+                output.writeBytes(
+                    "Content-Disposition: form-data; name=\"upload_preset\"\r\n\r\n"
+                )
+                output.writeBytes("$uploadPreset\r\n")
+
+                output.writeBytes("--$boundary\r\n")
+                output.writeBytes(
+                    "Content-Disposition: form-data; name=\"file\"; filename=\"image\"\r\n"
+                )
+                output.writeBytes("Content-Type: $mimeType\r\n\r\n")
+                output.write(imageBytes)
+                output.writeBytes("\r\n")
+                output.writeBytes("--$boundary--\r\n")
+            }
+
+            val code = connection.responseCode
+
+            val response = if (code in 200..299) {
+                connection.inputStream.bufferedReader().use { it.readText() }
+            } else {
+                connection.errorStream?.bufferedReader()?.use { it.readText() }
+                    ?: "Unknown error"
+            }
+
+            if (code !in 200..299) {
+                throw Exception(response)
+            }
+
+            JSONObject(response).getString("secure_url")
+
+        } finally {
+            connection.disconnect()
+        }
+    }
+    @Composable
+    fun RegisterCampsite(
+        onAddCampsite: (Campsite) -> Unit,
+        onDismissRequest: () -> Unit
+
+    ) {
+
+        val scope = rememberCoroutineScope()
+        var isUploading by remember { mutableStateOf(false) }
+
+            Column(
+                modifier = Modifier.fillMaxWidth()
+
+            ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+
+                ) {
+
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Card (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
-                                .padding(16.dp)
-                        ) {
+                        Text(
+                            text = "Add Campsite"
+                        )
+
+
+
+                        TextButton(
+                            onClick = onDismissRequest
+                        ) { Text("x") }
+
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+
+                    var campName by remember { mutableStateOf("") }
+
+                    TextField(
+                        value = campName,
+                        onValueChange = { campName = it },
+                        label = {
+                            Text("Campsite Name")
+                        },
+                        modifier = Modifier
+                            .testTag("campName")
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    //image uploading
+                    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+                    val imagePicker = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.GetContent()
+                    ) { uri ->
+                        imageUri = uri
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .border(
+                                width = 2.dp,
+                                color = Color.Gray,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .clickable {
+                                imagePicker.launch("image/*")
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (imageUri != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(imageUri),
+                                contentDescription = "Selected image",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
                             Column(
-                                modifier = Modifier.fillMaxSize()
-
-                                ) {
-
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Row(
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Text(
-                                        text = "Add Campsite"
-                                    )
-
-                                    Spacer(modifier = Modifier.width(100.dp))
-
-                                    TextButton(
-                                        onClick = { showRegistration = false },
-                                        modifier = Modifier.border(
-                                            width = 1.dp,
-                                            color = Color.Black,
-                                            shape = RoundedCornerShape(50)
-                                        )
-                                            .size(30.dp)
-                                    ) { Text("x") }
-                                }
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                TextField(
-                                    value = campName,
-                                    onValueChange = { campName = it },
-                                    label = {
-                                        Text("Campsite Name")
-                                    },
-                                    modifier = Modifier.testTag("campTextField")
-                                        .border(
-                                            width = 1.dp,
-                                            color = Color.Black,
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.CloudUpload,
+                                    contentDescription = "Upload image",
+                                    modifier = Modifier.size(40.dp),
+                                    tint = Color.Gray
                                 )
 
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                //image uploading
-                                var imageUri by remember { mutableStateOf<Uri?>(null) }
-
-                                val imagePicker = rememberLauncherForActivityResult(
-                                    contract = ActivityResultContracts.GetContent()
-                                ) { uri ->
-                                    imageUri = uri
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(180.dp)
-                                        .border(
-                                            width = 2.dp,
-                                            color = Color.Gray,
-                                            shape = RoundedCornerShape(12.dp)
-                                        )
-                                        .clickable {
-                                            imagePicker.launch("image/*")
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    if (imageUri != null) {
-                                        Image(
-                                            painter = rememberAsyncImagePainter(imageUri),
-                                            contentDescription = "Selected image",
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                    } else {
-                                        Column(
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.CloudUpload,
-                                                contentDescription = "Upload image",
-                                                modifier = Modifier.size(40.dp),
-                                                tint = Color.Gray
-                                            )
-
-                                            Text("Tap to upload an image")
-                                        }
-                                    }
-                                }
-
-                                // other text fields and buttons
-
-                                var location by remember { mutableStateOf("") }
-                                var occupancy by remember { mutableStateOf("") }
-                                var owner by remember { mutableStateOf("") }
-                                var price by remember { mutableStateOf("") }
-                                var mapLocation by remember { mutableStateOf("") }
-                                var availableDates by remember { mutableStateOf("")}
-
-//                                val datePickerState = rememberDatePickerState(
-//                                    initialSelectedDateMillis = availableDates
-//                                )
-
-                                var description by remember { mutableStateOf("") }
-                                var tags by remember { mutableStateOf("") }
-                                var rules by remember { mutableStateOf("") }
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                Row() {
-                                    TextField(
-                                        value = location,
-                                        onValueChange = { location = it },
-                                        label = {Text("Location")},
-                                        modifier = Modifier.border(
-                                            width = 1.dp,
-                                    color = Color.Black,
-                                    shape = RoundedCornerShape(16.dp)
-                                    )
-
-                                    )
-
-                                    TextField(
-                                        value = occupancy,
-                                        onValueChange = { occupancy = it },
-                                        label = {Text("Occupancy")},
-                                        modifier = Modifier.border(
-                                            width = 1.dp,
-                                            color = Color.Black,
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
-                                    )
-
-                                }
-
-
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Row() {
-                                    TextField(
-                                        value = owner,
-                                        onValueChange = { owner = it },
-                                        label = {Text("Owner")},
-                                        modifier = Modifier.border(
-                                            width = 1.dp,
-                                            color = Color.Black,
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
-                                    )
-
-                                    TextField(
-                                        value = price,
-                                        onValueChange = { price = it },
-                                        label = {Text("Price")},
-                                        modifier = Modifier.border(
-                                            width = 1.dp,
-                                            color = Color.Black,
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                Row() {
-
-                                    TextField(
-                                        value = availableDates,
-                                        onValueChange = {availableDates = it},
-                                        label = {Text("Available Dates")},
-                                        modifier = Modifier.border(
-                                            width = 1.dp,
-                                            color = Color.Black,
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Row() {
-                                    TextField(
-                                        value = mapLocation,
-                                        onValueChange = { mapLocation = it },
-                                        label = {Text("Map Location")},
-                                        modifier = Modifier.border(
-                                            width = 1.dp,
-                                            color = Color.Black,
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
-                                    )
-
-                                    Button(
-                                        onClick = {
-
-                                        }
-                                    ) { Text("Change")}
-                                }
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                TextField(
-                                    value = description,
-                                    onValueChange = { description = it },
-                                    label = {Text("Description")},
-                                    maxLines = 4,
-                                    modifier = Modifier.border(
-                                        width = 1.dp,
-                                        color = Color.Black,
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
-                                        .fillMaxWidth()
-                                )
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                TextField(
-                                    value = tags,
-                                    onValueChange = { tags = it },
-                                    maxLines = 3,
-                                    label = {Text("Tags")},
-                                    modifier = Modifier.border(
-                                        width = 1.dp,
-                                        color = Color.Black,
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
-                                        .fillMaxWidth()
-                                )
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                TextField(
-                                    value = rules,
-                                    onValueChange = { rules = it },
-                                    maxLines = 3,
-                                    label = {Text("Rules and terms of use")},
-                                    modifier = Modifier.border(
-                                        width = 1.dp,
-                                        color = Color.Black,
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
-                                        .fillMaxWidth()
-                                )
-
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                val context = LocalContext.current
-
-                                Row(
-                                    horizontalArrangement = Arrangement.End,
-                                    verticalAlignment = Alignment.Bottom
-                                ) {
-                                    Button(
-                                        onClick = {
-                                            if (campName.isNotBlank() && location.isNotBlank() &&
-                                                occupancy.isNotBlank() && owner.isNotBlank() && price.isNotBlank()
-                                                && mapLocation.isNotBlank() && description.isNotBlank() &&
-                                                tags.isNotBlank() && rules.isNotBlank()) {
-
-                                                onAddCampsite(
-                                                    Campsite(
-                                                        name = campName,
-                                                        location = location,
-                                                        occupancy = occupancy,
-                                                        owner = owner,
-                                                        price = price,
-                                                        mapLocation = mapLocation,
-                                                        adates = availableDates,
-                                                        description = description,
-                                                        tags = tags,
-                                                        rules = rules
-
-                                                    )
-                                                )
-
-                                                campName = ""
-                                                location = ""
-                                                occupancy = ""
-                                                owner = ""
-                                                mapLocation = ""
-                                                price = ""
-                                                description = ""
-                                                tags = ""
-                                                rules = ""
-
-                                                Toast.makeText(context,"Campsite Added", Toast.LENGTH_LONG).show()
-
-                                                showRegistration = false
-                                            }
-
-                                            else{
-                                                Toast.makeText(context,"Fill all fields", Toast.LENGTH_LONG).show()
-                                            }
-                                        },
-
-
-
-                                    ) { Text("Add") }
-                                }
-
-
+                                Text("Tap to upload an image")
                             }
                         }
                     }
+
+                    // other text fields and buttons
+
+                    var location by remember { mutableStateOf("") }
+                    var occupancy by remember { mutableStateOf("") }
+                    var owner by remember { mutableStateOf("") }
+                    var price by remember { mutableStateOf("") }
+                    var mapLocation by remember { mutableStateOf("") }
+                    var availableDates by remember { mutableStateOf("")}
+
+
+                               val dateRangePickerState = rememberDateRangePickerState()
+
+
+                    var description by remember { mutableStateOf("") }
+                    var tags by remember { mutableStateOf("") }
+                    var rules by remember { mutableStateOf("") }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row() {
+                        TextField(
+                            value = location,
+                            onValueChange = { location = it },
+                            label = { Text("Location") },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+
+                        )
+
+                        TextField(
+                            value = occupancy,
+                            onValueChange = { occupancy = it },
+                            label = { Text("Occupancy") },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        )
+
+                    }
+
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row() {
+                        TextField(
+                            value = owner,
+                            onValueChange = { owner = it },
+                            label = { Text("Owner") },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        )
+
+                        TextField(
+                            value = price,
+                            onValueChange = { price = it },
+                            label = { Text("Price") },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    var showDatePicker by remember { mutableStateOf(false) }
+                    Row() {
+
+                        TextField(
+                            value = availableDates,
+                            onValueChange = {},
+                            label = { Text("Available Dates") },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                            readOnly = true
+
+                        )
+
+                        Button(
+                            onClick = {
+
+                                showDatePicker = true
+
+                            }
+                        ){
+                           Text("Select Dates")
+                        }
+
+                        if (showDatePicker){
+                            DatePickerDialog(
+                                onDismissRequest = {showDatePicker = false},
+
+                                confirmButton = {
+                                    Button(
+                                        onClick = {
+
+                                            val start = dateRangePickerState.selectedStartDateMillis
+                                            val end = dateRangePickerState.selectedEndDateMillis
+
+                                            if(start != null && end != null){
+                                                val formatter = java.text.SimpleDateFormat(
+                                                    "dd/MM/yyyy",
+                                                    java.util.Locale.getDefault()
+                                                )
+
+                                                availableDates =
+                                                    "${formatter.format(java.util.Date(start))} - "+
+                                                            formatter.format(java.util.Date(end))
+
+                                            }
+
+
+                                            showDatePicker = false
+                                        }
+                                    ){Text("Ok")}
+                                },
+
+                                dismissButton = {
+                                    Button(
+                                        onClick = {
+                                            showDatePicker = false
+                                        }
+                                    ){
+                                        Text("Cancel")
+                                    }
+                                }
+                            ){
+
+                                DateRangePicker(state = dateRangePickerState)
+                            }
+                        }
+
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row() {
+                        TextField(
+                            value = mapLocation,
+                            onValueChange = { mapLocation = it },
+                            label = { Text("Map Location") },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        )
+
+                        Button(
+                            onClick = {
+
+                            }
+                        ) { Text("Change") }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        label = { Text("Description") },
+                        maxLines = 4,
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextField(
+                        value = tags,
+                        onValueChange = { tags = it },
+                        maxLines = 3,
+                        label = { Text("Tags") },
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextField(
+                        value = rules,
+                        onValueChange = { rules = it },
+                        maxLines = 3,
+                        label = { Text("Rules and terms of use") },
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    val context = LocalContext.current
+
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        Button(
+                            onClick = {
+
+                                if (campName.isBlank() || location.isBlank() ||
+                                    occupancy.isBlank() || owner.isBlank() ||
+                                    price.isBlank() || mapLocation.isBlank() ||
+                                    description.isBlank() || tags.isBlank() ||
+                                    rules.isBlank()
+                                ) {
+                                    Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
+                                if (imageUri == null) {
+                                    Toast.makeText(context, "Select an image", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
+                                scope.launch {
+                                    isUploading = true
+
+                                    try {
+                                        val imageUrl = uploadImage(context, imageUri!!)
+
+                                        onAddCampsite(
+                                            Campsite(
+                                                name = campName,
+                                                location = location,
+                                                occupancy = occupancy,
+                                                owner = owner,
+                                                price = price,
+                                                mapLocation = mapLocation,
+                                                adates = availableDates,
+                                                description = description,
+                                                tags = tags,
+                                                rules = rules,
+                                                image = imageUrl
+                                            )
+                                        )
+
+                                        Toast.makeText(context, "Campsite added!", Toast.LENGTH_SHORT).show()
+                                        onDismissRequest()
+
+                                    } catch (e: Exception) {
+                                        Toast.makeText(
+                                            context,
+                                            "Upload failed: ${e.message}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    } finally {
+                                        isUploading = false
+                                    }
+                                }
+                            }
+
+                            ) { Text(if (isUploading) "Uploading..." else "Add") }
+
+                    }
                 }
-
-
-
-
-                @Composable
-                fun Lottery() {
-
                 }
+            }
 
-                @Composable
-                fun Reservations() {
+    }
 
-                }
+
+            @Composable
+            fun Lottery() {
 
             }
+
+            @Composable
+            fun Reservations() {
+
+            }
+
+
         }
 

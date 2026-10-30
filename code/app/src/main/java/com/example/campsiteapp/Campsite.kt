@@ -11,5 +11,6 @@ data class Campsite(
     val adates: String = "",
     val description: String = "",
     val tags: String = "",
-    val rules: String = ""
+    val rules: String = "",
+    val image: String = ""
 )
