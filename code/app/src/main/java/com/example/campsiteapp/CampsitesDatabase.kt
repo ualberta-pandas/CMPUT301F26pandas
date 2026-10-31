@@ -6,13 +6,13 @@ import com.google.firebase.firestore.firestore
 
 
 
-class CampsiteRepo {
+class CampsitesDatabase {
 
     private val db = Firebase.firestore
 
     private val campsitesRef = db.collection("campsites")
 
-    private val _campsites = mutableStateListOf<Campsite>()
+    private val _campsites = mutableStateListOf<CampsiteObject>()
 
     init {
         campsitesRef.addSnapshotListener { snapshots, error ->
@@ -24,7 +24,7 @@ class CampsiteRepo {
 
             snapshots?.documents?.forEach { document ->
 
-                val campsite = document.toObject(Campsite::class.java)
+                val campsite = document.toObject(CampsiteObject::class.java)
                 if(campsite != null){
                     _campsites.add(
                         campsite.copy(id = document.id)
@@ -35,10 +35,10 @@ class CampsiteRepo {
         }
     }
 
-    val campsites: List<Campsite>
+    val campsites: List<CampsiteObject>
         get() = _campsites
 
-    fun addCampsite(campsite: Campsite){
+    fun addCampsite(campsite: CampsiteObject){
         campsitesRef.add(
             mapOf(
                 "name" to campsite.name,
