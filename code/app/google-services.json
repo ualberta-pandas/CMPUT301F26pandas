@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1052588464666",
+    "project_id": "pandas-93afc",
+    "storage_bucket": "pandas-93afc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1052588464666:android:ab17ac78814212721ecfa3",
+        "android_client_info": {
+          "package_name": "com.example.campsiteapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcWf-8Jhti0wRp6bNPTX8zMXZ7MXIl9wo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
