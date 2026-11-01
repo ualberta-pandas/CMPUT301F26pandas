@@ -1,4 +1,4 @@
-package com.example.campsiteapp
+package com.example.campsiteapp.data
 
 import androidx.compose.runtime.mutableStateListOf
 import com.google.firebase.Firebase
@@ -12,7 +12,7 @@ class CampsitesDatabase {
 
     private val campsitesRef = db.collection("campsites")
 
-    private val _campsites = mutableStateListOf<CampsiteObject>()
+    private val _campsites = mutableStateListOf<Campsite>()
 
     init {
         campsitesRef.addSnapshotListener { snapshots, error ->
@@ -24,7 +24,7 @@ class CampsitesDatabase {
 
             snapshots?.documents?.forEach { document ->
 
-                val campsite = document.toObject(CampsiteObject::class.java)
+                val campsite = document.toObject(Campsite::class.java)
                 if(campsite != null){
                     _campsites.add(
                         campsite.copy(id = document.id)
@@ -35,10 +35,10 @@ class CampsitesDatabase {
         }
     }
 
-    val campsites: List<CampsiteObject>
+    val campsites: List<Campsite>
         get() = _campsites
 
-    fun addCampsite(campsite: CampsiteObject){
+    fun addCampsite(campsite: Campsite){
         campsitesRef.add(
             mapOf(
                 "name" to campsite.name,
@@ -46,7 +46,8 @@ class CampsitesDatabase {
                 "occupancy" to campsite.occupancy,
                 "owner" to campsite.owner,
                 "mapLocation" to campsite.mapLocation,
-                "adates" to campsite.adates,
+                "startDate" to campsite.startDate,
+                "endDate" to campsite.startDate,
                 "description" to campsite.description,
                 "tags" to campsite.tags,
                 "rules" to campsite.rules,

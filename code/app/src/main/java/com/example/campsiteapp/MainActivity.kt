@@ -8,7 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.campsiteapp.controller.OwnerCampsiteController
+import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
+import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +22,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CampsiteAppTheme {
-                Campsite().CampsitesList(
+                OwnerCampsiteListScreen().CampsitesList(
                     campsites = campsitesDatabase.campsites,
                     onAddCampsite = {campsitesDatabase.addCampsite(it)}
                 )
@@ -28,18 +31,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CampsiteAppTheme {
-        Greeting("Android")
-    }
-}

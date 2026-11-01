@@ -1,6 +1,6 @@
-package com.example.campsiteapp
+package com.example.campsiteapp.data
 
-data class CampsiteObject(
+data class Campsite(
     val id: String = "",
     val name: String = "",
     val location: String = "",
@@ -8,7 +8,8 @@ data class CampsiteObject(
     val owner: String = "",
     val mapLocation: String = "",
     val price: String = "",
-    val adates: String = "",
+    val startDate: String = "",
+    val endDate: String = "",
     val description: String = "",
     val tags: String = "",
     val rules: String = "",

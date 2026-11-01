@@ -1,191 +1,65 @@
-package com.example.campsiteapp
+package com.example.campsiteapp.controller
 
+import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudUpload
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
-
-import coil.compose.AsyncImage
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-
+import com.example.campsiteapp.data.Campsite
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.DataOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.io.DataOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.UUID
 
+class OwnerCampsiteController {
 
-
-class Campsite {
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun CampsitesList(
-
-        campsites: List<CampsiteObject>,
-        onAddCampsite: (CampsiteObject) -> Unit
-
-    ) {
-
-
-        var showRegistration by remember { mutableStateOf(false) }
-
-
-        Column() {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.8f)
-
-            ) {
-                itemsIndexed(campsites) { index, campsite ->
-                    Spacer(modifier = Modifier.height(30.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
-                            .border(
-                                width = 2.dp,
-                                shape = RoundedCornerShape(12.dp),
-                                color = Color.Black
-                            )
-                            .padding(vertical = 20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-
-                        Column(
-                            modifier = Modifier.padding(10.dp)
-                        ) {
-                            Text(
-                                text = campsite.name,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                text = campsite.location
-                            )
-
-                            Text(
-                                text = campsite.occupancy,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                text = "Status",
-                                modifier = Modifier
-                                    .background(Color.Green)
-                                    .border(
-                                        width = 1.dp,
-                                        color = Color.Green,
-                                        shape = RoundedCornerShape(size = 20.dp)
-                                    )
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(80.dp))
-
-                        val url = campsite.image
-                        Column() {
-                            AsyncImage(
-                                model = url,
-                                contentDescription = "Campsite image",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp),
-                                contentScale = ContentScale.Crop
-                            )
-                        }
-
-                        if (index < campsites.lastIndex) {
-                            HorizontalDivider()
-                        }
-
-
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                FloatingActionButton(
-                    onClick = {
-                        showRegistration = true
-
-                    }
-                ) { Text(text = "+", fontSize = 20.sp) }
-            }
-
-            if (showRegistration){
-                Dialog(
-                    onDismissRequest = {showRegistration= false},
-                    properties = DialogProperties(
-                        usePlatformDefaultWidth = false
-                    )
-                ){
-                    RegisterCampsite(onAddCampsite = onAddCampsite, onDismissRequest= { showRegistration = false })
-                }
-            }
-
-        }
-
-
-    }
 
     private suspend fun uploadImage(
-        context: android.content.Context,
+        context: Context,
         imageUri: Uri
     ): String = withContext(Dispatchers.IO) {
 
@@ -252,7 +126,7 @@ class Campsite {
     }
     @Composable
     fun RegisterCampsite(
-        onAddCampsite: (CampsiteObject) -> Unit,
+        onAddCampsite: (Campsite) -> Unit,
         onDismissRequest: () -> Unit
 
     ) {
@@ -260,10 +134,10 @@ class Campsite {
         val scope = rememberCoroutineScope()
         var isUploading by remember { mutableStateOf(false) }
 
-            Column(
-                modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier.fillMaxWidth()
 
-            ) {
+        ) {
             Card(
                 modifier = Modifier
                     .fillMaxSize()
@@ -310,7 +184,7 @@ class Campsite {
                             .border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                             .fillMaxWidth()
                     )
@@ -333,7 +207,7 @@ class Campsite {
                             .border(
                                 width = 2.dp,
                                 color = Color.Gray,
-                                shape = RoundedCornerShape(12.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
                             )
                             .clickable {
                                 imagePicker.launch("image/*")
@@ -370,10 +244,10 @@ class Campsite {
                     var owner by remember { mutableStateOf("") }
                     var price by remember { mutableStateOf("") }
                     var mapLocation by remember { mutableStateOf("") }
-                    var availableDates by remember { mutableStateOf("")}
+                    var availableDates by remember { mutableStateOf("") }
 
 
-                               val dateRangePickerState = rememberDateRangePickerState()
+                    val dateRangePickerState = rememberDateRangePickerState()
 
 
                     var description by remember { mutableStateOf("") }
@@ -390,7 +264,7 @@ class Campsite {
                             modifier = Modifier.border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
 
                         )
@@ -402,7 +276,7 @@ class Campsite {
                             modifier = Modifier.border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
 
@@ -418,7 +292,7 @@ class Campsite {
                             modifier = Modifier.border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
 
@@ -429,7 +303,7 @@ class Campsite {
                             modifier = Modifier.border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
                     }
@@ -437,6 +311,8 @@ class Campsite {
                     Spacer(modifier = Modifier.height(10.dp))
 
                     var showDatePicker by remember { mutableStateOf(false) }
+                    var startDate by remember { mutableStateOf("") }
+                    var endDate by remember { mutableStateOf("") }
                     Row() {
 
                         TextField(
@@ -446,7 +322,7 @@ class Campsite {
                             modifier = Modifier.border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             ),
                             readOnly = true
 
@@ -458,13 +334,13 @@ class Campsite {
                                 showDatePicker = true
 
                             }
-                        ){
-                           Text("Select Dates")
+                        ) {
+                            Text("Select Dates")
                         }
 
-                        if (showDatePicker){
+                        if (showDatePicker) {
                             DatePickerDialog(
-                                onDismissRequest = {showDatePicker = false},
+                                onDismissRequest = { showDatePicker = false },
 
                                 confirmButton = {
                                     Button(
@@ -473,22 +349,27 @@ class Campsite {
                                             val start = dateRangePickerState.selectedStartDateMillis
                                             val end = dateRangePickerState.selectedEndDateMillis
 
-                                            if(start != null && end != null){
-                                                val formatter = java.text.SimpleDateFormat(
+                                            if (start != null && end != null) {
+                                                val formatter = SimpleDateFormat(
                                                     "dd/MM/yyyy",
-                                                    java.util.Locale.getDefault()
+                                                    Locale.getDefault()
                                                 )
 
                                                 availableDates =
-                                                    "${formatter.format(java.util.Date(start))} - "+
-                                                            formatter.format(java.util.Date(end))
+                                                    "${formatter.format(Date(start))} - " +
+                                                            formatter.format(Date(end))
+
+                                                startDate = "${formatter.format(Date(start))}"
+                                                endDate = "${formatter.format(Date(end))}"
+
+
 
                                             }
 
 
                                             showDatePicker = false
                                         }
-                                    ){Text("Ok")}
+                                    ) { Text("Ok") }
                                 },
 
                                 dismissButton = {
@@ -496,11 +377,11 @@ class Campsite {
                                         onClick = {
                                             showDatePicker = false
                                         }
-                                    ){
+                                    ) {
                                         Text("Cancel")
                                     }
                                 }
-                            ){
+                            ) {
 
                                 DateRangePicker(state = dateRangePickerState)
                             }
@@ -518,7 +399,7 @@ class Campsite {
                             modifier = Modifier.border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
 
@@ -540,7 +421,7 @@ class Campsite {
                             .border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                             .fillMaxWidth()
                     )
@@ -556,7 +437,7 @@ class Campsite {
                             .border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                             .fillMaxWidth()
                     )
@@ -572,7 +453,7 @@ class Campsite {
                             .border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                             .fillMaxWidth()
                     )
@@ -594,12 +475,14 @@ class Campsite {
                                     description.isBlank() || tags.isBlank() ||
                                     rules.isBlank()
                                 ) {
-                                    Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT)
+                                        .show()
                                     return@Button
                                 }
 
                                 if (imageUri == null) {
-                                    Toast.makeText(context, "Select an image", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Select an image", Toast.LENGTH_SHORT)
+                                        .show()
                                     return@Button
                                 }
 
@@ -610,14 +493,15 @@ class Campsite {
                                         val imageUrl = uploadImage(context, imageUri!!)
 
                                         onAddCampsite(
-                                            CampsiteObject(
+                                            Campsite(
                                                 name = campName,
                                                 location = location,
                                                 occupancy = occupancy,
                                                 owner = owner,
                                                 price = price,
                                                 mapLocation = mapLocation,
-                                                adates = availableDates,
+                                                startDate = startDate,
+                                                endDate = endDate,
                                                 description = description,
                                                 tags = tags,
                                                 rules = rules,
@@ -625,7 +509,11 @@ class Campsite {
                                             )
                                         )
 
-                                        Toast.makeText(context, "Campsite added!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "Campsite added!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                         onDismissRequest()
 
                                     } catch (e: Exception) {
@@ -640,26 +528,15 @@ class Campsite {
                                 }
                             }
 
-                            ) { Text(if (isUploading) "Uploading..." else "Add") }
+                        ) { Text(if (isUploading) "Uploading..." else "Add") }
 
                     }
                 }
-                }
             }
+        }
 
     }
 
 
-            @Composable
-            fun Lottery() {
-
-            }
-
-            @Composable
-            fun Reservations() {
-
-            }
-
 
         }
-
