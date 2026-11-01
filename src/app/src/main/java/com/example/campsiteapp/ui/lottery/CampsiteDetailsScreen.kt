@@ -199,6 +199,7 @@ fun CampsiteView(
 @Composable
 fun CampsiteViewPreview() {
     val campsite = Campsite(
+        id = "1",
         name = "Campsite Location A",
         owner = "dana_device_id",
         location = "123 Jasper, Edmonton, AB",

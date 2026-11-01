@@ -3,6 +3,7 @@ package com.example.campsiteapp.data
 import java.time.LocalDate
 
 data class Campsite(
+    var id: String,
     var name: String,
     var owner: String, var location: String,
     var startDate: LocalDate, var endDate: LocalDate,
