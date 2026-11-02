@@ -2,18 +2,15 @@ package com.example.campsiteapp
 
 import android.content.Context
 import android.media.Image
+import com.google.firebase.firestore.DocumentId
 
-open class User (
-    var userName: String,
-    var userEmail: String,
-    var userPhoneNumber: String,
-    var userProfileImage: Image?, //Profile photo is not required
-) {
-    val userDeviceId = getID()
+open class User () {
+    var userName: String = ""
+    var userEmail: String = ""
+    var userPhoneNumber: String = ""
+    var userProfileImage: String = "" //Profile photo is not required
+    @DocumentId
+    var userDeviceId = "" //Not yet implemented
     var notificationPreference: Boolean = true //True is "notifications on", which is default
 
-    fun getID(): String{
-        //To actually generate a unique device identifier, will implement later
-        return "Test"
-    }
 }
