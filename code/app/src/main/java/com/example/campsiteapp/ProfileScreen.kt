@@ -1,4 +1,5 @@
 package com.example.campsiteapp
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -73,6 +74,7 @@ fun ProfileScreen(
     var newUserEmail by remember {mutableStateOf("")}
     var newUserPhoneNumber by remember {mutableStateOf("")}
     var newUserProfileImage by remember { mutableStateOf("")}
+    var newUserNotificationPreference by remember { mutableStateOf(true) }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var openDeletionConfirmation by remember { mutableStateOf(false) }
 
@@ -80,7 +82,7 @@ fun ProfileScreen(
 
     LaunchedEffect(key1=deviceId){
         //Return profile with specified device id if it exists
-        userProfile=getDocument("profiles",deviceId)
+        userProfile=getProfileDocument(deviceId)
 
         //Display profile if something is passed in, display own profile if it exists, else, prompt to create profile
         profileToDisplay=profile ?: userProfile ?: User()
@@ -106,6 +108,10 @@ fun ProfileScreen(
 
         if(profileToDisplay.userProfileImage!=""){
             newUserProfileImage=profileToDisplay.userProfileImage
+        }
+
+        if(!profileToDisplay.notificationPreference){
+            newUserNotificationPreference=profileToDisplay.notificationPreference
         }
 
         //set state and title
@@ -321,8 +327,9 @@ fun ProfileScreen(
                                         newProfile.userEmail = newUserEmail
                                         newProfile.userPhoneNumber = newUserPhoneNumber
                                         newProfile.userProfileImage = newUserProfileImage
-                                        newProfile.notificationPreference = true
-                                        if (profileScreenMode == "Create Profile") {
+                                        newProfile.notificationPreference =
+                                            newUserNotificationPreference
+                                        if (currentProfileScreenState == ProfileScreenState.CREATE) {
                                             onAddUser(newProfile)
                                         } else {
                                             onUpdateUser(profileToDisplay, newProfile)
@@ -390,7 +397,7 @@ fun ProfileScreen(
                                         .background(Color.DarkGray)
                                         .padding(8.dp)
                                         .clickable {
-                                            //navHost not implemented, should pop back stack
+                                            navController.popBackStack()
                                         },
                                     tint = Color.White
                                 )
@@ -439,6 +446,37 @@ fun ProfileScreen(
                             textAlign = TextAlign.Left,
                             modifier = Modifier.fillMaxWidth()
                         )
+                    }
+                    if(currentProfileScreenState==ProfileScreenState.VIEWOWN){
+                        Row(){
+
+                            var buttonText by remember {
+                                if (profileToDisplay.notificationPreference) {
+                                    mutableStateOf("Opt out of notifications")
+                                } else {
+                                    mutableStateOf("Opt in to notifications")
+                                }
+                            }
+
+                            Button(onClick={
+                                val newProfile = User()
+                                newProfile.userDeviceId = profileToDisplay.userDeviceId
+                                newProfile.userName = profileToDisplay.userName
+                                newProfile.userEmail = profileToDisplay.userEmail
+                                newProfile.userPhoneNumber = profileToDisplay.userPhoneNumber
+                                newProfile.userProfileImage = profileToDisplay.userProfileImage
+                                newProfile.notificationPreference = !profileToDisplay.notificationPreference
+                                onUpdateUser(profileToDisplay,newProfile)
+                                profileToDisplay.notificationPreference=newProfile.notificationPreference
+                                if (profileToDisplay.notificationPreference) {
+                                    buttonText="Opt out of notifications"
+                                } else {
+                                    buttonText="Opt in to notifications"
+                                }
+                            }){
+                                Text(buttonText)
+                            }
+                        }
                     }
                 }
             }

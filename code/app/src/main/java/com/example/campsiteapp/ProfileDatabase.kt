@@ -7,9 +7,6 @@ import com.google.firebase.Firebase
 class ProfileDatabase {
     private val _profiles = mutableStateListOf<User>()
 
-    val profiles: List<User>
-        get() = _profiles
-
     fun addProfile(profile: User){
         profilesRef.document(profile.userDeviceId).set(profile)
     }
@@ -20,9 +17,7 @@ class ProfileDatabase {
         profilesRef.document(profile.userDeviceId).delete()
     }
 
-    private val db = Firebase.firestore
-
-    private val profilesRef = db.collection("profiles")
+    private val profilesRef = Firebase.firestore.collection("profiles")
 
     init {
         profilesRef.addSnapshotListener { snapshots, error ->
