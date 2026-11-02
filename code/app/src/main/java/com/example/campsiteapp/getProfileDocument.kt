@@ -5,6 +5,16 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Returns a User if data is found at specified document id
+ *
+ * Looks for a document in database with specified document id
+ * If it finds a document, it converts it to a User object and returns it
+ * If it doesn’t find the document or an error occurs, it returns null
+ *
+ * @param documentId the requested document’s id
+ * @return User if successful, null if not
+ */
 suspend fun getProfileDocument(documentId: String): User? {
     val db = Firebase.firestore
     val documentReference = db.collection("profiles").document(documentId)
