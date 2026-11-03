@@ -1,6 +1,7 @@
 package com.example.campsiteapp
 
 
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,10 +15,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -46,7 +50,7 @@ import kotlinx.coroutines.launch
 import kotlin.String
 
 /**
- * Handles profile display
+ * Handles the displaying of profiles
  *
  * Displays a profile using [DisplayProfileScreen]
  * Its nested class [ProfileScreen.ProfileScreenState] handles state logic
@@ -59,7 +63,7 @@ class ProfileScreen{
      */
     enum class  ProfileScreenState{
         /**
-         * While LaunchedEffect is running, screens cannot be rendered
+         * While LauncheEffect is running, screens cannot be rendered
          */
         LOADING,
         /**
@@ -124,6 +128,7 @@ class ProfileScreen{
         var newUserNotificationPreference by remember { mutableStateOf(true) }
         var imageUri by remember { mutableStateOf<Uri?>(null) }
         var openDeletionConfirmation by remember { mutableStateOf(false) }
+        var viewGuidelines by remember { mutableStateOf(false) }
 
         //State and related variables must be determined inside LaunchedEffect so they are decided before rendering something other than LOADING screen
         LaunchedEffect(key1=deviceId){
@@ -503,7 +508,7 @@ class ProfileScreen{
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
-                        //Opt in/out of notifications option if is user's profile
+                        //Opt in/out of notifications, view guidelines options if is user's profile
                         if(currentProfileScreenState==ProfileScreenState.VIEWOWN){
                             Row{
                                 var buttonText by remember {
@@ -513,26 +518,98 @@ class ProfileScreen{
                                         mutableStateOf("Opt in to notifications")
                                     }
                                 }
-                                Button(onClick={
-                                    //replaces profile with copy
-                                    val newProfile = User()
-                                    newProfile.userDeviceId = profileToDisplay.userDeviceId
-                                    newProfile.userName = profileToDisplay.userName
-                                    newProfile.userEmail = profileToDisplay.userEmail
-                                    newProfile.userPhoneNumber = profileToDisplay.userPhoneNumber
-                                    newProfile.userProfileImage = profileToDisplay.userProfileImage
-                                    newProfile.notificationPreference = !profileToDisplay.notificationPreference
-                                    onUpdateUser(profileToDisplay,newProfile)
-                                    //ensure modification is conserved in display version
-                                    profileToDisplay.notificationPreference=newProfile.notificationPreference
-                                    //update button text when clicked
-                                    buttonText = if (profileToDisplay.notificationPreference) {
-                                        "Opt out of notifications"
-                                    } else {
-                                        "Opt in to notifications"
+                                Button(
+                                    onClick={
+                                        //replaces profile with copy
+                                        val newProfile = User()
+                                        newProfile.userDeviceId = profileToDisplay.userDeviceId
+                                        newProfile.userName = profileToDisplay.userName
+                                        newProfile.userEmail = profileToDisplay.userEmail
+                                        newProfile.userPhoneNumber = profileToDisplay.userPhoneNumber
+                                        newProfile.userProfileImage = profileToDisplay.userProfileImage
+                                        newProfile.notificationPreference = !profileToDisplay.notificationPreference
+                                        onUpdateUser(profileToDisplay,newProfile)
+                                        //ensure modification is conserved in display version
+                                        profileToDisplay.notificationPreference=newProfile.notificationPreference
+                                        //update button text when clicked
+                                        buttonText = if (profileToDisplay.notificationPreference) {
+                                            "Opt out of notifications"
+                                        } else {
+                                            "Opt in to notifications"
+                                        }
                                     }
-                                }){
+                                ){
                                     Text(buttonText)
+                                }
+                            }
+                            Row{
+                                //opens View App Policy and Guidelines popup
+                                Button(
+                                    onClick = {
+                                        viewGuidelines=true
+                                    }
+                                ){
+                                    Text("View App Policy and Guidelines")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //Popup appears when View App Policy and Guidelines button is clicked
+            if(viewGuidelines){
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                )
+                Popup(
+                    alignment = Alignment.Center,
+                    onDismissRequest = { viewGuidelines = false }
+                ) {
+                    Box(modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .background(Color.White, shape = RoundedCornerShape(16.dp))
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ){
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ){
+                                Text(
+                                    "View App Policy and Guidelines"
+                                )
+                            }
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ){
+                                Box(
+                                    modifier = Modifier
+                                        .heightIn(max = 200.dp)
+                                        .verticalScroll(rememberScrollState())
+                                        .padding(25.dp)
+                                ){
+                                    Text(
+                                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                                    )
+                                }
+                            }
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ){
+                                //close popup
+                                Button(
+                                    onClick={
+                                        viewGuidelines=false
+                                    },
+                                    modifier = Modifier.padding(4.dp)
+                                ) {
+                                    Text("Okay")
                                 }
                             }
                         }
@@ -552,15 +629,20 @@ class ProfileScreen{
                     onDismissRequest = { openDeletionConfirmation = false }
                 ) {
                     Box(modifier = Modifier
+                        .padding(16.dp)
                         .fillMaxWidth()
                         .background(Color.White, shape = RoundedCornerShape(16.dp))
                     ) {
-                        Column{
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ){
                             Row(modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center
                             ){
                                 Text(
-                                    "Delete Profile"
+                                    "Delete Profile",
+                                    modifier = Modifier
+                                        .padding(4.dp)
                                 )
                             }
                             Row(modifier = Modifier.fillMaxWidth(),
@@ -570,7 +652,9 @@ class ProfileScreen{
                                     "Are you sure you want to delete your profile?"
                                 )
                             }
-                            Row(modifier = Modifier.fillMaxWidth(),
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ){
                                 //close popup
