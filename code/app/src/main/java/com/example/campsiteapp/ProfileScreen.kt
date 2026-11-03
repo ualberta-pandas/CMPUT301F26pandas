@@ -101,7 +101,7 @@ class ProfileScreen(){
      * @param onUpdateUser passed in so function can trigger ProfileDatabase.updateProfile
      */
     @Composable
-    fun displayProfileScreen(
+    fun DisplayProfileScreen(
         navController: NavController,
         //deviceId is probably temporary but works better to pass in test values for now
         deviceId: String,
