@@ -48,14 +48,14 @@ import kotlin.String
 /**
  * Handles profile display
  *
- * Displays a profile using [displayProfileScreen]
+ * Displays a profile using [DisplayProfileScreen]
  * Its nested class [ProfileScreen.ProfileScreenState] handles state logic
  */
-class ProfileScreen(){
+class ProfileScreen{
     /**
      * Used to handle distinct ui states
      *
-     * Used by [displayProfileScreen] to display and differentiate between ui states
+     * Used by [DisplayProfileScreen] to display and differentiate between ui states
      */
     enum class  ProfileScreenState{
         /**
@@ -175,7 +175,7 @@ class ProfileScreen(){
         }
 
         //All composables are below
-        Box(){
+        Box{
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -198,12 +198,12 @@ class ProfileScreen(){
                     }
                     //Display create option if user has no profile
                     ProfileScreenState.CREATEPROMPT -> {
-                        Row() {
+                        Row{
                             Text(
                                 "You have no profile."
                             )
                         }
-                        Row() {
+                        Row{
                             //Exit prompt and enter creation screen
                             Button(
                                 onClick = { currentProfileScreenState = ProfileScreenState.CREATE }
@@ -480,7 +480,7 @@ class ProfileScreen(){
                         }
 
                         //profile name
-                        Row() {
+                        Row{
                             Text(
                                 profileToDisplay.userName,
                                 textAlign = TextAlign.Center,
@@ -488,7 +488,7 @@ class ProfileScreen(){
                             )
                         }
                         //profile email
-                        Row() {
+                        Row{
                             Text(
                                 profileToDisplay.userEmail,
                                 textAlign = TextAlign.Left,
@@ -496,7 +496,7 @@ class ProfileScreen(){
                             )
                         }
                         //profile phone number
-                        Row() {
+                        Row{
                             Text(
                                 profileToDisplay.userPhoneNumber,
                                 textAlign = TextAlign.Left,
@@ -505,7 +505,7 @@ class ProfileScreen(){
                         }
                         //Opt in/out of notifications option if is user's profile
                         if(currentProfileScreenState==ProfileScreenState.VIEWOWN){
-                            Row(){
+                            Row{
                                 var buttonText by remember {
                                     if (profileToDisplay.notificationPreference) {
                                         mutableStateOf("Opt out of notifications")
@@ -555,7 +555,7 @@ class ProfileScreen(){
                         .fillMaxWidth()
                         .background(Color.White, shape = RoundedCornerShape(16.dp))
                     ) {
-                        Column(){
+                        Column{
                             Row(modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center
                             ){
