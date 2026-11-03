@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+import android.app.Dialog
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -18,9 +19,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePickerDialog
@@ -45,15 +48,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.example.campsiteapp.controller.OwnerCampsiteController
 import com.example.campsiteapp.data.Campsite
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import java.util.Properties
 
 class OwnerCampsiteDetailsScreen {
 
@@ -63,7 +71,8 @@ class OwnerCampsiteDetailsScreen {
 
     fun CampsiteDetailsScreen(
         onDismissRequest: () -> Unit,
-        selectedCampsiteDetails: Campsite?
+        selectedCampsiteDetails: Campsite?,
+        onEditCampsite: (Campsite, Campsite) -> Unit
 
     ){
         Column(
@@ -123,9 +132,10 @@ class OwnerCampsiteDetailsScreen {
                             .border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(16.dp)
                             )
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        readOnly = true
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -133,7 +143,7 @@ class OwnerCampsiteDetailsScreen {
                     Column() {
                         AsyncImage(
                             model = selectedCampsiteDetails?.image,
-                            contentDescription = "Campsite image",
+                            contentDescription = "Edit",
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp),
@@ -176,12 +186,14 @@ class OwnerCampsiteDetailsScreen {
 
                     val dateRangePickerState = rememberDateRangePickerState(
                         initialSelectedStartDateMillis = startDate?.atStartOfDay(
-                            java.time.ZoneOffset.UTC
+                            ZoneOffset.UTC
                         )?.toInstant()?.toEpochMilli(),
 
                         initialSelectedEndDateMillis = endDate?.atStartOfDay(
-                            java.time.ZoneOffset.UTC
-                        )?.toInstant()?.toEpochMilli()
+                            ZoneOffset.UTC
+                        )?.toInstant()?.toEpochMilli(),
+
+
                     )
 
 
@@ -203,7 +215,8 @@ class OwnerCampsiteDetailsScreen {
                                 width = 1.dp,
                                 color = Color.Black,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            )
+                            ),
+                            readOnly = true
 
                         )
 
@@ -215,7 +228,8 @@ class OwnerCampsiteDetailsScreen {
                                 width = 1.dp,
                                 color = Color.Black,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            )
+                            ),
+                            readOnly = true
                         )
 
                     }
@@ -231,7 +245,8 @@ class OwnerCampsiteDetailsScreen {
                                 width = 1.dp,
                                 color = Color.Black,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            )
+                            ),
+                            readOnly = true
                         )
 
                         TextField(
@@ -242,7 +257,8 @@ class OwnerCampsiteDetailsScreen {
                                 width = 1.dp,
                                 color = Color.Black,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            )
+                            ),
+                            readOnly = true
                         )
                     }
 
@@ -307,26 +323,6 @@ class OwnerCampsiteDetailsScreen {
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
-                    Row() {
-                        TextField(
-                            value = mapLocation,
-                            onValueChange = { mapLocation = it },
-                            label = { Text("Map Location") },
-                            modifier = Modifier.border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            )
-                        )
-
-                        Button(
-                            onClick = {
-
-                            }
-                        ) { Text("Change") }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
 
                     TextField(
                         value = description,
@@ -339,7 +335,8 @@ class OwnerCampsiteDetailsScreen {
                                 color = Color.Black,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        readOnly = true
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -355,7 +352,8 @@ class OwnerCampsiteDetailsScreen {
                                 color = Color.Black,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        readOnly = true
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -371,12 +369,15 @@ class OwnerCampsiteDetailsScreen {
                                 color = Color.Black,
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        readOnly = true
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val context = LocalContext.current
+                    val qrScanScreen = remember { QrScanScreen() }
+                    var showQrScanScreen by remember { mutableStateOf(false) }
 
                     Row(
                         horizontalArrangement = Arrangement.End,
@@ -385,14 +386,50 @@ class OwnerCampsiteDetailsScreen {
                         Button(
                             onClick = {
 
-
+                              showQrScanScreen = true
                             }
 
-                        ) { Text( "Share") }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share",
+                                tint = Color.White
+                            )
+                        }
 
+
+                        if (showQrScanScreen && selectedCampsiteDetails != null){
+
+                            Dialog(
+                                onDismissRequest = {showQrScanScreen = false},
+                                properties = DialogProperties(
+                                    usePlatformDefaultWidth = false
+                                )
+
+                            ) {
+
+                                Card(
+
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        qrScanScreen.QrScan(
+                                            campsiteId = selectedCampsiteDetails.id
+                                        )
+                                    }
+                                }
+                            }
+
+
+                        }
+
+                        var showEdit by remember { mutableStateOf(false) }
                         Button(
                             onClick = {
 
+                                showEdit = true
 
                             }
 
@@ -403,6 +440,34 @@ class OwnerCampsiteDetailsScreen {
                                 tint = Color.White,
                                 modifier = Modifier.size(30.dp)
                             )
+                        }
+
+                        if (showEdit && selectedCampsiteDetails != null){
+                            Dialog(
+                                onDismissRequest = {showEdit = false
+                                                   },
+                                properties = DialogProperties(
+                                    usePlatformDefaultWidth = false
+                                )
+
+                            ) {
+
+                                Card(
+
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+
+                                        OwnerCampsiteController().EditCampsite(
+                                            onDismissRequest = { showEdit = false },
+                                            selectedCampsiteDetails,
+                                            onEditCampsite = onEditCampsite
+                                        )
+                                    }
+                                }
+                            }
                         }
 
                     }

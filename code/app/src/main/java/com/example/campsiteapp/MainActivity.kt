@@ -1,9 +1,11 @@
 package com.example.campsiteapp
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,6 +16,7 @@ import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -24,7 +27,13 @@ class MainActivity : ComponentActivity() {
             CampsiteAppTheme {
                 OwnerCampsiteListScreen().CampsitesList(
                     campsites = campsitesDatabase.campsites,
-                    onAddCampsite = {campsitesDatabase.addCampsite(it)}
+                    onAddCampsite = {campsite -> campsitesDatabase.addCampsite(campsite)},
+                    onEditCampsite = {oldCampsiteDetails, newCampsiteDetails ->
+                        campsitesDatabase.updateCampsite(
+                            oldCampsiteDetails,
+                            newCampsiteDetails = newCampsiteDetails
+                        )
+                    }
                 )
             }
         }

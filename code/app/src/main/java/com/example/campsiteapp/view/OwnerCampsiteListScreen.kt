@@ -49,7 +49,8 @@ class OwnerCampsiteListScreen {
     fun CampsitesList(
 
         campsites: List<Campsite>,
-        onAddCampsite: (Campsite) -> Unit
+        onAddCampsite: (Campsite) -> Unit,
+        onEditCampsite: (Campsite, Campsite) -> Unit
 
     ) {
 
@@ -182,6 +183,8 @@ class OwnerCampsiteListScreen {
                    ownerDetailsScreen.CampsiteDetailsScreen(
 
                        selectedCampsiteDetails = selectedCampsite,
+                       onEditCampsite = onEditCampsite,
+
 
                        onDismissRequest = {
                            showDetails = false

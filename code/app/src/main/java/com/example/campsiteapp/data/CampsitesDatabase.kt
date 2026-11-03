@@ -57,6 +57,15 @@ class CampsitesDatabase {
         )
     }
 
+    fun updateCampsite(oldCampsiteDetails: Campsite, newCampsiteDetails: Campsite){
+        val index = _campsites.indexOf(oldCampsiteDetails)
+
+        if(index != -1){
+            _campsites[index] = newCampsiteDetails
+        }
+
+    }
+
 
 
 }
