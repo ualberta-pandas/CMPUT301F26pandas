@@ -1,8 +1,11 @@
 package com.example.campsiteapp.view
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,6 +43,7 @@ class OwnerCampsiteListScreen {
 
     val ownerController = OwnerCampsiteController()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CampsitesList(
@@ -52,6 +56,7 @@ class OwnerCampsiteListScreen {
 
         var showDetails by remember { mutableStateOf(false) }
         var selectedCampsite by remember { mutableStateOf<Campsite?>(null) }
+        var showRegistration by remember { mutableStateOf(false) }
 
         val ownerDetailsScreen = OwnerCampsiteDetailsScreen()
 
@@ -75,11 +80,14 @@ class OwnerCampsiteListScreen {
                                 color = Color.Black
                             )
                             .padding(vertical = 20.dp)
-                            .clickable(
-                                onClick = {
-                                        showDetails = true
-                                        selectedCampsite = campsite
-                                      }
+                            .combinedClickable(
+                                onDoubleClick = {
+
+                                    selectedCampsite = campsite
+                                    showDetails = true
+
+                                      },
+                                onClick = {}
                             ),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
@@ -144,13 +152,27 @@ class OwnerCampsiteListScreen {
             ) {
                 FloatingActionButton(
                     onClick = {
-                        showDetails = true
+                        showRegistration = true
 
                     }
                 ) { Text(text = "+", fontSize = 20.sp) }
             }
 
-            if (showDetails) {
+            if (showRegistration){
+                Dialog(
+                    onDismissRequest = {showRegistration = false},
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    )
+                ) {
+                    ownerController.RegisterCampsite(
+                        onDismissRequest = { showRegistration = false },
+                        onAddCampsite = onAddCampsite
+                    )
+                }
+            }
+
+            if (showDetails && selectedCampsite != null) {
                 Dialog(
                     onDismissRequest = { showDetails = false },
                     properties = DialogProperties(
@@ -158,9 +180,14 @@ class OwnerCampsiteListScreen {
                     )
                 ) {
                    ownerDetailsScreen.CampsiteDetailsScreen(
+
                        selectedCampsiteDetails = selectedCampsite,
 
-                       onDismissRequest = { showDetails = false })
+                       onDismissRequest = {
+                           showDetails = false
+                           selectedCampsite = null
+                       }
+                   )
 
 
                 }

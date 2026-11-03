@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material3.Button
@@ -55,75 +56,12 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
-class OwnerCampsiteController {
+class OwnerCampsiteController (
+
+) {
 
 
-    private suspend fun uploadImage(
-        context: Context,
-        imageUri: Uri
-    ): String = withContext(Dispatchers.IO) {
 
-        val cloudName = "lgwzmfuq"
-        val uploadPreset = "campsite_upload"
-
-        val mimeType = context.contentResolver.getType(imageUri) ?: "image/jpeg"
-
-        val imageBytes = context.contentResolver
-            .openInputStream(imageUri)
-            ?.use { it.readBytes() }
-            ?: throw Exception("Cannot read image")
-
-        val boundary = "Boundary-${UUID.randomUUID()}"
-
-        val connection = URL(
-            "https://api.cloudinary.com/v1_1/$cloudName/image/upload"
-        ).openConnection() as HttpURLConnection
-
-        try {
-            connection.requestMethod = "POST"
-            connection.doOutput = true
-            connection.setRequestProperty(
-                "Content-Type",
-                "multipart/form-data; boundary=$boundary"
-            )
-
-            DataOutputStream(connection.outputStream).use { output ->
-
-                output.writeBytes("--$boundary\r\n")
-                output.writeBytes(
-                    "Content-Disposition: form-data; name=\"upload_preset\"\r\n\r\n"
-                )
-                output.writeBytes("$uploadPreset\r\n")
-
-                output.writeBytes("--$boundary\r\n")
-                output.writeBytes(
-                    "Content-Disposition: form-data; name=\"file\"; filename=\"image\"\r\n"
-                )
-                output.writeBytes("Content-Type: $mimeType\r\n\r\n")
-                output.write(imageBytes)
-                output.writeBytes("\r\n")
-                output.writeBytes("--$boundary--\r\n")
-            }
-
-            val code = connection.responseCode
-
-            val response = if (code in 200..299) {
-                connection.inputStream.bufferedReader().use { it.readText() }
-            } else {
-                connection.errorStream?.bufferedReader()?.use { it.readText() }
-                    ?: "Unknown error"
-            }
-
-            if (code !in 200..299) {
-                throw Exception(response)
-            }
-
-            JSONObject(response).getString("secure_url")
-
-        } finally {
-            connection.disconnect()
-        }
-    }
     @Composable
     fun RegisterCampsite(
         onAddCampsite: (Campsite) -> Unit,
@@ -131,8 +69,14 @@ class OwnerCampsiteController {
 
     ) {
 
+
+
         val scope = rememberCoroutineScope()
         var isUploading by remember { mutableStateOf(false) }
+        val imageUploadService = remember {
+            ImageUploadService()
+        }
+        var imageUri by remember { mutableStateOf<Uri?>(null) }
 
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -191,51 +135,17 @@ class OwnerCampsiteController {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+
                     //image uploading
-                    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
-                    val imagePicker = rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.GetContent()
-                    ) { uri ->
-                        imageUri = uri
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp)
-                            .border(
-                                width = 2.dp,
-                                color = Color.Gray,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-                            )
-                            .clickable {
-                                imagePicker.launch("image/*")
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (imageUri != null) {
-                            Image(
-                                painter = rememberAsyncImagePainter(imageUri),
-                                contentDescription = "Selected image",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.CloudUpload,
-                                    contentDescription = "Upload image",
-                                    modifier = Modifier.size(40.dp),
-                                    tint = Color.Gray
-                                )
-
-                                Text("Tap to upload an image")
-                            }
+                    imageUploadService.ImagePicker(
+                        imageUri = imageUri,
+                        onImageSelected = {
+                            uri ->
+                            imageUri = uri
                         }
-                    }
+                    )
+
 
                     // other text fields and buttons
 
@@ -399,7 +309,7 @@ class OwnerCampsiteController {
                             modifier = Modifier.border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(16.dp)
                             )
                         )
 
@@ -480,17 +390,29 @@ class OwnerCampsiteController {
                                     return@Button
                                 }
 
-                                if (imageUri == null) {
-                                    Toast.makeText(context, "Select an image", Toast.LENGTH_SHORT)
-                                        .show()
-                                    return@Button
-                                }
+
 
                                 scope.launch {
                                     isUploading = true
 
                                     try {
-                                        val imageUrl = uploadImage(context, imageUri!!)
+
+                                        val selectedImage = imageUri
+
+                                        if (selectedImage == null) {
+                                            Toast.makeText(
+                                                context,
+                                                "Please select an image",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                            return@launch
+                                        }
+
+                                        val imageUrl = imageUploadService.uploadImage(
+                                            context,
+                                            selectedImage
+                                        )
 
                                         onAddCampsite(
                                             Campsite(
