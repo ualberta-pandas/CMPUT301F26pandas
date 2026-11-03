@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 import kotlin.String
 
 /**
- * Handles the displaying of profiles
+ * Handles profile display
  *
  * Displays a profile using [displayProfileScreen]
  * Its nested class [ProfileScreen.ProfileScreenState] handles state logic
@@ -59,7 +59,7 @@ class ProfileScreen(){
      */
     enum class  ProfileScreenState{
         /**
-         * While LauncheEffect is running, screens cannot be rendered
+         * While LaunchedEffect is running, screens cannot be rendered
          */
         LOADING,
         /**
