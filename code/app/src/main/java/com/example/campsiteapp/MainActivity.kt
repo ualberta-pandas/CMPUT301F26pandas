@@ -26,12 +26,12 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Uncomment to show the admin screens; this replaces the content set above.
-        // setContent {
-        //     CampsiteAppTheme {
-        //         com.example.campsiteapp.view.AdminApp(campsitesDatabase)
-        //     }
-        // }
+//         Uncomment to show the admin screens
+//         setContent {
+//             CampsiteAppTheme {
+//                 com.example.campsiteapp.view.AdminApp(campsitesDatabase)
+//             }
+//         }
     }
 }
 

@@ -58,7 +58,7 @@ fun ScreenScaffold(
 }
 
 /**
- * Grey circle with a white "<", as in the admin mockups.
+ * Grey circle with a white "<" for the back button.
  */
 @Composable
 private fun BackButton(onClick: () -> Unit) {

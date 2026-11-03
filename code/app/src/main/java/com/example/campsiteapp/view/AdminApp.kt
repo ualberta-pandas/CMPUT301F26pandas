@@ -2,7 +2,7 @@
  * Root of the admin screens: the admin menu and navigation between screens.
  *
  * Outstanding issues:
- * - Not reachable yet; see the commented block in MainActivity.
+ * - Still need the way to navigate between entrant/owner/admin for testing.
  * - Browse images and the notification and message logs are not implemented yet.
  */
 package com.example.campsiteapp.view

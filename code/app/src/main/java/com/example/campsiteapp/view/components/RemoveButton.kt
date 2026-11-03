@@ -1,5 +1,5 @@
 /*
- * Red remove button and the confirmation dialog it opens, as in the admin mockups.
+ * Red remove button and the confirmation dialog it opens.
  */
 package com.example.campsiteapp.view.components
 
