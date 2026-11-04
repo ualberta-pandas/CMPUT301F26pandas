@@ -1,7 +1,6 @@
-package com.example.campsiteapp
+package com.example.campsiteapp.data
 
 import androidx.compose.runtime.mutableStateListOf
-import com.example.campsiteapp.data.Campsite
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
@@ -52,10 +51,22 @@ class CampsitesDatabase {
                 "description" to campsite.description,
                 "tags" to campsite.tags,
                 "rules" to campsite.rules,
-                "image" to campsite.image
+                "image" to campsite.image,
+                "price" to campsite.price
             )
 
         )
+    }
+
+    //edit campsites
+
+    fun updateCampsite(oldCampsiteDetails: Campsite, newCampsiteDetails: Campsite){
+        val index = _campsites.indexOf(oldCampsiteDetails)
+
+        if(index != -1){
+            _campsites[index] = newCampsiteDetails
+        }
+
     }
 
 

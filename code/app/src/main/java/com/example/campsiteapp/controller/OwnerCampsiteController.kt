@@ -395,7 +395,7 @@ class OwnerCampsiteController (
                                     occupancy.isBlank() || owner.isBlank() ||
                                     price.isBlank() || mapLocation.isBlank() ||
                                     description.isBlank() || tags.isBlank() ||
-                                    rules.isBlank()
+                                    rules.isBlank() || price.isBlank()
                                 ) {
                                     Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT)
                                         .show()
