@@ -1,24 +1,44 @@
-/*
- * A user profile, stored in the Firestore "profiles" collection.
- *
- * Outstanding issues:
- * - Updating the profile and notification preference is not implemented yet.
- */
-package com.example.campsiteapp.model
+package com.example.campsiteapp
+
+import android.net.Uri
+import androidx.core.net.toUri
+import com.google.firebase.firestore.DocumentId
 
 /**
- * A user of the app, identified by their device ID. Every property has a default
- * so Firestore can create it from a document.
+ * Represents a user’s profile
  *
- * @property deviceId ID of the user's device; also the profile's document ID.
- * @property roles roles the user holds, such as "Entrant", "Owner" or "Admin".
+ * Stores user’s personal information and notification preferences
+ * Profile info can be retrieved and displayed in various formats or contexts
+ *
+ * @property name the name chosen by the user
+ * @property email the email address entered by the user
+ * @property phone the phone number entered by the user
+ * @property profileImage the profile image selected by the user, optional
+ * @property deviceId the user’s unique device identifier, also serves as the document id in the database
+ * @property notificationsEnabled the user’s notification preference. Opt in = true (default), Opt out = false
  */
-data class User(
-    val deviceId: String = "",
-    val name: String = "",
-    val email: String = "",
-    val phone: String = "",
-    val profileImage: String = "",
-    val notificationsEnabled: Boolean = true,
-    val roles: List<String> = emptyList(),
-)
+open class User1 {
+    var name: String = ""
+    var email: String = ""
+    var phone: String = ""
+    var profileImage: String = ""
+    @DocumentId
+    var deviceId = ""
+    var notificationsEnabled: Boolean = true //True is "notifications on", which is default
+    //Currently this is a boolean applying to all notifications, but it could be changed to be a bitfield or something if need be
+
+    /**
+     * Get a Uri from image's string representation
+     *
+     * Returns [profileImage] converted to a Uri if possible
+     *
+     * @return Uri if string is not empty, or null if it is
+     */
+    fun getUri(): Uri? {
+        return if (this.profileImage!=""){
+            this.profileImage.toUri()
+        }else{
+            null
+        }
+    }
+}
