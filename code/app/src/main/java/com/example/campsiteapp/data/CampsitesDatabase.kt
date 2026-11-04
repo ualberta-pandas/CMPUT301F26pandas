@@ -52,7 +52,8 @@ class CampsitesDatabase {
                 "description" to campsite.description,
                 "tags" to campsite.tags,
                 "rules" to campsite.rules,
-                "image" to campsite.image
+                "image" to campsite.image,
+                "price" to campsite.price
             )
 
         )
