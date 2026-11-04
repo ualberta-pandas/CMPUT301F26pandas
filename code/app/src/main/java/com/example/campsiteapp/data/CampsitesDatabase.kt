@@ -57,6 +57,8 @@ class CampsitesDatabase {
         )
     }
 
+    //edit campsites
+
     fun updateCampsite(oldCampsiteDetails: Campsite, newCampsiteDetails: Campsite){
         val index = _campsites.indexOf(oldCampsiteDetails)
 
