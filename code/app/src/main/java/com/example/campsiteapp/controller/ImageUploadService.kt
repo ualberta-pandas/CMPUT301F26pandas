@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.Dispatchers
@@ -45,10 +46,33 @@ class ImageUploadService {
         onImageSelected: (Uri?) -> Unit
     ) {
 
+        val context = LocalContext.current
         val imagePicker = rememberLauncherForActivityResult(
+
             contract = ActivityResultContracts.PickVisualMedia()
         ) { uri ->
-            onImageSelected(uri)
+
+            if (uri != null) {
+                android.util.Log.d("IMAGE_TEST", "URI: $uri")
+
+                try {
+                    val stream = context.contentResolver.openInputStream(uri)
+
+                    if (stream != null) {
+                        android.util.Log.d("IMAGE_TEST", "IMAGE READ SUCCESS")
+                        stream.close()
+                    } else {
+                        android.util.Log.e("IMAGE_TEST", "IMAGE STREAM IS NULL")
+                    }
+
+                } catch (e: Exception) {
+                    android.util.Log.e("IMAGE_TEST", "IMAGE READ FAILED", e)
+                }
+
+                onImageSelected(uri)
+            } else{
+                android.util.Log.d("IMAGE_TEST", "UPLOAD BOX CLICKED")
+            }
         }
 
         Box(
@@ -57,6 +81,7 @@ class ImageUploadService {
                 .height(180.dp)
                 .border(2.dp, Color.Gray, RoundedCornerShape(12.dp))
                 .clickable {
+                    android.util.Log.d("IMAGE_TEST", "UPLOAD BOX CLICKED")
                     imagePicker.launch(
                         PickVisualMediaRequest(
                         ActivityResultContracts.PickVisualMedia.ImageOnly
