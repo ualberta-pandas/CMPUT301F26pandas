@@ -1,3 +1,42 @@
 <resources>
     <string name="app_name">campsiteApp</string>
+
+    <!-- Admin -->
+    <string name="back">Back</string>
+    <string name="close">Close</string>
+    <string name="cancel">Cancel</string>
+    <string name="remove">Remove</string>
+    <string name="admin_title">Admin</string>
+    <string name="browse_campsites">Browse Campsites</string>
+    <string name="browse_profiles">Browse Profiles</string>
+
+    <!-- Campsites -->
+    <string name="campsites_title">Campsites</string>
+    <string name="campsite_image">Campsite image</string>
+    <string name="owned_by">Owned by %1$s</string>
+    <string name="people">%1$s people</string>
+    <string name="label_location">Location</string>
+    <string name="label_map_location">Map Location</string>
+    <string name="label_occupancy">Occupancy</string>
+    <string name="label_owner">Owned by</string>
+    <string name="label_price">Price</string>
+    <string name="label_available_dates">Available Dates</string>
+    <string name="label_description">Description</string>
+    <string name="label_tags">Tags</string>
+    <string name="label_rules">Rules and Cancellation Policy</string>
+    <string name="remove_campsite_title">Remove Campsite</string>
+    <string name="remove_campsite_message">Are you sure you want to remove this campsite listing?</string>
+
+    <!-- Profiles -->
+    <string name="profiles_title">Profiles</string>
+    <string name="view_profile_title">View Profile</string>
+    <string name="profile_image">Profile image</string>
+    <string name="label_email">Email</string>
+    <string name="label_phone">Phone Number</string>
+    <string name="label_notifications">Notifications</string>
+    <string name="notifications_on">Opted in</string>
+    <string name="notifications_off">Opted out</string>
+    <string name="remove_profile_title">Remove Profile</string>
+    <string name="remove_profile_message">Are you sure you want to remove this profile?</string>
+    <string name="remove_owner_message">Are you sure you want to remove this profile? Their %1$d campsite listing(s) will also be removed.</string>
 </resources>
