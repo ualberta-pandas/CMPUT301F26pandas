@@ -1,5 +1,7 @@
 package com.example.campsiteapp
 
+import android.net.Uri
+import androidx.core.net.toUri
 import com.google.firebase.firestore.DocumentId
 
 /**
@@ -25,4 +27,18 @@ open class User {
     var notificationPreference: Boolean = true //True is "notifications on", which is default
     //Currently this is a boolean applying to all notifications, but it could be changed to be a bitfield or something if need be
 
+    /**
+     * Get a Uri from image's string representation
+     *
+     * Returns [userProfileImage] converted to a Uri if possible
+     *
+     * @return Uri if string is not empty, or null if it is
+     */
+    fun getUri(): Uri? {
+        return if (this.userProfileImage!=""){
+            this.userProfileImage.toUri()
+        }else{
+            null
+        }
+    }
 }
