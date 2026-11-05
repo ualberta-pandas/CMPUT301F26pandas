@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Added to automatically generated gitignore:
+/.idea/deploymentTargetSelector.xml
+/.idea/gradle.xml
+/.idea/misc.xml
