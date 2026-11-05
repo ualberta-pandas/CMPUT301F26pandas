@@ -53,6 +53,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation("androidx.compose.material:material-icons-core")
     implementation("com.google.zxing:core:3.5.3")
+    implementation("com.google.maps.android:maps-compose:6.4.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

@@ -164,7 +164,7 @@ class OwnerCampsiteDetailsScreen {
                     var price by remember (selectedCampsiteDetails){
                         mutableStateOf(selectedCampsiteDetails?.price?:"") }
                     var mapLocation by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.mapLocation?:"") }
+                        mutableStateOf(selectedCampsiteDetails?.latitude+','+selectedCampsiteDetails?.longitude) }
                     var availableDates by remember(selectedCampsiteDetails) {
                         mutableStateOf(
                             selectedCampsiteDetails?.startDate+'-'+selectedCampsiteDetails?.endDate) }

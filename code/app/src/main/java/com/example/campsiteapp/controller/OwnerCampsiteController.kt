@@ -67,6 +67,17 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import android.location.Geocoder
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class OwnerCampsiteController (
 
@@ -312,6 +323,31 @@ class OwnerCampsiteController (
 
                     }
 
+
+                    var showMap by remember { mutableStateOf(false) }
+
+                    var longitude by remember { mutableDoubleStateOf(0.0) }
+                    var latitude by remember { mutableDoubleStateOf(0.0) }
+
+
+                    if (showMap) {
+
+                        MapLocationPicker(
+                            onLocationSelected = { lat, long ->
+                                latitude = lat
+                                longitude = long
+                                showMap = false
+                            }
+                        )
+
+                    }
+
+
+
+                    val coordinates = "$latitude,$longitude"
+
+                    mapLocation = coordinates
+
                     Spacer(modifier = Modifier.height(10.dp))
                     Row() {
                         TextField(
@@ -327,9 +363,9 @@ class OwnerCampsiteController (
 
                         Button(
                             onClick = {
-
+                                showMap = true
                             }
-                        ) { Text("Change") }
+                        ) { Text("Choose Location") }
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -433,7 +469,8 @@ class OwnerCampsiteController (
                                                 occupancy = occupancy,
                                                 owner = owner,
                                                 price = price,
-                                                mapLocation = mapLocation,
+                                                latitude = latitude.toString(),
+                                                longitude = longitude.toString(),
                                                 startDate = startDate,
                                                 endDate = endDate,
                                                 description = description,
@@ -584,7 +621,7 @@ class OwnerCampsiteController (
                     var price by remember (selectedCampsiteDetails){
                         mutableStateOf(selectedCampsiteDetails?.price?:"") }
                     var mapLocation by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.mapLocation?:"") }
+                        mutableStateOf("${selectedCampsiteDetails?.latitude}, ${selectedCampsiteDetails?.longitude}") }
                     var availableDates by remember(selectedCampsiteDetails) {
                         mutableStateOf(
                             selectedCampsiteDetails?.startDate+'-'+selectedCampsiteDetails?.endDate) }
@@ -739,6 +776,55 @@ class OwnerCampsiteController (
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    var showMap by remember { mutableStateOf(false) }
+
+                    var longitude by remember(selectedCampsiteDetails) {
+                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble()
+                        ?: 0.0) }
+                    var latitude by remember(selectedCampsiteDetails) {
+                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble() ?:0.0) }
+
+
+                    if (showMap) {
+
+                        MapLocationPicker(
+                            onLocationSelected = { lat, long ->
+                                latitude = lat
+                                longitude = long
+                                showMap = false
+                            }
+                        )
+
+                    }
+
+
+
+                    val coordinates = "$latitude,$longitude"
+
+                    mapLocation = coordinates
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row() {
+                        TextField(
+                            value = mapLocation,
+                            onValueChange = { mapLocation = it },
+                            label = { Text("Map Location") },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        )
+
+                        Button(
+                            onClick = {
+                                showMap = true
+                            }
+                        ) { Text("Choose Location") }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     TextField(
                         value = description,
                         onValueChange = { description = it },
@@ -828,7 +914,8 @@ class OwnerCampsiteController (
                                                selectedCampsiteDetails?.location ?: "",
                                                selectedCampsiteDetails?.occupancy ?: "",
                                                selectedCampsiteDetails?.owner ?: "",
-                                               selectedCampsiteDetails?.mapLocation ?: "",
+                                               selectedCampsiteDetails?.latitude ?: "",
+                                               selectedCampsiteDetails?.longitude?:"",
                                                selectedCampsiteDetails?.price ?: "",
                                                selectedCampsiteDetails?.startDate ?: "",
                                                selectedCampsiteDetails?.endDate ?: "",
@@ -844,7 +931,8 @@ class OwnerCampsiteController (
                                                location = location,
                                                occupancy = occupancy,
                                                owner = owner,
-                                               mapLocation = mapLocation,
+                                               latitude = latitude.toString(),
+                                               longitude = longitude.toString(),
                                                price = price,
                                                startDate = startDate.toString(),
                                                endDate = endDate.toString(),
