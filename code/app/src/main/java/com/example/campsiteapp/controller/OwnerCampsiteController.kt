@@ -186,6 +186,7 @@ class OwnerCampsiteController (
                     var description by remember { mutableStateOf("") }
                     var tags by remember { mutableStateOf("") }
                     var rules by remember { mutableStateOf("") }
+                    var status by remember{mutableStateOf("Available")}
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -418,6 +419,21 @@ class OwnerCampsiteController (
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    TextField(
+                        value = status,
+                        onValueChange = { status = it },
+                        label = { Text("Status") },
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     val context = LocalContext.current
 
                     Row(
@@ -431,7 +447,7 @@ class OwnerCampsiteController (
                                     occupancy.isBlank() || owner.isBlank() ||
                                     price.isBlank() || mapLocation.isBlank() ||
                                     description.isBlank() || tags.isBlank() ||
-                                    rules.isBlank() || price.isBlank()
+                                    rules.isBlank() || price.isBlank() || status.isBlank()
                                 ) {
                                     Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT)
                                         .show()
@@ -476,7 +492,8 @@ class OwnerCampsiteController (
                                                 description = description,
                                                 tags = tags,
                                                 rules = rules,
-                                                image = imageUrl
+                                                image = imageUrl,
+                                                status = status
                                             )
                                         )
 
@@ -660,6 +677,9 @@ class OwnerCampsiteController (
                         mutableStateOf(selectedCampsiteDetails?.tags?:"") }
                     var rules by remember(selectedCampsiteDetails) {
                         mutableStateOf(selectedCampsiteDetails?.rules?:"") }
+                    var status by remember(selectedCampsiteDetails){
+                        mutableStateOf(selectedCampsiteDetails?.status?:"")
+                    }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -740,7 +760,7 @@ class OwnerCampsiteController (
 
                             }
                         ) {
-                            Text("View Dates")
+                            Text("Change Dates")
                         }
 
                         if (showDatePicker) {
@@ -873,6 +893,22 @@ class OwnerCampsiteController (
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    TextField(
+                        value = status,
+                        onValueChange = { status = it },
+                        label = { Text("Status") },
+                        maxLines = 4,
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     val context = LocalContext.current
                     val qrScanScreen = remember { QrScanScreen() }
                     var showQrScanScreen by remember { mutableStateOf(false) }
@@ -889,7 +925,7 @@ class OwnerCampsiteController (
                                     occupancy.isBlank() || owner.isBlank() ||
                                     price.isBlank() || mapLocation.isBlank() ||
                                     description.isBlank() || tags.isBlank() ||
-                                    rules.isBlank()
+                                    rules.isBlank() || status.isBlank()
                                 ) {
                                     Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT)
                                         .show()
@@ -923,6 +959,7 @@ class OwnerCampsiteController (
                                                selectedCampsiteDetails?.tags ?: "",
                                                selectedCampsiteDetails?.rules ?: "",
                                                selectedCampsiteDetails?.image ?: "",
+                                               selectedCampsiteDetails?.status?:""
 
 
                                            ),
@@ -939,10 +976,14 @@ class OwnerCampsiteController (
                                                description = description,
                                                tags = tags,
                                                rules = rules,
-                                               image = imageUrl
+                                               image = imageUrl,
+                                               status = status
 
                                            )
                                        )
+
+                                        Toast.makeText(context, "Successfully Edited", Toast.LENGTH_LONG).show()
+                                        onDismissRequest()
 
 
 

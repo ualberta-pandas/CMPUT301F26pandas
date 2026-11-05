@@ -53,7 +53,8 @@ class CampsitesDatabase {
                 "tags" to campsite.tags,
                 "rules" to campsite.rules,
                 "image" to campsite.image,
-                "price" to campsite.price
+                "price" to campsite.price,
+                "status" to campsite.status
             )
 
         )

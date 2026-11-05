@@ -36,6 +36,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -52,6 +53,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.example.campsiteapp.controller.MapLocationPicker
 import com.example.campsiteapp.controller.OwnerCampsiteController
 import com.example.campsiteapp.data.Campsite
 import kotlinx.coroutines.launch
@@ -203,6 +205,9 @@ class OwnerCampsiteDetailsScreen {
                         mutableStateOf(selectedCampsiteDetails?.tags?:"") }
                     var rules by remember(selectedCampsiteDetails) {
                         mutableStateOf(selectedCampsiteDetails?.rules?:"") }
+                    var status by remember(selectedCampsiteDetails){
+                        mutableStateOf(selectedCampsiteDetails?.status?:"")
+                    }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -324,6 +329,55 @@ class OwnerCampsiteDetailsScreen {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    var showMap by remember { mutableStateOf(false) }
+
+                    var longitude by remember(selectedCampsiteDetails) {
+                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble()
+                            ?: 0.0) }
+                    var latitude by remember(selectedCampsiteDetails) {
+                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble() ?:0.0) }
+
+
+                    if (showMap) {
+
+                        MapLocationPicker(
+                            onLocationSelected = { lat, long ->
+                                latitude = lat
+                                longitude = long
+                                showMap = false
+                            }
+                        )
+
+                    }
+
+
+
+                    val coordinates = "$latitude,$longitude"
+
+                    mapLocation = coordinates
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row() {
+                        TextField(
+                            value = mapLocation,
+                            onValueChange = { mapLocation = it },
+                            label = { Text("Map Location") },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        )
+
+                        Button(
+                            onClick = {
+                                showMap = true
+                            }
+                        ) { Text("Choose Location") }
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     TextField(
                         value = description,
                         onValueChange = { description = it },
@@ -372,6 +426,22 @@ class OwnerCampsiteDetailsScreen {
                             .fillMaxWidth(),
                         readOnly = true
                     )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextField(
+                        value = status,
+                        onValueChange = {status = it},
+                        label = { Text("Status") },
+                        modifier = Modifier.border(
+                            width = 1.dp,
+                            color = Color.Black,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                        ),
+                        readOnly = true
+
+                    )
+
 
                     Spacer(modifier = Modifier.height(10.dp))
 

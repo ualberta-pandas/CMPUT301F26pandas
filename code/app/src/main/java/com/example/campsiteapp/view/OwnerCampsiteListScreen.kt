@@ -111,7 +111,7 @@ class OwnerCampsiteListScreen {
                             )
 
                             Text(
-                                text = "Status",
+                                text = campsite.status,
                                 modifier = Modifier
                                     .background(Color.Green)
                                     .border(
