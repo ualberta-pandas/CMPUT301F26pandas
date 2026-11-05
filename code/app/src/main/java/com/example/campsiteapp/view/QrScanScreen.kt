@@ -10,10 +10,20 @@ import com.example.campsiteapp.controller.QrCodeService
 
 class QrScanScreen {
 
+    /**
+     * This class shows a QR code to show the current selected campsite details
+     */
+
     @Composable
     fun QrScan(
         campsiteId: String
     ) {
+
+        /**
+         * This function uses QrCodeGenerator to generate and show a QR code on the screen
+         *
+         * @param campsiteId is passed to this function to create a Qr code of it's details
+         */
 
         val qrCodeService = QrCodeService()
 

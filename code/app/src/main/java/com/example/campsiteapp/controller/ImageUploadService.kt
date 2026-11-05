@@ -46,6 +46,15 @@ class ImageUploadService {
         onImageSelected: (Uri?) -> Unit
     ) {
 
+        /**
+         * This is used to pick images from the phone when the box is clicked.
+         *
+         *
+         *@param imageUri holds the uri picked and sends it to the classes using this
+         * @param onImageSelected holds the selected image and it's uri
+         *
+         */
+
         val context = LocalContext.current
         val imagePicker = rememberLauncherForActivityResult(
 
@@ -53,25 +62,8 @@ class ImageUploadService {
         ) { uri ->
 
             if (uri != null) {
-                android.util.Log.d("IMAGE_TEST", "URI: $uri")
-
-                try {
-                    val stream = context.contentResolver.openInputStream(uri)
-
-                    if (stream != null) {
-                        android.util.Log.d("IMAGE_TEST", "IMAGE READ SUCCESS")
-                        stream.close()
-                    } else {
-                        android.util.Log.e("IMAGE_TEST", "IMAGE STREAM IS NULL")
-                    }
-
-                } catch (e: Exception) {
-                    android.util.Log.e("IMAGE_TEST", "IMAGE READ FAILED", e)
-                }
 
                 onImageSelected(uri)
-            } else{
-                android.util.Log.d("IMAGE_TEST", "UPLOAD BOX CLICKED")
             }
         }
 
@@ -120,6 +112,15 @@ class ImageUploadService {
         context: Context,
         uri: Uri
     ): String = withContext(Dispatchers.IO) {
+
+        /**
+         * This function is used to upload images to Cloudinary, so we can
+         * store it there for future use.
+         *
+         * @param context is the LocalContext and gives the info available for
+         * this function.
+         * @param uri is the uri of the image that is to uplaoded
+         */
 
         val cloudName = "lgwzmfuq"
         val uploadPreset = "campsite_upload"

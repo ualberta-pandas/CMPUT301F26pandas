@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.campsiteapp.CampsitesDatabase
+import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.R
 import com.example.campsiteapp.controller.CampsiteAdminController
 import com.example.campsiteapp.controller.ProfileAdminController

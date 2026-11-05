@@ -4,7 +4,17 @@ import androidx.compose.runtime.mutableStateListOf
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
+/**
 
+    * This is the database, and it stores and retrieves data from Firestore database
+
+
+    * @property db stores the database
+ * @property campsitesRef stores the campsite collection for future use
+ * @property _campsites is an empty mutable list to store campsites
+ * @property campsites converts _campsites mutable into normal List
+
+ */
 
 class CampsitesDatabase {
 
@@ -15,6 +25,14 @@ class CampsitesDatabase {
     private val _campsites = mutableStateListOf<Campsite>()
 
     init {
+
+
+        /**
+         * This init is used to retrieve the data in the campsite collection
+         * to store it in _campsites mutable list
+         * by looping through all documents in the collection
+         */
+
         campsitesRef.addSnapshotListener { snapshots, error ->
             if (error != null){
                 return@addSnapshotListener
@@ -35,10 +53,20 @@ class CampsitesDatabase {
         }
     }
 
+
+
     val campsites: List<Campsite>
         get() = _campsites
 
     fun addCampsite(campsite: Campsite){
+
+        /**
+         * this function is used by our controller to add campsites into our database
+         * through campsitesRef.
+         * It maps different collection fields to their
+         * corresponding campsite properties
+         */
+
         campsitesRef.add(
             mapOf(
                 "name" to campsite.name,
@@ -52,7 +80,8 @@ class CampsitesDatabase {
                 "tags" to campsite.tags,
                 "rules" to campsite.rules,
                 "image" to campsite.image,
-                "price" to campsite.price
+                "price" to campsite.price,
+                "status" to campsite.status
             )
 
         )
@@ -61,6 +90,18 @@ class CampsitesDatabase {
     //edit campsites
 
     fun updateCampsite(oldCampsiteDetails: Campsite, newCampsiteDetails: Campsite){
+
+        /**
+         * This function is used by our controller to update campsite details.
+         * It retrieves the old campsite index from the _campsites list, then
+         * it replaces it with the new campsite
+         *
+         *
+         * @param oldCampsiteDetails holds old campsite details passed by the controller
+         * @param newCampsiteDetails holds new campsite details passed by the controller
+
+         */
+
         val index = _campsites.indexOf(oldCampsiteDetails)
 
         if(index != -1){

@@ -72,7 +72,10 @@ class OwnerCampsiteController (
 
 ) {
 
-
+    /**
+     * This is our owner campsite controller.
+     * It has register campsite and edit campsite functions
+     */
 
     @Composable
     fun RegisterCampsite(
@@ -82,6 +85,17 @@ class OwnerCampsiteController (
     ) {
 
 
+        /**
+         * This function is used to add new campsites to our database
+         * It takes the owner's input in textfields, image, datepicker and mapLocation
+         * and sends it to addCampsite function in the CampsiteDatabase
+         *
+         * All fields are required to be filled, including uploading image choosing the dates,
+         * and map location.
+         *
+         * @param onAddCampsite - used to send new campsite details to CampsiteDatabase
+         * @param onDismissRequest - handles closing the window
+         */
 
         val scope = rememberCoroutineScope()
         var isUploading by remember { mutableStateOf(false) }
@@ -175,6 +189,7 @@ class OwnerCampsiteController (
                     var description by remember { mutableStateOf("") }
                     var tags by remember { mutableStateOf("") }
                     var rules by remember { mutableStateOf("") }
+                    var status by remember { mutableStateOf("Available") }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -382,6 +397,22 @@ class OwnerCampsiteController (
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+                    TextField(
+                        value = status,
+                        onValueChange = {status=it},
+                        label = { Text("Status") },
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth()
+
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
                     val context = LocalContext.current
 
                     Row(
@@ -395,7 +426,7 @@ class OwnerCampsiteController (
                                     occupancy.isBlank() || owner.isBlank() ||
                                     price.isBlank() || mapLocation.isBlank() ||
                                     description.isBlank() || tags.isBlank() ||
-                                    rules.isBlank() || price.isBlank()
+                                    rules.isBlank() || price.isBlank() || status.isBlank()
                                 ) {
                                     Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT)
                                         .show()
@@ -439,7 +470,8 @@ class OwnerCampsiteController (
                                                 description = description,
                                                 tags = tags,
                                                 rules = rules,
-                                                image = imageUrl
+                                                image = imageUrl,
+                                                status = status
                                             )
                                         )
 
@@ -481,6 +513,18 @@ class OwnerCampsiteController (
         onEditCampsite: (Campsite, Campsite) -> Unit
 
     ){
+
+        /**
+         * This is used to edit existing campsite details which were selected
+         * by owner with the new ones put now.
+         *
+         *
+         * @param onDismissRequest used to close the window
+         * @param selectedCampsiteDetails - the campsite to be edited.
+         * @param onEditCampsite - used to pass old and new campsite details to
+         * the database
+         *
+         */
 
         val scope = rememberCoroutineScope()
         var isUploading by remember { mutableStateOf(false) }
@@ -623,6 +667,9 @@ class OwnerCampsiteController (
                         mutableStateOf(selectedCampsiteDetails?.tags?:"") }
                     var rules by remember(selectedCampsiteDetails) {
                         mutableStateOf(selectedCampsiteDetails?.rules?:"") }
+                    var status by remember (selectedCampsiteDetails){
+                        mutableStateOf(selectedCampsiteDetails?.status?:"")
+                    }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -786,6 +833,23 @@ class OwnerCampsiteController (
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
+
+                    TextField(
+                        value = status,
+                        onValueChange = { status = it },
+                        label = { Text("Status") },
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+
 
                     val context = LocalContext.current
                     val qrScanScreen = remember { QrScanScreen() }

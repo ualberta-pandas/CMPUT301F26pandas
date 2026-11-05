@@ -3,8 +3,8 @@
  */
 package com.example.campsiteapp.controller
 
-import com.example.campsiteapp.CampsiteObject
-import com.example.campsiteapp.CampsitesDatabase
+import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.data.CampsitesDatabase
 
 /**
  * Lets an admin browse and remove campsites.
@@ -13,7 +13,7 @@ import com.example.campsiteapp.CampsitesDatabase
  */
 class CampsiteAdminController(private val campsitesDatabase: CampsitesDatabase) {
     /** All campsites. Updates when the database changes. */
-    val campsites: List<CampsiteObject>
+    val campsites: List<Campsite>
         get() = campsitesDatabase.campsites
 
     /**

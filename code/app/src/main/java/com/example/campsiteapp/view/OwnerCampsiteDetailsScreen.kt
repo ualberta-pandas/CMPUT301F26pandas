@@ -75,6 +75,17 @@ class OwnerCampsiteDetailsScreen {
         onEditCampsite: (Campsite, Campsite) -> Unit
 
     ){
+
+        /**
+         * This shows the details of a campsite selected by the owner.
+         * It clearly shows all data, and allows going to edit, and
+         * qr code pages
+         *
+         * @param selectedCampsiteDetails is the details which we will show it's
+         * details after selecting.
+         * @param onEditCampsite is used by EditCampsite to edit campsites
+         */
+
         Column(
             modifier = Modifier.fillMaxWidth()
 
@@ -203,6 +214,9 @@ class OwnerCampsiteDetailsScreen {
                         mutableStateOf(selectedCampsiteDetails?.tags?:"") }
                     var rules by remember(selectedCampsiteDetails) {
                         mutableStateOf(selectedCampsiteDetails?.rules?:"") }
+                    var status by remember(selectedCampsiteDetails){
+                        mutableStateOf(selectedCampsiteDetails?.status?:"")
+                    }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -363,6 +377,22 @@ class OwnerCampsiteDetailsScreen {
                         onValueChange = { rules = it },
                         maxLines = 3,
                         label = { Text("Rules and terms of use") },
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth(),
+                        readOnly = true
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextField(
+                        value = status,
+                        onValueChange = { status = it },
+                        label = { Text("Status") },
                         modifier = Modifier
                             .border(
                                 width = 1.dp,

@@ -55,6 +55,18 @@ class OwnerCampsiteListScreen {
     ) {
 
 
+        /**
+         * This lists all the owner's campsites' names, occupancies,
+         * locations and availability statuses
+         *
+         * @param campsites this is the list of campsites to be shown
+         * @param onAddCampsite is passed to OwnerCampsiteController to
+         * add new campsites
+         * @param onEditCampsite is passed to CampsiteDetailsScreen and
+         * then to EditCampsite to edit campsites
+         */
+
+
         var showDetails by remember { mutableStateOf(false) }
         var selectedCampsite by remember { mutableStateOf<Campsite?>(null) }
         var showRegistration by remember { mutableStateOf(false) }
@@ -111,7 +123,7 @@ class OwnerCampsiteListScreen {
                             )
 
                             Text(
-                                text = "Status",
+                                text = campsite.status,
                                 modifier = Modifier
                                     .background(Color.Green)
                                     .border(

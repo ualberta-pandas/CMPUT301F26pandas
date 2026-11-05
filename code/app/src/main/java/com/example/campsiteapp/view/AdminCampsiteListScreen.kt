@@ -28,7 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.campsiteapp.CampsiteObject
+import com.example.campsiteapp.data.Campsite
 import com.example.campsiteapp.R
 import com.example.campsiteapp.view.components.ScreenScaffold
 
@@ -41,8 +41,8 @@ import com.example.campsiteapp.view.components.ScreenScaffold
  */
 @Composable
 fun AdminCampsiteListScreen(
-    campsites: List<CampsiteObject>,
-    onRemoveCampsite: (CampsiteObject) -> Unit,
+    campsites: List<Campsite>,
+    onRemoveCampsite: (Campsite) -> Unit,
     onBack: () -> Unit,
 ) {
     var selectedId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -71,7 +71,7 @@ fun AdminCampsiteListScreen(
 }
 
 @Composable
-private fun CampsiteRow(campsite: CampsiteObject, onClick: () -> Unit) {
+private fun CampsiteRow(campsite: Campsite, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
