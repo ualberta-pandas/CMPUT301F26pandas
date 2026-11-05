@@ -1,0 +1,216 @@
+package com.example.campsiteapp.view
+
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import coil.compose.AsyncImage
+import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.controller.OwnerCampsiteController
+
+class OwnerCampsiteListScreen {
+
+    val ownerController = OwnerCampsiteController()
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun CampsitesList(
+
+        campsites: List<Campsite>,
+        onAddCampsite: (Campsite) -> Unit,
+        onEditCampsite: (Campsite, Campsite) -> Unit
+
+    ) {
+
+
+        /**
+         * This lists all the owner's campsites' names, occupancies,
+         * locations and availability statuses
+         *
+         * @param campsites this is the list of campsites to be shown
+         * @param onAddCampsite is passed to OwnerCampsiteController to
+         * add new campsites
+         * @param onEditCampsite is passed to CampsiteDetailsScreen and
+         * then to EditCampsite to edit campsites
+         */
+
+
+        var showDetails by remember { mutableStateOf(false) }
+        var selectedCampsite by remember { mutableStateOf<Campsite?>(null) }
+        var showRegistration by remember { mutableStateOf(false) }
+
+        val ownerDetailsScreen = OwnerCampsiteDetailsScreen()
+
+
+        Column() {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(0.8f)
+
+            ) {
+                itemsIndexed(campsites) { index, campsite ->
+                    Spacer(modifier = Modifier.height(30.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                            .border(
+                                width = 2.dp,
+                                shape = RoundedCornerShape(12.dp),
+                                color = Color.Black
+                            )
+                            .padding(vertical = 20.dp)
+                            .combinedClickable(
+                                onDoubleClick = {
+
+                                    selectedCampsite = campsite
+                                    showDetails = true
+
+                                      },
+                                onClick = {}
+                            ),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+
+                        Column(
+                            modifier = Modifier.padding(10.dp)
+                        ) {
+                            Text(
+                                text = campsite.name,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Text(
+                                text = campsite.location
+                            )
+
+                            Text(
+                                text = campsite.occupancy,
+                                fontWeight = FontWeight.Bold
+                            )
+
+                            Text(
+                                text = campsite.status,
+                                modifier = Modifier
+                                    .background(Color.Green)
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color.Green,
+                                        shape = RoundedCornerShape(size = 20.dp)
+                                    )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(80.dp))
+
+                        val url = campsite.image
+                        Column() {
+                            AsyncImage(
+                                model = url,
+                                contentDescription = "Campsite image",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+                        if (index < campsites.lastIndex) {
+                            HorizontalDivider()
+                        }
+
+
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                FloatingActionButton(
+                    onClick = {
+                        showRegistration = true
+
+                    }
+                ) { Text(text = "+", fontSize = 20.sp) }
+            }
+
+            if (showRegistration){
+                Dialog(
+                    onDismissRequest = {showRegistration = false},
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    )
+                ) {
+                    ownerController.RegisterCampsite(
+                        onDismissRequest = { showRegistration = false },
+                        onAddCampsite = onAddCampsite
+                    )
+                }
+            }
+
+            if (showDetails && selectedCampsite != null) {
+                Dialog(
+                    onDismissRequest = { showDetails = false },
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    )
+                ) {
+                   ownerDetailsScreen.CampsiteDetailsScreen(
+
+                       selectedCampsiteDetails = selectedCampsite,
+                       onEditCampsite = onEditCampsite,
+
+
+                       onDismissRequest = {
+                           showDetails = false
+                           selectedCampsite = null
+                       }
+                   )
+
+
+                }
+            }
+
+        }
+
+
+    }
+
+}

@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-
+    id("org.jetbrains.dokka") version "2.2.0"
     id("com.google.gms.google-services")
 }
 
@@ -51,6 +51,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:35.1.0"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
+    implementation("androidx.compose.material:material-icons-core")
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("com.google.maps.android:maps-compose:6.4.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -58,5 +62,4 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation("androidx.navigation:navigation-compose:2.9.8")
 }
