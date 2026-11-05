@@ -17,7 +17,7 @@ import com.google.firebase.firestore.DocumentId
  * @property deviceId the user’s unique device identifier, also serves as the document id in the database
  * @property notificationsEnabled the user’s notification preference. Opt in = true (default), Opt out = false
  */
-open class User1 {
+open class User {
     var name: String = ""
     var email: String = ""
     var phone: String = ""

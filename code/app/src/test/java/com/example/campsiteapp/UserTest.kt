@@ -22,85 +22,85 @@ class UserTest{
 
     @Test
     fun getUserName() {
-        assert(testUser1.userName=="")
-        val userName=testUser1.userName
+        assert(testUser1.name=="")
+        val userName=testUser1.name
         assert(userName=="")
     }
 
     @Test
     fun setUserName() {
-        assert(testUser1.userName=="")
-        testUser1.userName="Test"
-        assert(testUser1.userName=="Test")
+        assert(testUser1.name=="")
+        testUser1.name="Test"
+        assert(testUser1.name=="Test")
     }
 
     @Test
     fun getUserEmail() {
-        assert(testUser1.userEmail=="")
-        val userEmail=testUser1.userEmail
+        assert(testUser1.email=="")
+        val userEmail=testUser1.email
         assert(userEmail=="")
     }
 
     @Test
     fun setUserEmail() {
-        assert(testUser1.userEmail=="")
-        testUser1.userEmail="Test"
-        assert(testUser1.userEmail=="Test")
+        assert(testUser1.email=="")
+        testUser1.email="Test"
+        assert(testUser1.email=="Test")
     }
 
     @Test
     fun getUserPhoneNumber() {
-        assert(testUser1.userPhoneNumber=="")
-        val userPhoneNumber=testUser1.userPhoneNumber
+        assert(testUser1.phone=="")
+        val userPhoneNumber=testUser1.phone
         assert(userPhoneNumber=="")
     }
 
     @Test
     fun setUserPhoneNumber() {
-        assert(testUser1.userPhoneNumber=="")
-        testUser1.userPhoneNumber="Test"
-        assert(testUser1.userPhoneNumber=="Test")
+        assert(testUser1.phone=="")
+        testUser1.phone="Test"
+        assert(testUser1.phone=="Test")
     }
 
     @Test
     fun getUserProfileImage() {
-        assert(testUser1.userProfileImage=="")
-        val userProfileImage=testUser1.userProfileImage
+        assert(testUser1.profileImage=="")
+        val userProfileImage=testUser1.profileImage
         assert(userProfileImage=="")
     }
 
     @Test
     fun setUserProfileImage() {
-        assert(testUser1.userProfileImage=="")
-        testUser1.userProfileImage="Test"
-        assert(testUser1.userProfileImage=="Test")
+        assert(testUser1.profileImage=="")
+        testUser1.profileImage="Test"
+        assert(testUser1.profileImage=="Test")
     }
 
     @Test
     fun getUserDeviceId() {
-        assert(testUser1.userDeviceId=="")
-        val userDeviceId=testUser1.userDeviceId
+        assert(testUser1.deviceId=="")
+        val userDeviceId=testUser1.deviceId
         assert(userDeviceId=="")
     }
 
     @Test
     fun setUserDeviceId() {
-        assert(testUser1.userDeviceId=="")
-        testUser1.userDeviceId="Test"
-        assert(testUser1.userDeviceId=="Test")
+        assert(testUser1.deviceId=="")
+        testUser1.deviceId="Test"
+        assert(testUser1.deviceId=="Test")
     }
 
     @Test
     fun getNotificationPreference() {
-        assert(testUser1.notificationPreference)
-        val notificationPreference=testUser1.notificationPreference
+        assert(testUser1.notificationsEnabled)
+        val notificationPreference=testUser1.notificationsEnabled
         assert(notificationPreference)
     }
 
     @Test
     fun setNotificationPreference() {
-        assert(testUser1.notificationPreference)
-        testUser1.notificationPreference=false
-        assert(!testUser1.notificationPreference)
+        assert(testUser1.notificationsEnabled)
+        testUser1.notificationsEnabled=false
+        assert(!testUser1.notificationsEnabled)
     }
 }

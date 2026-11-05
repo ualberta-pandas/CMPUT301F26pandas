@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.campsiteapp.R
-import com.example.campsiteapp.model.User
+import com.example.campsiteapp.User
 import com.example.campsiteapp.view.components.LabelledField
 import com.example.campsiteapp.view.components.RemoveButton
 import com.example.campsiteapp.view.components.ScreenScaffold

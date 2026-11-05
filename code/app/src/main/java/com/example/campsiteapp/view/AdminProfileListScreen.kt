@@ -13,12 +13,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.R
-import com.example.campsiteapp.model.User
+import com.example.campsiteapp.User
 import com.example.campsiteapp.view.components.ScreenScaffold
 
 /**
@@ -40,7 +39,6 @@ fun AdminProfileListScreen(profiles: List<User>, onProfileClick: (User) -> Unit,
                         .padding(16.dp),
                 ) {
                     Text(profile.name, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                    Text(profile.roles.joinToString(", "), color = Color.Gray)
                 }
                 HorizontalDivider()
             }
