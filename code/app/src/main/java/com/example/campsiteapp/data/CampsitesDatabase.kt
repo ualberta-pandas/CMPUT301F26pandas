@@ -1,6 +1,7 @@
 package com.example.campsiteapp.data
 
 import androidx.compose.runtime.mutableStateListOf
+import com.example.campsiteapp.model.Campsite
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
@@ -76,7 +77,7 @@ class CampsitesDatabase {
                 "latitude" to campsite.latitude,
                 "longitude" to campsite.longitude,
                 "startDate" to campsite.startDate,
-                "endDate" to campsite.startDate,
+                "endDate" to campsite.endDate,
                 "description" to campsite.description,
                 "tags" to campsite.tags,
                 "rules" to campsite.rules,
