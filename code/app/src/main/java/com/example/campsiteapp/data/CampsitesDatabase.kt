@@ -76,7 +76,7 @@ class CampsitesDatabase {
                 "latitude" to campsite.latitude,
                 "longitude" to campsite.longitude,
                 "startDate" to campsite.startDate,
-                "endDate" to campsite.startDate,
+                "endDate" to campsite.endDate,
                 "description" to campsite.description,
                 "tags" to campsite.tags,
                 "rules" to campsite.rules,
@@ -103,11 +103,33 @@ class CampsitesDatabase {
 
          */
 
+        // The edit form doesn't set an id, so keep the old one.
+        val updatedCampsite = newCampsiteDetails.copy(id = oldCampsiteDetails.id)
+
         val index = _campsites.indexOf(oldCampsiteDetails)
 
         if(index != -1){
-            _campsites[index] = newCampsiteDetails
+            _campsites[index] = updatedCampsite
         }
+
+        campsitesRef.document(updatedCampsite.id).set(
+            mapOf(
+                "name" to updatedCampsite.name,
+                "location" to updatedCampsite.location,
+                "occupancy" to updatedCampsite.occupancy,
+                "owner" to updatedCampsite.owner,
+                "latitude" to updatedCampsite.latitude,
+                "longitude" to updatedCampsite.longitude,
+                "startDate" to updatedCampsite.startDate,
+                "endDate" to updatedCampsite.endDate,
+                "description" to updatedCampsite.description,
+                "tags" to updatedCampsite.tags,
+                "rules" to updatedCampsite.rules,
+                "image" to updatedCampsite.image,
+                "price" to updatedCampsite.price,
+                "status" to updatedCampsite.status
+            )
+        )
 
     }
 
