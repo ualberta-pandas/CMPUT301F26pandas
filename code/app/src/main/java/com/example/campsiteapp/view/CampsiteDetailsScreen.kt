@@ -50,8 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
-import com.example.campsiteapp.data.Campsite
-import com.example.campsiteapp.data.Lottery
+import com.example.campsiteapp.model.Campsite
+import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
 import com.example.campsiteapp.controller.EntrantWaitlistController.addEntrantToWaitlist
@@ -283,6 +283,7 @@ fun CampsiteView(
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun CampsiteDetailsScreenPreview() {
@@ -327,3 +328,5 @@ fun CampsiteDetailsScreenPreview() {
         )
     }
 }
+
+ */

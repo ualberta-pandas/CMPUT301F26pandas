@@ -2,9 +2,9 @@ package com.example.campsiteapp.controller
 
 import android.content.Context
 import android.content.Intent
-import com.example.campsiteapp.data.Lottery
+import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.data.Reservation
-import com.example.campsiteapp.model.LotteryDatabase
+import com.example.campsiteapp.data.LotteryDatabase
 import com.example.campsiteapp.model.ReservationDatabase
 
 import com.example.campsiteapp.view.CampsiteDetailsScreen

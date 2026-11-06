@@ -43,10 +43,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
-import com.example.campsiteapp.data.Lottery
+import com.example.campsiteapp.model.Lottery
 
 import com.example.campsiteapp.controller.EntrantCampsiteController
 
@@ -192,6 +192,7 @@ fun CampsiteListView(
     }
 }
 
+/*
 // Just generated random values using Claude for the preview as I'm developing
 @Preview(showBackground = true)
 @Composable
@@ -278,6 +279,7 @@ fun CampsiteListViewPreview() {
         )
     }
 }
+*/
 /*
 Prompts to
 okay, I know that if you change something in a list, when there's a lazy_column that's relying on it, its going to recompose because of

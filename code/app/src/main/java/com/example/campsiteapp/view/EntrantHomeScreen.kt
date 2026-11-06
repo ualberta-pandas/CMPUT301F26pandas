@@ -52,9 +52,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campsiteapp.controller.EntrantCampsiteController
-import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.data.DeviceIDs
-import com.example.campsiteapp.data.Lottery
+import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
 private val pill = RoundedCornerShape(50)
@@ -79,7 +79,9 @@ class EntrantHomeScreen : ComponentActivity() {
                         },
                         deviceId = deviceId,
 
-                        openProfileScreen = {},
+                        openProfileScreen = {
+
+                        },
 
                         openOwnerScreen = {},
 
@@ -229,7 +231,7 @@ fun EntrantHomeScreenView(
                             fontSize = 12.sp, lineHeight = 10.sp)
                         Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
 
-                        val status: Pair<String, Color> = Pair("Booked - Cancel Before ${reservation.campsite.startDate}", Color(0xFFB5C7BE))
+                        val status: Pair<String, Color> = Pair("Booked - Cancel Before ${campsite.startDate}", Color(0xFFB5C7BE))
                         Text(
                             text = status.first,
                             color = Color.Black,
@@ -253,7 +255,7 @@ fun EntrantHomeScreenView(
         displayCampsitesAsCards(modifier, EntrantCampsiteController.getLotteriesById(deviceId),
             {}, getTextAttributes = { lottery ->
                 if (lottery.winner == deviceId) {
-                    Pair("Campsite won - respond before ${lottery.acceptDeadline}", Color(0xFFE6DDB0))
+                    Pair("Campsite won - respond before ${lottery.bookingEndDate}", Color(0xFFE6DDB0))
                 } else {
                     Pair("Entered in lottery", Color(0xFFD9D9D9))
                 }

@@ -8,8 +8,9 @@ import com.example.campsiteapp.controller.EntrantWaitlistController
 
 import com.example.campsiteapp.view.EntrantHomeScreen
 import com.example.campsiteapp.data.DeviceIDs
-
-
+import com.example.campsiteapp.data.LotteryDatabase
+import com.example.campsiteapp.model.Campsite
+import com.example.campsiteapp.model.Lottery
 
 
 class MainActivity : ComponentActivity() {
@@ -23,6 +24,4 @@ class MainActivity : ComponentActivity() {
         startActivity(Intent(this, EntrantHomeScreen::class.java))
         finish()
     }
-
-
 }
