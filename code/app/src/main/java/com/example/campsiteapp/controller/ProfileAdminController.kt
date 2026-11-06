@@ -10,8 +10,8 @@
 package com.example.campsiteapp.controller
 
 import androidx.compose.runtime.mutableStateListOf
-import com.example.campsiteapp.CampsiteObject
-import com.example.campsiteapp.CampsitesDatabase
+import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -34,7 +34,7 @@ class ProfileAdminController(private val campsitesDatabase: CampsitesDatabase) {
             if (error != null) return@addSnapshotListener
             _profiles.clear()
             snapshots?.documents?.forEach { document ->
-                document.toObject(User::class.java)?.let { _profiles.add(it.copy(deviceId = document.id)) }
+                document.toObject(User::class.java)?.let { _profiles.add(it) }
             }
         }
     }
@@ -42,7 +42,7 @@ class ProfileAdminController(private val campsitesDatabase: CampsitesDatabase) {
     /**
      * Returns the campsites owned by the user with [deviceId].
      */
-    fun campsitesOwnedBy(deviceId: String): List<CampsiteObject> =
+    fun campsitesOwnedBy(deviceId: String): List<Campsite> =
         campsitesDatabase.campsites.filter { it.owner == deviceId }
 
     /**
