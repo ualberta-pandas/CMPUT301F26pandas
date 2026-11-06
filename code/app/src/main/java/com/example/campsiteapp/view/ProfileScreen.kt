@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.campsiteapp.controller.ProfileDatabase
+import com.example.campsiteapp.data.DeviceIDs
 import kotlinx.coroutines.launch
 import com.example.campsiteapp.model.User
 import com.example.campsiteapp.model.ImageUploadService
@@ -142,8 +143,10 @@ fun ProfileScreen(
         ImageUploadService()
     }
 
+    val context = LocalContext.current
     suspend {
-        //deviceId = DeviceIDs().fetchDeviceId()?:DeviceIds().registerDeviceId()
+        val deviceIds = DeviceIDs(context)
+        deviceId = deviceIds.fetchDeviceId()?:deviceIds.registerDeviceId()
     }
     //State and related variables must be determined inside LaunchedEffect so they are decided before rendering something other than LOADING screen
     LaunchedEffect(key1 = deviceId) {
