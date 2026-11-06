@@ -85,7 +85,7 @@ private fun CampsiteRow(campsite: Campsite, onClick: () -> Unit) {
             Text(campsite.name, fontWeight = FontWeight.Bold)
             Text(campsite.location, color = Color.Gray)
             Text(stringResource(R.string.owned_by, campsite.owner))
-            Text(stringResource(R.string.people, campsite.occupancy))
+            Text(stringResource(R.string.people, campsite.occupancy.toInt().toString()))
         }
         AsyncImage(
             model = campsite.image,
