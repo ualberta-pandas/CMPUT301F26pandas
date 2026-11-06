@@ -1,4 +1,4 @@
-package com.example.campsiteapp.data
+package com.example.campsiteapp.model
 
 data class Campsite(
     val id: String = "",

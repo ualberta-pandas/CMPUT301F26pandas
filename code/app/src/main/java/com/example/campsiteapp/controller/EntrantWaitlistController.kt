@@ -1,6 +1,6 @@
 package com.example.campsiteapp.controller
 
-import com.example.campsiteapp.data.Lottery
+import com.example.campsiteapp.model.Lottery
 
 object EntrantWaitlistController {
     /**
