@@ -1,10 +1,12 @@
 package com.example.campsiteapp.model
 
+
+
 data class Campsite(
     val id: String = "",
     var name: String = "",
     var location: String = "",
-    var occupancy: Double = 0.0,
+    var occupancy: Int = 0,
     var owner: String = "",
     val latitude: String = "",
     val longitude: String = "",

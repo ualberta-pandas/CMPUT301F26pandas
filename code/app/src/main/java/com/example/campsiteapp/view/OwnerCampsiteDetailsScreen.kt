@@ -44,12 +44,19 @@ import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.campsiteapp.controller.MapLocationPicker
 import com.example.campsiteapp.controller.OwnerCampsiteController
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import com.example.campsiteapp.model.Campsite
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
-/*
 class OwnerCampsiteDetailsScreen {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -140,18 +147,27 @@ class OwnerCampsiteDetailsScreen {
                         Column(
                             modifier = Modifier.width(200.dp).height(200.dp)
                         ) {
-                            MapLocationPicker(
-                                onLocationSelected = { lat, long ->
-                                    latitude = lat
-                                    longitude = long
-                                }
-                            )
+                            val location = LatLng(selectedCampsiteDetails?.latitude?.toDouble() ?: 0.0, selectedCampsiteDetails?.longitude?.toDouble()?:0.0)
+
+                            val cameraPositionState = rememberCameraPositionState {
+                                position = CameraPosition.fromLatLngZoom(location, 15f)
+                            }
+
+                            GoogleMap(
+                                modifier = Modifier.fillMaxSize(),
+                                cameraPositionState = cameraPositionState
+                            ) {
+                                Marker(
+                                    state = rememberMarkerState(position = location),
+                                    title = "Campsite Location"
+                                )
+                            }
                         }
 
 
                         Column() {
                             AsyncImage(
-                                model = selectedCampsiteDetails?.image,
+                                model = selectedCampsiteDetails?.image?:"Campsite Image",
                                 contentDescription = "Edit",
                                 modifier = Modifier
                                     .width(200.dp)
@@ -235,7 +251,7 @@ class OwnerCampsiteDetailsScreen {
                         )
 
                         TextField(
-                            value = occupancy,
+                            value = occupancy.toString(),
                             onValueChange = { occupancy = it },
                             label = { Text("Occupancy") },
                             modifier = Modifier.border(
@@ -522,5 +538,3 @@ class OwnerCampsiteDetailsScreen {
     }
 
 }
-
- */

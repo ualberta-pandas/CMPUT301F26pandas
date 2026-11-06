@@ -1,16 +1,10 @@
 package com.example.campsiteapp.controller
 
-import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,11 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudUpload
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePickerDialog
@@ -52,13 +42,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.QrScanScreen
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.io.DataOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -83,7 +67,7 @@ class OwnerCampsiteController (
 
 ) {
 
-/*
+
 
     @Composable
     fun RegisterCampsite(
@@ -507,7 +491,7 @@ class OwnerCampsiteController (
                                             Campsite(
                                                 name = campName,
                                                 location = location,
-                                                occupancy = occupancy,
+                                                occupancy = occupancy.toInt(),
                                                 owner = owner,
                                                 price = price,
                                                 latitude = latitude.toString(),
@@ -722,7 +706,7 @@ class OwnerCampsiteController (
                         )
 
                         TextField(
-                            value = occupancy,
+                            value = occupancy.toString(),
                             onValueChange = { occupancy = it },
                             label = { Text("Occupancy") },
                             modifier = Modifier.border(
@@ -947,7 +931,7 @@ class OwnerCampsiteController (
                             onClick = {
 
                                 if (campName.isBlank() || location.isBlank() ||
-                                    occupancy.isBlank() || owner.isBlank() ||
+                                    occupancy == "" || owner.isBlank() ||
                                     price.isBlank() || mapLocation.isBlank() ||
                                     description.isBlank() || tags.isBlank() ||
                                     rules.isBlank() || status.isBlank()
@@ -973,7 +957,7 @@ class OwnerCampsiteController (
                                                selectedCampsiteDetails?.id ?: "",
                                                selectedCampsiteDetails?.name ?: "",
                                                selectedCampsiteDetails?.location ?: "",
-                                               selectedCampsiteDetails?.occupancy ?: "",
+                                               selectedCampsiteDetails?.occupancy ?: 0,
                                                selectedCampsiteDetails?.owner ?: "",
                                                selectedCampsiteDetails?.latitude ?: "",
                                                selectedCampsiteDetails?.longitude?:"",
@@ -991,7 +975,7 @@ class OwnerCampsiteController (
                                            Campsite(
                                                name = campName,
                                                location = location,
-                                               occupancy = occupancy,
+                                               occupancy = occupancy as Int,
                                                owner = owner,
                                                latitude = latitude.toString(),
                                                longitude = longitude.toString(),
@@ -1041,6 +1025,5 @@ class OwnerCampsiteController (
 
             }}
     }
-*/
-}
 
+        }
