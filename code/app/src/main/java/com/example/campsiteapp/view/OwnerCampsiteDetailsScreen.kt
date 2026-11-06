@@ -118,7 +118,7 @@ class OwnerCampsiteDetailsScreen {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                            Text("${selectedCampsiteDetails?.name} Details Screen")
+                        Text("${selectedCampsiteDetails?.name} Details Screen")
 
                     }
 
@@ -236,7 +236,7 @@ class OwnerCampsiteDetailsScreen {
                         )?.toInstant()?.toEpochMilli(),
 
 
-                    )
+                        )
 
 
                     var description by remember(selectedCampsiteDetails)
@@ -462,7 +462,7 @@ class OwnerCampsiteDetailsScreen {
                         Button(
                             onClick = {
 
-                              showQrScanScreen = true
+                                showQrScanScreen = true
                             }
 
                         ) {
@@ -521,7 +521,7 @@ class OwnerCampsiteDetailsScreen {
                         if (showEdit && selectedCampsiteDetails != null){
                             Dialog(
                                 onDismissRequest = {showEdit = false
-                                                   },
+                                },
                                 properties = DialogProperties(
                                     usePlatformDefaultWidth = false
                                 )

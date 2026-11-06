@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -36,8 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
-import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.controller.OwnerCampsiteController
+import com.example.campsiteapp.model.Campsite
 
 class OwnerCampsiteListScreen {
 
@@ -59,7 +60,7 @@ class OwnerCampsiteListScreen {
         var selectedCampsite by remember { mutableStateOf<Campsite?>(null) }
         var showRegistration by remember { mutableStateOf(false) }
 
-        val ownerDetailsScreen = OwnerCampsiteDetailsScreen()
+
 
 
         Column() {
@@ -184,7 +185,7 @@ class OwnerCampsiteListScreen {
                         usePlatformDefaultWidth = false
                     )
                 ) {
-                    ownerDetailsScreen.CampsiteDetailsScreen(
+                   OwnerCampsiteDetailsScreen().CampsiteDetailsScreen(
 
                         selectedCampsiteDetails = selectedCampsite,
                         onEditCampsite = onEditCampsite,

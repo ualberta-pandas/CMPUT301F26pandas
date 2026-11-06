@@ -133,7 +133,7 @@ class OwnerCampsiteController (
                     imageUploadService.ImagePicker(
                         imageUri = imageUri,
                         onImageSelected = {
-                            uri ->
+                                uri ->
                             imageUri = uri
                         }
                     )
@@ -814,7 +814,7 @@ class OwnerCampsiteController (
 
                     var longitude by remember(selectedCampsiteDetails) {
                         mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble()
-                        ?: 0.0) }
+                            ?: 0.0) }
                     var latitude by remember(selectedCampsiteDetails) {
                         mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble() ?:0.0) }
 
@@ -957,59 +957,59 @@ class OwnerCampsiteController (
                                             imageUploadService.uploadImage(context, imageUri!!)
                                         }
 
-                                       onEditCampsite(
-                                           Campsite(
-                                               selectedCampsiteDetails?.id ?: "",
-                                               selectedCampsiteDetails?.name ?: "",
-                                               selectedCampsiteDetails?.location ?: "",
-                                               selectedCampsiteDetails?.occupancy ?: 0.0,
-                                               selectedCampsiteDetails?.owner ?: "",
-                                               selectedCampsiteDetails?.latitude ?: "",
-                                               selectedCampsiteDetails?.longitude?:"",
-                                               selectedCampsiteDetails?.price ?: "",
-                                               selectedCampsiteDetails?.startDate ?: "",
-                                               selectedCampsiteDetails?.endDate ?: "",
-                                               selectedCampsiteDetails?.description ?: "",
-                                               selectedCampsiteDetails?.tags ?: "",
-                                               selectedCampsiteDetails?.rules ?: "",
-                                               selectedCampsiteDetails?.image ?: "",
-                                               selectedCampsiteDetails?.status?:""
+                                        onEditCampsite(
+                                            Campsite(
+                                                selectedCampsiteDetails?.id ?: "",
+                                                selectedCampsiteDetails?.name ?: "",
+                                                selectedCampsiteDetails?.location ?: "",
+                                                selectedCampsiteDetails?.occupancy ?: 0.0,
+                                                selectedCampsiteDetails?.owner ?: "",
+                                                selectedCampsiteDetails?.latitude ?: "",
+                                                selectedCampsiteDetails?.longitude?:"",
+                                                selectedCampsiteDetails?.price ?: "",
+                                                selectedCampsiteDetails?.startDate ?: "",
+                                                selectedCampsiteDetails?.endDate ?: "",
+                                                selectedCampsiteDetails?.description ?: "",
+                                                selectedCampsiteDetails?.tags ?: "",
+                                                selectedCampsiteDetails?.rules ?: "",
+                                                selectedCampsiteDetails?.image ?: "",
+                                                selectedCampsiteDetails?.status?:""
 
 
-                                           ),
-                                           Campsite(
-                                               name = campName,
-                                               location = location,
-                                               occupancy = occupancy as Double,
-                                               owner = owner,
-                                               latitude = latitude.toString(),
-                                               longitude = longitude.toString(),
-                                               price = price,
-                                               startDate = startDate,
-                                               endDate = endDate,
-                                               description = description,
-                                               tags = tags,
-                                               rules = rules,
-                                               image = imageUrl,
-                                               status = status
+                                            ),
+                                            Campsite(
+                                                name = campName,
+                                                location = location,
+                                                occupancy = occupancy as Double,
+                                                owner = owner,
+                                                latitude = latitude.toString(),
+                                                longitude = longitude.toString(),
+                                                price = price,
+                                                startDate = startDate.toString(),
+                                                endDate = endDate.toString(),
+                                                description = description,
+                                                tags = tags,
+                                                rules = rules,
+                                                image = imageUrl,
+                                                status = status
 
-                                           )
-                                       )
+                                            )
+                                        )
 
                                         Toast.makeText(context, "Successfully Edited", Toast.LENGTH_LONG).show()
                                         onDismissRequest()
 
 
 
-                                } catch (e: Exception) {
-                                Toast.makeText(
-                                    context,
-                                    "Upload failed: ${e.message}",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            } finally {
-                                isUploading = false
-                            }
+                                    } catch (e: Exception) {
+                                        Toast.makeText(
+                                            context,
+                                            "Upload failed: ${e.message}",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    } finally {
+                                        isUploading = false
+                                    }
                                 }
 
 
@@ -1031,4 +1031,4 @@ class OwnerCampsiteController (
             }}
     }
 
-        }
+}

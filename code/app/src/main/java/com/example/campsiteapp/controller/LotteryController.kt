@@ -3,7 +3,7 @@ package com.example.campsiteapp.controller
 import com.example.campsiteapp.data.LotteryStorage
 import com.example.campsiteapp.model.Lottery
 
-/*
+
 
 /**
  * Creates and updates lottery from the details an owner enters
@@ -53,17 +53,19 @@ class LotteryController(private val storage: LotteryStorage) {
         /**
          * Checks a lottery before it is saved to the database
          *
+         * Dates are compared as TEXT, which only works for YYYY-MM-DD
+         *
          * Must have: a campsite, both date ranges set and in order, lottery must
          * close before booking period begins,
          */
         fun validate(lottery: Lottery): String? = when {
             lottery.campsiteIds.isEmpty() ->
                 "Select at least one campsite"
-            lottery.bookingStartDate == 0L || lottery.bookingEndDate == 0L ->
+            lottery.bookingStartDate.isBlank()|| lottery.bookingEndDate.isBlank() ->
                 "Choose the booking period"
             lottery.bookingEndDate < lottery.bookingStartDate ->
                 "Booking period must end after it starts"
-            lottery.lotteryStartDate == 0L || lottery.lotteryEndDate == 0L ->
+            lottery.lotteryStartDate.isBlank() || lottery.lotteryEndDate.isBlank() ->
                 "Choose the lottery period"
             lottery.lotteryEndDate < lottery.lotteryStartDate ->
                 "Lottery period must end after it starts"
@@ -77,5 +79,3 @@ class LotteryController(private val storage: LotteryStorage) {
         }
     }
 }
-
- */

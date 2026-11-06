@@ -7,24 +7,17 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import com.example.campsiteapp.data.LotteryStorage
+import com.example.campsiteapp.model.Lottery
 import org.junit.Assert.assertEquals
 
 class LotteryControllerTest {
-
-    // Epoch millis at UTC midnight, matching what the date range picker returns.
-    private fun date(year: Int, month: Int, day: Int): Long =
-        LocalDate.of(year, month, day)
-            .atStartOfDay(ZoneOffset.UTC)
-            .toInstant()
-            .toEpochMilli()
-
     // Registration Nov 10-20, 2026; booking period Dec 1-5, 2026
     private val validLottery = Lottery(
         campsiteIds = listOf("campsiteA"),
-        lotteryStartDate = date(2026, 11, 10),
-        lotteryEndDate = date(2026, 11, 20),
-        bookingStartDate = date(2026, 12, 1),
-        bookingEndDate = date(2026, 12, 5),
+        lotteryStartDate = "2026-11-10",
+        lotteryEndDate = "2026-11-20",
+        bookingStartDate = "2026-12-01",
+        bookingEndDate = "2026-12-05",
         numWinners = 2,
         waitlistMax = 5
     )
@@ -41,22 +34,22 @@ class LotteryControllerTest {
 
     @Test
     fun validate_bookingEndsBeforeItStarts_returnsError() {
-        assertNotNull(LotteryController.validate(validLottery.copy(bookingEndDate = date(2026, 11, 30))))
+        assertNotNull(LotteryController.validate(validLottery.copy(bookingEndDate = "2026-11-30")))
     }
 
     @Test
     fun validate_registrationEndsBeforeItStarts_returnsError() {
-        assertNotNull(LotteryController.validate(validLottery.copy(lotteryEndDate = date(2026, 11, 9))))
+        assertNotNull(LotteryController.validate(validLottery.copy(lotteryEndDate = "2026-11-09")))
     }
 
     @Test
     fun validate_registrationClosesAfterBookingStarts_returnsError() {
-        assertNotNull(LotteryController.validate(validLottery.copy(lotteryEndDate = date(2026, 12, 3))))
+        assertNotNull(LotteryController.validate(validLottery.copy(lotteryEndDate = "2026-12-03")))
     }
 
     @Test
     fun validate_registrationClosesOnBookingStartDate_isValid() {
-        assertNull(LotteryController.validate(validLottery.copy(lotteryEndDate = date(2026, 12, 1))))
+        assertNull(LotteryController.validate(validLottery.copy(lotteryEndDate = "2026-12-01")))
     }
 
     @Test
@@ -125,6 +118,13 @@ class LotteryControllerTest {
 
         assertNotNull(result)
         assertEquals(emptyList<Lottery>(), storage.updated)
+    }
+
+    @Test
+    fun validate_registrationPeriodNotSet_returnsError() {
+        assertNotNull(
+            LotteryController.validate(validLottery.copy(bookingStartDate = "", bookingEndDate = ""))
+        )
     }
 }
 
