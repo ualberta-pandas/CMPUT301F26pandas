@@ -2,3 +2,7 @@
 .DS_Store.kotlin/
 /src/
 .DS_Store
+
+.gradle/
+build/
+local.properties
