@@ -1,7 +1,5 @@
 package com.example.campsiteapp.view.components
 
-import android.content.Context
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -179,7 +177,7 @@ fun ProfilePicture(
     contentDescription: String,
     customContent: @Composable () -> Unit
 ){
-    val context=LocalContext.current
+
     Box(
         modifier
             .size(size)
@@ -204,6 +202,7 @@ fun ProfilePicture(
                 )
             }
         }else{
+            val context=LocalContext.current
             Image(
                 painter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(context)
