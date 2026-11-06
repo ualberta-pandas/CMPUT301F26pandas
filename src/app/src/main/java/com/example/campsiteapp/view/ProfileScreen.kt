@@ -47,7 +47,7 @@ import androidx.navigation.NavController
 import com.example.campsiteapp.getProfileDocument
 import kotlinx.coroutines.launch
 import com.example.campsiteapp.model.User
-import com.example.campsiteapp.model.ImageUploadService
+import com.example.campsiteapp.controller.ImageUploadService
 import com.example.campsiteapp.view.components.CancelOrProceedTextButtonsPair
 import com.example.campsiteapp.view.components.CustomPopup
 import com.example.campsiteapp.view.components.ProfilePicture

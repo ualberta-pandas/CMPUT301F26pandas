@@ -79,11 +79,11 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/*
 class OwnerCampsiteController (
 
 ) {
 
-/*
 
     @Composable
     fun RegisterCampsite(
@@ -1016,6 +1016,6 @@ class OwnerCampsiteController (
 
             }}
     }
-*/
 }
 
+*/

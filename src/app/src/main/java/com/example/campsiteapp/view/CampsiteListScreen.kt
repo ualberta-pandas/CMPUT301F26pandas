@@ -52,7 +52,9 @@ import androidx.compose.foundation.lazy.items
 import com.example.campsiteapp.data.Lottery
 
 import com.example.campsiteapp.controller.EntrantCampsiteController
+
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
+import com.example.campsiteapp.controller.EntrantCampsiteController.toggleCampsiteDetailsScreen
 
 
 private val pill = RoundedCornerShape(50)
@@ -74,10 +76,13 @@ class CampsiteListScreen : ComponentActivity() {
                     CampsiteListView(
                         modifier = Modifier.padding(innerPadding),
                         updateByUserSearch = { newSearch ->
-                            EntrantCampsiteController.toggleSearchResultsScreen(this@CampsiteListScreen, newSearch)
+                            toggleSearchResultsScreen(this@CampsiteListScreen, newSearch)
                             finish()
                         },
-                        onLotteryClick = {},
+                        onLotteryClick = {lotteryId ->
+                            toggleCampsiteDetailsScreen(this@CampsiteListScreen, lotteryId)
+                            finish()
+                        },
 
                         lotteries = EntrantCampsiteController.getResultsBySearch(searchResult), // Know that campsites is based on the lottery database
                         searchResult

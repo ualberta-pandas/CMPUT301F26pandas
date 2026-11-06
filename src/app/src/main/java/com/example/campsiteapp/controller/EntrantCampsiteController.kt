@@ -12,6 +12,8 @@ import com.example.campsiteapp.view.CampsiteListScreen
 object EntrantCampsiteController {
 
     private val lotteryDB = LotteryDatabase()
+    private val lotteries: List<Lottery> = lotteryDB.lotteries
+
 
     /**
      Returns a list of the lotteries that have their campsites matching
@@ -20,7 +22,6 @@ object EntrantCampsiteController {
     fun getResultsBySearch(searchResult: String): List<Lottery>{
         val regex = Regex(Regex.escape(searchResult), RegexOption.IGNORE_CASE)
 
-        val lotteries: List<Lottery> = lotteryDB.lotteries
         val newLotteries = mutableListOf<Lottery>()
 
         for (lottery in lotteries) {
@@ -38,13 +39,17 @@ object EntrantCampsiteController {
         context.startActivity(intent)
     }
 
-    fun toggleCampsiteListScreen(context: Context){
-
-    }
-
-    fun viewCampsiteDetails(context: Context, campsiteId: String){
+    fun toggleCampsiteDetailsScreen(context: Context, lotteryId: String){
         val intent = Intent(context, CampsiteDetailsScreen::class.java)
-        intent.putExtra("campsiteId", campsiteId)
+
+        var lottery: Lottery? = lotteries.firstOrNull{ it.id == lotteryId }
+
+        if (lottery == null){
+            return Unit
+        }
+
+        intent.putExtra("lottery", lottery)
+        intent.putExtra("campsite", lottery.campsite)
         context.startActivity(intent)
     }
 }
