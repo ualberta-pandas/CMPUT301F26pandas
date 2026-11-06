@@ -10,6 +10,7 @@ import com.example.campsiteapp.view.AdminActivity
 
 import com.example.campsiteapp.view.CampsiteDetailsScreen
 import com.example.campsiteapp.view.CampsiteListScreen
+import com.example.campsiteapp.view.ProfileActivity
 
 
 object EntrantCampsiteController {
@@ -90,12 +91,8 @@ object EntrantCampsiteController {
     }
 
     fun toggleProfileScreen(context: Context, deviceId: String = "") {
-        /*
         val intent = Intent(context, ProfileActivity::class.java)
-        intent.putExtra("deviceId", deviceId)
         context.startActivity(intent)
-
-         */
     }
 
     fun toggleOwnerScreen(context: Context) {
