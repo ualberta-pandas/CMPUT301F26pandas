@@ -245,7 +245,6 @@ fun CampsiteDetailsScreenPreview() {
         numWinners = 5,
         lotteryStartDate = "2026-09-22",
         lotteryEndDate = "2026-10-30",
-        waitlistCount = 12,
         waitlistMax = 50,
         waitlist = arrayListOf("abc123", "xyz789"),
         campsite = campsite,

@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +52,7 @@ import androidx.compose.foundation.lazy.items
 import com.example.campsiteapp.data.Lottery
 
 import com.example.campsiteapp.controller.EntrantCampsiteController
+import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 
 
 private val pill = RoundedCornerShape(50)
@@ -71,7 +73,12 @@ class CampsiteListScreen : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CampsiteListView(
                         modifier = Modifier.padding(innerPadding),
-                        updateByUserSearch = {},
+                        updateByUserSearch = { newSearch ->
+                            EntrantCampsiteController.toggleSearchResultsScreen(this@CampsiteListScreen, newSearch)
+                            finish()
+                        },
+                        onLotteryClick = {},
+
                         lotteries = EntrantCampsiteController.getResultsBySearch(searchResult), // Know that campsites is based on the lottery database
                         searchResult
                     )
@@ -85,8 +92,9 @@ class CampsiteListScreen : ComponentActivity() {
 fun CampsiteListView(
     modifier: Modifier = Modifier,
     updateByUserSearch: (search: String) -> Unit,
+    onLotteryClick: (String) -> Unit,
 
-    lotteries: ArrayList<Lottery>,
+    lotteries: List<Lottery>,
     searchResult: String
 ){
     var entrantSearch by remember { mutableStateOf("") }
@@ -182,6 +190,7 @@ fun CampsiteListView(
                     Box(modifier = modifier
                         .size(width = 350.dp, height = 140.dp)
                         .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
+                        .clickable { onLotteryClick(lottery.id) }
                     ){
                         Column(
                             modifier = Modifier
@@ -195,8 +204,8 @@ fun CampsiteListView(
 
                             val currSize: Int = lottery.waitlistMax - lottery.waitlist.size
 
-                            var selectedString: String = ""
-                            var selectedColor: Color = Color.Black
+                            var selectedString = ""
+                            var selectedColor: Color
 
                             if (currSize == 0){
                                 selectedString = textToDisplay[0]
@@ -220,14 +229,9 @@ fun CampsiteListView(
                                 fontSize = 12.sp
                             )
                         }
-
-
-
-
                     }
 
-                    Spacer(modifier = Modifier.height(15.dp))
-
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
@@ -288,7 +292,6 @@ fun CampsiteListViewPreview() {
             numWinners = 5,
             lotteryStartDate = "2026-09-16",
             lotteryEndDate = "2026-09-23",
-            waitlistCount = 2,
             waitlistMax = 2,
             waitlist = arrayListOf("abc123", "xyz789"),
             campsite = campsiteA
@@ -299,7 +302,6 @@ fun CampsiteListViewPreview() {
             numWinners = 3,
             lotteryStartDate = "2026-09-18",
             lotteryEndDate = "2026-09-25",
-            waitlistCount = 2,
             waitlistMax = 3,
             waitlist = arrayListOf("abc123", "xyz789"),
             campsite = campsiteB
@@ -310,7 +312,6 @@ fun CampsiteListViewPreview() {
             numWinners = 5,
             lotteryStartDate = "2026-09-20",
             lotteryEndDate = "2026-09-27",
-            waitlistCount = 2,
             waitlistMax = 50,
             waitlist = arrayListOf("abc123", "xyz789"),
             campsite = campsiteA
@@ -320,6 +321,7 @@ fun CampsiteListViewPreview() {
     CampsiteAppTheme {
         CampsiteListView(
             updateByUserSearch = {},
+            onLotteryClick = {},
             lotteries = lotteries,
             searchResult = "e"
         )

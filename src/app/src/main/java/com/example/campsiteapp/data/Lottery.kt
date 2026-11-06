@@ -1,19 +1,21 @@
 package com.example.campsiteapp.data
 
-import java.time.LocalDate
-
 data class Lottery(
-    val campsiteId: Int,
-    var numWinners: Int,
-    var lotteryStartDate: String, var lotteryEndDate: String,
+    val id: String = "",
+    val campsiteId: Int = 0,
+    var numWinners: Int = 0,
+    var lotteryStartDate: String = "",
+    var lotteryEndDate: String = "",
+    var waitlistMax: Int = 0,
+    var waitlist: ArrayList<String> = ArrayList(),
+    var campsite: Campsite = Campsite()
+) : java.io.Serializable {
 
-    var waitlistCount: Int, var waitlistMax: Int,
-    var waitlist: ArrayList<String>,
+    fun isFull(): Boolean {
+        return waitlist.size == waitlistMax
+    }
 
-    var campsite: Campsite
-): java.io.Serializable
-{
-    fun isFull(): Boolean{
-        return waitlistCount == waitlistMax
+    fun getCapacityLeft(): Int {
+        return waitlistMax - waitlist.size
     }
 }
