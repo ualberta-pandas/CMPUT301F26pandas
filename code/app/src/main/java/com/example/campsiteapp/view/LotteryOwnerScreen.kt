@@ -25,6 +25,12 @@ import com.example.campsiteapp.model.Lottery
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 
 /**
@@ -35,15 +41,16 @@ import java.util.TimeZone
  * Does not handle creating and editing
  */
 class LotteryOwnerScreen {
-
     @Composable
     fun LotteryList(
         lotteries: List<Lottery>,
         campsites: List<Campsite>,
-        onCreateClick: () -> Unit,
-        onLotteryClick: (Lottery) -> Unit
+        onCreateLottery: (Lottery) -> String?,
+        onUpdateLottery: (Lottery) -> String?
     ) {
         val campsiteNames = campsites.associate { it.id to it.name }
+        var creating by remember { mutableStateOf(false) }
+        var editing by remember { mutableStateOf<Lottery?>(null) }
 
         Box(modifier = Modifier.fillMaxSize()) {
             if(lotteries.isEmpty()) {
@@ -61,19 +68,42 @@ class LotteryOwnerScreen {
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(lotteries) { lottery ->
-                        LotteryCard(lottery, campsiteNames) { onLotteryClick(lottery) }
+                        LotteryCard(lottery, campsiteNames) { editing = lottery }
                     }
                 }
             }
 
             FloatingActionButton(
-                onClick = onCreateClick,
+                onClick = { creating = true },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(16.dp)
                     .testTag("createLotteryButton")
             ) {
                 Text("+")
+            }
+        }
+
+        if(creating || editing != null) {
+            val lotteryBeingEdited = editing
+            val close = { creating = false; editing = null }
+
+            Dialog(
+                onDismissRequest = close,
+                properties = DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                LotteryForm(
+                    initial = lotteryBeingEdited,
+                    campsites = campsites,
+                    onSave = { lottery ->
+                        if(lotteryBeingEdited == null) {
+                            onCreateLottery(lottery)
+                        } else {
+                            onUpdateLottery(lottery)
+                        }
+                    },
+                    onClose = close
+                )
             }
         }
     }
@@ -101,7 +131,7 @@ private fun LotteryCard(
             Text("Registration: ${formatDate(lottery.lotteryStartDate)} - ${formatDate(lottery.lotteryEndDate)}")
             Text("Booking: ${formatDate(lottery.bookingStartDate)} - ${formatDate(lottery.bookingEndDate)}")
             Text("Winners: ${lottery.numWinners}")
-            Text("Waitlist: ${lottery.waitlistCapacity?.toString() ?: "No limit"}")
+            Text("Waitlist: ${lottery.waitlistMax?.toString() ?: "No limit"}")
             if(lottery.status.isNotBlank()) {
                 Text("Status: ${lottery.status}")
             }
@@ -128,7 +158,7 @@ private fun LotteryListPreview() {
                 bookingStartDate = previewDate("2026-12-01"),
                 bookingEndDate = previewDate("2026-12-05"),
                 numWinners = 2,
-                waitlistCapacity = 10,
+                waitlistMax = 10,
                 status = "Registration open"
             ),
             Lottery(
@@ -145,7 +175,7 @@ private fun LotteryListPreview() {
             Campsite(id = "a", name = "Elk Island Site"),
             Campsite(id = "b", name = "Cooking Lake Site")
         ),
-        onCreateClick = {},
-        onLotteryClick = {}
+        onCreateLottery = { null },
+        onUpdateLottery = { null }
     )
 }

@@ -69,7 +69,7 @@ class LotteryController(private val storage: LotteryStorage) {
                 "Lottery must close before booking can begin"
             lottery.numWinners < 1 ->
                 "There must be at least one winnter"
-            (lottery.waitlistCapacity ?: Int.MAX_VALUE) < lottery.numWinners ->
+            lottery.waitlistMax < lottery.numWinners ->
                 "Waitlist capacity can't be smaller than the number of winners"
             else -> null
         }
