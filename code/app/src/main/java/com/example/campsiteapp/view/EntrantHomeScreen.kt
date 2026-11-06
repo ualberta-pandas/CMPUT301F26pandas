@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +39,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -157,6 +161,16 @@ fun EntrantHomeScreenView(
         Text("      Your Pending Bookings")
         LazyColumn(modifier = Modifier.weight(1f)) {
 
+        }
+
+        val context = LocalContext.current
+        OutlinedButton(
+            onClick = { context.startActivity(Intent(context, PastReservationsScreen::class.java)) },
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .testTag("pastReservationsButton")
+        ) {
+            Text("See past reservations")
         }
     }
 }
