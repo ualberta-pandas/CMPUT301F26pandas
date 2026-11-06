@@ -110,6 +110,8 @@ class CampsitesDatabase {
 
     }
 
+    //Delete/overwrite this
+    fun deleteCampsite(id: String) {}
 
 
 }

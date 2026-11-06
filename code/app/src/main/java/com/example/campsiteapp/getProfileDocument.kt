@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
+import com.example.campsiteapp.model.User
 
 /**
  * Returns a User if data is found at specified document id
