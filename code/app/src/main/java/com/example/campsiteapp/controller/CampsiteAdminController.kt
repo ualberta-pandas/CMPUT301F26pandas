@@ -20,6 +20,6 @@ class CampsiteAdminController(private val campsitesDatabase: CampsitesDatabase) 
      * Removes the campsite with [id].
      */
     fun removeCampsite(id: String) {
-        campsitesDatabase.deleteCampsite(id)
+        //campsitesDatabase.deleteCampsite(id)
     }
 }

@@ -14,27 +14,28 @@ import com.example.campsiteapp.controller.OwnerCampsiteController
 import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
-
+import com.example.campsiteapp.view.OwnerCampsiteDetailsScreen
+import com.example.campsiteapp.data.DeviceIDs
 class MainActivity : ComponentActivity() {
+
+
+    private lateinit var deviceIds: DeviceIDs // Do not delete IMPORTANT(device id)
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        //check deviceIDs class for usage documentation
+        deviceIds = DeviceIDs(applicationContext) // Do not delete IMPORTANT(device id)
 
         val campsitesDatabase = CampsitesDatabase()
+        enableEdgeToEdge()
 
         setContent {
             CampsiteAppTheme {
-                OwnerCampsiteListScreen().CampsitesList(
-                    campsites = campsitesDatabase.campsites,
-                    onAddCampsite = {campsite -> campsitesDatabase.addCampsite(campsite)},
-                    onEditCampsite = {oldCampsiteDetails, newCampsiteDetails ->
-                        campsitesDatabase.updateCampsite(
-                            oldCampsiteDetails,
-                            newCampsiteDetails = newCampsiteDetails
-                        )
-                    }
-                )
+
+
+
             }
         }
 
