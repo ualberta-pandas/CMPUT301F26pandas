@@ -1,6 +1,5 @@
 package com.example.campsiteapp.view
 
-/*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -129,8 +128,8 @@ private fun LotteryCard(
                 lottery.campsiteIds.joinToString { campsiteNames[it] ?: "Unknown campsite" },
                 fontWeight = FontWeight.Bold
             )
-            Text("Registration: ${formatDate(lottery.lotteryStartDate)} - ${formatDate(lottery.lotteryEndDate)}")
-            Text("Booking: ${formatDate(lottery.bookingStartDate)} - ${formatDate(lottery.bookingEndDate)}")
+            Text("Registration: ${lottery.lotteryStartDate} - ${lottery.lotteryEndDate}")
+            Text("Booking: ${lottery.bookingStartDate} - ${lottery.bookingEndDate}")
             Text("Winners: ${lottery.numWinners}")
             Text("Waitlist: ${lottery.waitlistMax?.toString() ?: "No limit"}")
             if(lottery.status.isNotBlank()) {
@@ -138,12 +137,6 @@ private fun LotteryCard(
             }
         }
     }
-}
-
-private fun previewDate(text: String): Long {
-    val format = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-    format.timeZone = TimeZone.getTimeZone("UTC")
-    return format.parse(text)!!.time
 }
 
 @Preview(showBackground = true)
@@ -154,10 +147,10 @@ private fun LotteryListPreview() {
             Lottery(
                 id = "1",
                 campsiteIds = listOf("a", "b"),
-                lotteryStartDate = previewDate("2026-11-10"),
-                lotteryEndDate = previewDate("2026-11-20"),
-                bookingStartDate = previewDate("2026-12-01"),
-                bookingEndDate = previewDate("2026-12-05"),
+                lotteryStartDate = "2026-11-10",
+                lotteryEndDate = "2026-11-20",
+                bookingStartDate = "2026-12-01",
+                bookingEndDate = "2026-12-05",
                 numWinners = 2,
                 waitlistMax = 10,
                 status = "Registration open"
@@ -165,10 +158,10 @@ private fun LotteryListPreview() {
             Lottery(
                 id = "2",
                 campsiteIds = listOf("a"),
-                lotteryStartDate = previewDate("2026-12-01"),
-                lotteryEndDate = previewDate("2026-12-10"),
-                bookingStartDate = previewDate("2027-01-05"),
-                bookingEndDate = previewDate("2027-01-09"),
+                lotteryStartDate = "2026-12-01",
+                lotteryEndDate = "2026-12-10",
+                bookingStartDate = "2027-01-05",
+                bookingEndDate = "2027-01-09",
                 numWinners = 1
             )
         ),
@@ -180,5 +173,3 @@ private fun LotteryListPreview() {
         onUpdateLottery = { null }
     )
 }
-
- */
