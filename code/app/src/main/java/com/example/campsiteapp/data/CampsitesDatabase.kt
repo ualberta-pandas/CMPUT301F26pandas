@@ -1,4 +1,4 @@
-package com.example.campsiteapp.model
+package com.example.campsiteapp.data
 
 import androidx.compose.runtime.mutableStateListOf
 import com.example.campsiteapp.model.Campsite
