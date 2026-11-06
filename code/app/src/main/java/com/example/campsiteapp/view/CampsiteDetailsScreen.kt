@@ -36,11 +36,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,8 +55,10 @@ import com.example.campsiteapp.data.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
 import com.example.campsiteapp.controller.EntrantWaitlistController.addEntrantToWaitlist
-import com.example.campsiteapp.controller.EntrantWaitlistController.veryUserOnWaitlist
+import com.example.campsiteapp.controller.EntrantWaitlistController.verifyUserOnWaitlist
 import com.example.campsiteapp.controller.EntrantWaitlistController.removeEntrantFromWaitlist
+
+import com.example.campsiteapp.data.DeviceIDs
 private val pill = RoundedCornerShape(50)
 
 class CampsiteDetailsScreen : ComponentActivity() {
@@ -67,20 +71,26 @@ class CampsiteDetailsScreen : ComponentActivity() {
         val lottery = IntentCompat.getSerializableExtra(intent, "lottery", Lottery::class.java)
 
         setContent {
+            val context = LocalContext.current
+            val deviceId by produceState(initialValue = "") {
+                value = DeviceIDs(context).fetchDeviceId() ?: ""
+            }
+
+
             CampsiteAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CampsiteView(
                         campsiteSelection = campsite,
                         lottery = lottery,
                         userOnWaitlist = {
-                            veryUserOnWaitlist()
+                            verifyUserOnWaitlist(lottery, deviceId)
                         },
 
                         waitlistSelectionClick = { userOnWaitList ->
                             if (userOnWaitList) {
-                                addEntrantToWaitlist(lottery)
+                                addEntrantToWaitlist(lottery, deviceId)
                             } else {
-                                removeEntrantFromWaitlist(lottery)
+                                removeEntrantFromWaitlist(lottery, deviceId)
                             }
                         },
 

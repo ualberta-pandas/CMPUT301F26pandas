@@ -6,21 +6,16 @@ object EntrantWaitlistController {
     /**
         Calls for the device_id and adds the entrant to the specific lottery
      **/
-    fun addEntrantToWaitlist(lottery: Lottery?): Unit {
 
+    fun addEntrantToWaitlist(lottery: Lottery?, deviceId: String) {
+        lottery?.waitlist?.add(deviceId)
     }
 
-    fun removeEntrantFromWaitlist(lottery: Lottery?): Unit{
-
+    fun removeEntrantFromWaitlist(lottery: Lottery?, deviceId: String) {
+        lottery?.waitlist?.remove(deviceId)
     }
 
-    fun veryUserOnWaitlist(): Boolean{
-        return false
+    fun verifyUserOnWaitlist(lottery: Lottery?, deviceId: String): Boolean {
+        return lottery?.waitlist?.contains(deviceId) ?: false
     }
-
-
-
-    /**
-
-     **/
 }

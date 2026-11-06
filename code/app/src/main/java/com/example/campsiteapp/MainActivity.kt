@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import com.example.campsiteapp.controller.EntrantWaitlistController
 
 
 import com.example.campsiteapp.data.Campsite
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
 
         //check deviceIDs class for usage documentation
         deviceIds = DeviceIDs(applicationContext) // Do not delete IMPORTANT(device id)
+
         startActivity(Intent(this, EntrantHomeScreen::class.java))
         finish()
     }

@@ -4,9 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -48,14 +46,12 @@ import androidx.compose.ui.unit.sp
 import com.example.campsiteapp.data.Campsite
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
-import androidx.compose.foundation.lazy.items
 import com.example.campsiteapp.data.Lottery
 
 import com.example.campsiteapp.controller.EntrantCampsiteController
 
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleCampsiteDetailsScreen
-
 
 private val pill = RoundedCornerShape(50)
 
@@ -93,6 +89,9 @@ class CampsiteListScreen : ComponentActivity() {
     }
 }
 
+
+
+
 @Composable
 fun CampsiteListView(
     modifier: Modifier = Modifier,
@@ -103,10 +102,6 @@ fun CampsiteListView(
     searchResult: String
 ){
     var entrantSearch by remember { mutableStateOf("") }
-
-    // These two lists control the text, and the colors to show for the campsites
-    val textToDisplay = listOf("Closed - No Space Left", "Open - 2 Spaces remaining", "Open - Many Spots", )
-    val colorToDisplay = listOf(Color(0xFFD9B8B8), Color(0xFFE6DDB0), Color(0xFFB5C7BE))
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -180,66 +175,17 @@ fun CampsiteListView(
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        Column(
-        ){
-            Text("Bookings for:  ${searchResult}")
-            Spacer(modifier = Modifier.height(12.dp))
-
-            LazyColumn( modifier = modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                items(lotteries) { lottery ->
-                    val campsite: Campsite = lottery.campsite
-
-                    Box(modifier = modifier
-                        .size(width = 350.dp, height = 140.dp)
-                        .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
-                        .clickable { onLotteryClick(lottery.id) }
-                    ){
-                        Column(
-                            modifier = Modifier
-                                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-                        ){
-                            Text(text = campsite.name, fontSize = 18.sp)
-                            Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
-                            Text(text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
-                                fontSize = 12.sp, lineHeight = 10.sp)
-                            Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
-
-                            val currSize: Int = lottery.waitlistMax - lottery.waitlist.size
-
-                            var selectedString = ""
-                            var selectedColor: Color
-
-                            if (currSize == 0){
-                                selectedString = textToDisplay[0]
-                                selectedColor = colorToDisplay[0]
-                            } else if(currSize < 2){
-                                selectedString = textToDisplay[1]
-                                selectedColor = colorToDisplay[1]
-                            } else{
-                                selectedString = textToDisplay[2]
-                                selectedColor = colorToDisplay[2]
-                            }
-
-                            Text(
-                                text = selectedString,
-                                color = Color.Black,
-                                modifier = Modifier
-                                    .width(300.dp)
-                                    .height(60.dp)
-                                    .background(selectedColor, RoundedCornerShape(50))
-                                    .padding(horizontal = 12.dp, vertical = 4.dp),
-                                fontSize = 12.sp
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
+        displayCampsitesAsCards(Modifier, lotteries = lotteries, onLotteryClick,
+            getTextAttributes = {lottery ->
+                val currSize = lottery.waitlistMax - lottery.waitlist.size
+                if (currSize == 0) {
+                    Pair("Closed - No Space Left", Color(0xFFD9B8B8))
+                } else if (currSize < 2) {
+                    Pair("Open - 2 Spaces remaining", Color(0xFFE6DDB0))
+                } else {
+                    Pair("Open - Many Spots", Color(0xFFB5C7BE))
                 }
-            }
-        }
+            })
 
         Spacer(modifier = Modifier.height(12.dp))
 

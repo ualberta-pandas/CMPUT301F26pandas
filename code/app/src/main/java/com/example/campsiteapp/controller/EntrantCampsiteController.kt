@@ -3,7 +3,9 @@ package com.example.campsiteapp.controller
 import android.content.Context
 import android.content.Intent
 import com.example.campsiteapp.data.Lottery
+import com.example.campsiteapp.data.Reservation
 import com.example.campsiteapp.model.LotteryDatabase
+import com.example.campsiteapp.model.ReservationDatabase
 
 import com.example.campsiteapp.view.CampsiteDetailsScreen
 import com.example.campsiteapp.view.CampsiteListScreen
@@ -11,8 +13,11 @@ import com.example.campsiteapp.view.CampsiteListScreen
 
 object EntrantCampsiteController {
 
-    private val lotteryDB = LotteryDatabase()
-    private val lotteries: List<Lottery> = lotteryDB.lotteries
+    private val lotteryDB by lazy { LotteryDatabase() }
+    private val reservationDB by lazy { ReservationDatabase() }
+
+    private val lotteries: List<Lottery> get() = lotteryDB.lotteries
+    private val reservations: List<Reservation> get() = reservationDB.reservations
 
 
     /**
@@ -31,6 +36,32 @@ object EntrantCampsiteController {
         }
 
         return newLotteries
+    }
+
+    fun getLotteriesById(deviceId: String): List<Lottery>{
+        val newLotteries = mutableListOf<Lottery>()
+
+
+        for (lottery in lotteries) {
+            val lotteryInId: String? = lottery.waitlist.firstOrNull { it == deviceId }
+
+            if (lotteryInId != null) {
+                newLotteries.add(lottery)
+            }
+        }
+        return newLotteries
+    }
+
+
+    fun getReservationsById(deviceId: String): List<Reservation> {
+        val newReservations = mutableListOf<Reservation>()
+
+        for (reservation in reservations) {
+            if (reservation.entrantId == deviceId) {
+                newReservations.add(reservation)
+            }
+        }
+        return newReservations
     }
 
     fun toggleSearchResultsScreen(context: Context, userSearch: String){
