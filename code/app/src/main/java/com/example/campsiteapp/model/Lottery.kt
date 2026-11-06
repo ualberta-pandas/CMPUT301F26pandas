@@ -3,6 +3,8 @@ package com.example.campsiteapp.model
 /**
  * A lottery an owner can run for a campsite
  *
+ * Dates are text in yyyy-mm-dd format. Empty means "not set yet"
+ *
  * @property id Firestore document id
  * @property ownerId Owner who created lottery
  * @property campsiteIds Campsites lottery is for
@@ -24,7 +26,7 @@ data class Lottery(
     var lotteryStartDate: Long = 0L,
     var lotteryEndDate: Long = 0L,
     var numWinners: Int,
-    var waitlistMax: Int = 0, //null means unlimited
+    var waitlistMax: Int = 0,
     var waitlist: ArrayList<String> = ArrayList(),
     var status: String = ""
 ) : java.io.Serializable {
