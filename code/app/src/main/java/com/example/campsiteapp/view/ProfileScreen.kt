@@ -113,11 +113,14 @@ fun ProfileScreen(
     profile: User?,
 ){
     val scope = rememberCoroutineScope()
+    val profileDatabase = ProfileDatabase()
+
     //UI state (see possible states in enum class)
     var currentProfileScreenState by remember { mutableStateOf(ProfileScreenState.LOADING) }
     var profileScreenMode by remember { mutableStateOf("") }
     var userProfile by remember { mutableStateOf<User?>(null) }
     var profileToDisplay: User by remember { mutableStateOf(User()) }
+    var deviceId = ""
 
     var newUserName by remember { mutableStateOf("") }
     var newUserEmail by remember { mutableStateOf("") }
@@ -139,10 +142,13 @@ fun ProfileScreen(
         ImageUploadService()
     }
 
+    suspend {
+        deviceId = DeviceIDs().fetchDeviceId()?:DeviceIds().registerDeviceId()
+    }
     //State and related variables must be determined inside LaunchedEffect so they are decided before rendering something other than LOADING screen
     LaunchedEffect(key1 = deviceId) {
         //Return profile with specified device id if it exists
-        userProfile = ProfileDatabase().getProfileDocument(deviceId)
+        userProfile = profileDatabase.getProfileDocument(deviceId)
 
         //Display profile if something is passed in, display own profile if it exists, else, prompt to create profile
         profileToDisplay = profile ?: userProfile ?: User()
@@ -376,10 +382,10 @@ fun ProfileScreen(
                                             newUserNotificationPreference
                                         //Add profile if in create mode
                                         if (currentProfileScreenState == ProfileScreenState.CREATE) {
-                                            ProfileDatabase().addProfile(newProfile)
+                                            profileDatabase.addProfile(newProfile)
                                             //Update existing profile if in edit mode
                                         } else {
-                                            ProfileDatabase().updateProfile(deviceId,newProfile)
+                                            profileDatabase.updateProfile(deviceId,newProfile)
                                         }
                                         //display new/updated profile
                                         profileScreenMode = "My Profile"
@@ -506,7 +512,7 @@ fun ProfileScreen(
                                     newProfile.profileImage = profileToDisplay.profileImage
                                     newProfile.notificationsEnabled =
                                         !profileToDisplay.notificationsEnabled
-                                    ProfileDatabase().updateProfile(deviceId,newProfile)
+                                    profileDatabase.updateProfile(deviceId,newProfile)
                                     //ensure modification is conserved in display version
                                     profileToDisplay.notificationsEnabled =
                                         newProfile.notificationsEnabled
@@ -603,7 +609,7 @@ fun ProfileScreen(
                         { openDeletionConfirmation = false },
                         {
                             //delete user's profile and return them to creation prompt
-                            ProfileDatabase().deleteProfile(profileToDisplay)
+                            profileDatabase.deleteProfile(profileToDisplay)
                             newUserName = "Name"
                             newUserEmail = "Email"
                             newUserPhoneNumber = "Phone number"
