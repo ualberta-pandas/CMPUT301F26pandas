@@ -7,6 +7,7 @@
  */
 package com.example.campsiteapp.view
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,6 +51,10 @@ fun AdminApp(campsitesDatabase: CampsitesDatabase) {
     var backStack by remember { mutableStateOf(listOf<Destination>(Destination.Menu)) }
     val navigate = { destination: Destination -> backStack = backStack + destination }
     val goBack = { backStack = backStack.dropLast(1) }
+    val context = LocalContext.current
+    val showRemoveFailed = { _: Exception ->
+        Toast.makeText(context, R.string.remove_failed, Toast.LENGTH_SHORT).show()
+    }
 
     BackHandler(enabled = backStack.size > 1, onBack = goBack)
 
@@ -60,7 +66,7 @@ fun AdminApp(campsitesDatabase: CampsitesDatabase) {
 
         Destination.Campsites -> AdminCampsiteListScreen(
             campsites = campsiteAdminController.campsites,
-            onRemoveCampsite = { campsiteAdminController.removeCampsite(it.id) },
+            onRemoveCampsite = { campsiteAdminController.removeCampsite(it.id, showRemoveFailed) },
             onBack = goBack,
         )
 
@@ -80,7 +86,7 @@ fun AdminApp(campsitesDatabase: CampsitesDatabase) {
                     profile = profile,
                     ownedCampsiteCount = profileAdminController.campsitesOwnedBy(profile.deviceId).size,
                     onRemove = {
-                        profileAdminController.removeProfile(profile.deviceId)
+                        profileAdminController.removeProfile(profile.deviceId, showRemoveFailed)
                         goBack()
                     },
                     onBack = goBack,

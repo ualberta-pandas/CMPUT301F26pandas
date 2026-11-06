@@ -6,6 +6,7 @@
     <string name="close">Close</string>
     <string name="cancel">Cancel</string>
     <string name="remove">Remove</string>
+    <string name="remove_failed">Could not remove. Check your connection and try again.</string>
     <string name="admin_title">Admin</string>
     <string name="browse_campsites">Browse Campsites</string>
     <string name="browse_profiles">Browse Profiles</string>
