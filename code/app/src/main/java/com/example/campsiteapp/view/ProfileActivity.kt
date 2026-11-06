@@ -11,6 +11,10 @@ import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.data.ProfileDatabase
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
+/**
+ * Activity that shows [ProfileScreen].
+ */
+
 class ProfileActivity : ComponentActivity() {
     override fun onCreate( savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
