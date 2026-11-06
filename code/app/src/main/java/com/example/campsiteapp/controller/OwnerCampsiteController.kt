@@ -83,7 +83,7 @@ class OwnerCampsiteController (
 
 ) {
 
-
+/*
 
     @Composable
     fun RegisterCampsite(
@@ -1041,5 +1041,6 @@ class OwnerCampsiteController (
 
             }}
     }
+*/
+}
 
-        }
