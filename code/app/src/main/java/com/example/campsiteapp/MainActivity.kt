@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.campsiteapp.controller.OwnerCampsiteController
-import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.model.CampsitesDatabase
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
