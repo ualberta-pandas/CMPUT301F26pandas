@@ -18,4 +18,4 @@ data class Campsite(
     val rules: String = "",
     val image: String = "",
     val status: String = ""
-)
+) : java.io.Serializable
