@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+/*
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -38,7 +39,8 @@ import coil.compose.AsyncImage
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.controller.OwnerCampsiteController
 
-/*
+
+
 class OwnerCampsiteListScreen {
 
     val ownerController = OwnerCampsiteController()
@@ -214,5 +216,4 @@ class OwnerCampsiteListScreen {
     }
 
 }
-
- */
+*/
