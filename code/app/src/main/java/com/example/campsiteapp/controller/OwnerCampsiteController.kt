@@ -1,16 +1,10 @@
 package com.example.campsiteapp.controller
 
-import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,11 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudUpload
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePickerDialog
@@ -42,47 +32,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.QrScanScreen
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.io.DataOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
-import java.util.UUID
-import android.location.Geocoder
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-/*
 class OwnerCampsiteController (
 
 ) {
+
 
 
     @Composable
@@ -507,7 +476,7 @@ class OwnerCampsiteController (
                                             Campsite(
                                                 name = campName,
                                                 location = location,
-                                                occupancy = occupancy,
+                                                occupancy = occupancy.toDouble(),
                                                 owner = owner,
                                                 price = price,
                                                 latitude = latitude.toString(),
@@ -664,36 +633,38 @@ class OwnerCampsiteController (
                         mutableStateOf(selectedCampsiteDetails?.price?:"") }
                     var mapLocation by remember(selectedCampsiteDetails) {
                         mutableStateOf("${selectedCampsiteDetails?.latitude}, ${selectedCampsiteDetails?.longitude}") }
-                    var availableDates by remember(selectedCampsiteDetails) {
-                        mutableStateOf(
-                            selectedCampsiteDetails?.startDate+'-'+selectedCampsiteDetails?.endDate) }
 
 
                     val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
 
-                    val startDate = runCatching {
-                        selectedCampsiteDetails?.startDate?.let {
-                            LocalDate.parse(it, formatter)
-                        }
-                    }.getOrNull()
+                    var startDate by remember(selectedCampsiteDetails) {
+                        mutableStateOf(selectedCampsiteDetails?.startDate ?: "")
+                    }
 
-                    val endDate = runCatching {
-                        selectedCampsiteDetails?.endDate?.let {
-                            LocalDate.parse(it, formatter)
-                        }
-                    }.getOrNull()
+                    var endDate by remember(selectedCampsiteDetails) {
+                        mutableStateOf(selectedCampsiteDetails?.endDate ?: "")
+                    }
+
+                    var availableDates by remember(selectedCampsiteDetails) {
+                        mutableStateOf("$startDate - $endDate")
+                    }
+
 
                     val dateRangePickerState = rememberDateRangePickerState(
-                        initialSelectedStartDateMillis = startDate?.atStartOfDay(
-                            java.time.ZoneOffset.UTC
-                        )?.toInstant()?.toEpochMilli(),
+                        initialSelectedStartDateMillis = runCatching {
+                            LocalDate.parse(startDate, formatter)
+                                .atStartOfDay(java.time.ZoneOffset.UTC)
+                                .toInstant()
+                                .toEpochMilli()
+                        }.getOrNull(),
 
-                        initialSelectedEndDateMillis = endDate?.atStartOfDay(
-                            java.time.ZoneOffset.UTC
-                        )?.toInstant()?.toEpochMilli(),
-
-
-                        )
+                        initialSelectedEndDateMillis = runCatching {
+                            LocalDate.parse(endDate, formatter)
+                                .atStartOfDay(java.time.ZoneOffset.UTC)
+                                .toInstant()
+                                .toEpochMilli()
+                        }.getOrNull()
+                    )
 
 
                     var description by remember(selectedCampsiteDetails)
@@ -722,7 +693,7 @@ class OwnerCampsiteController (
                         )
 
                         TextField(
-                            value = occupancy,
+                            value = occupancy.toString(),
                             onValueChange = { occupancy = it },
                             label = { Text("Occupancy") },
                             modifier = Modifier.border(
@@ -795,6 +766,24 @@ class OwnerCampsiteController (
                                 confirmButton = {
                                     Button(
                                         onClick = {
+
+                                            val start = dateRangePickerState.selectedStartDateMillis
+                                            val end = dateRangePickerState.selectedEndDateMillis
+
+                                            if (start != null && end != null) {
+
+                                                startDate = java.time.Instant.ofEpochMilli(start)
+                                                    .atZone(java.time.ZoneOffset.UTC)
+                                                    .toLocalDate()
+                                                    .format(formatter)
+
+                                                endDate = java.time.Instant.ofEpochMilli(end)
+                                                    .atZone(java.time.ZoneOffset.UTC)
+                                                    .toLocalDate()
+                                                    .format(formatter)
+
+                                                availableDates = "$startDate - $endDate"
+                                            }
 
                                             showDatePicker = false
                                         }
@@ -947,7 +936,7 @@ class OwnerCampsiteController (
                             onClick = {
 
                                 if (campName.isBlank() || location.isBlank() ||
-                                    occupancy.isBlank() || owner.isBlank() ||
+                                    occupancy == "" || owner.isBlank() ||
                                     price.isBlank() || mapLocation.isBlank() ||
                                     description.isBlank() || tags.isBlank() ||
                                     rules.isBlank() || status.isBlank()
@@ -973,7 +962,7 @@ class OwnerCampsiteController (
                                                selectedCampsiteDetails?.id ?: "",
                                                selectedCampsiteDetails?.name ?: "",
                                                selectedCampsiteDetails?.location ?: "",
-                                               selectedCampsiteDetails?.occupancy ?: "",
+                                               selectedCampsiteDetails?.occupancy ?: 0.0,
                                                selectedCampsiteDetails?.owner ?: "",
                                                selectedCampsiteDetails?.latitude ?: "",
                                                selectedCampsiteDetails?.longitude?:"",
@@ -991,13 +980,13 @@ class OwnerCampsiteController (
                                            Campsite(
                                                name = campName,
                                                location = location,
-                                               occupancy = occupancy,
+                                               occupancy = occupancy as Double,
                                                owner = owner,
                                                latitude = latitude.toString(),
                                                longitude = longitude.toString(),
                                                price = price,
-                                               startDate = startDate.toString(),
-                                               endDate = endDate.toString(),
+                                               startDate = startDate,
+                                               endDate = endDate,
                                                description = description,
                                                tags = tags,
                                                rules = rules,
@@ -1041,6 +1030,5 @@ class OwnerCampsiteController (
 
             }}
     }
-}
 
-*/
+        }
