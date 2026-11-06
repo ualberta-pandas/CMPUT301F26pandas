@@ -9,8 +9,8 @@
 package com.example.campsiteapp.controller
 
 import androidx.compose.runtime.mutableStateListOf
-import com.example.campsiteapp.data.Reservation
-import com.example.campsiteapp.data.ReservationStatus
+import com.example.campsiteapp.model.Reservation
+import com.example.campsiteapp.model.ReservationStatus
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 

@@ -5,7 +5,7 @@
  * - Nothing creates reservations yet.
  * - Whether the entrant acknowledged the campsite rules is not tracked yet.
  */
-package com.example.campsiteapp.data
+package com.example.campsiteapp.model
 
 /**
  * A reservation of [campsite] by an entrant for the booked dates.
