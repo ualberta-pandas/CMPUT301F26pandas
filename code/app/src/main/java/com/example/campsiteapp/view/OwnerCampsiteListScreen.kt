@@ -1,6 +1,6 @@
 package com.example.campsiteapp.view
 
-/*
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
