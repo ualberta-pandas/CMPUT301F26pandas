@@ -3,7 +3,7 @@ Monitor and/or read/write profile documents from database
 Outstanding issues:
 - lacks a proper listener method, so dynamic updates in compose are not automatically triggered (only an issue if viewing others' profiles)
  */
-package com.example.campsiteapp.controller
+package com.example.campsiteapp.data
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf

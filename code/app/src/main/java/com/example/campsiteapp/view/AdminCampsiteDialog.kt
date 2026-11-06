@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
-import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.R
 import com.example.campsiteapp.view.components.LabelledField
 import com.example.campsiteapp.view.components.RemoveButton

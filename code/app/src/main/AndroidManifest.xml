@@ -41,6 +41,10 @@
         <activity
             android:name=".view.CampsiteDetailsScreen"
             android:exported="false" />
+
+        <activity
+            android:name=".view.PastReservationsScreen"
+            android:exported="false" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

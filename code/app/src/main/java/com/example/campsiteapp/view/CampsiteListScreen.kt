@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -45,14 +46,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
-import androidx.compose.foundation.lazy.items
-import com.example.campsiteapp.data.Lottery
-
 import com.example.campsiteapp.controller.EntrantCampsiteController
-import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
+import com.example.campsiteapp.model.Lottery
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 
 private val pill = RoundedCornerShape(50)
@@ -241,6 +242,12 @@ fun CampsiteListView(
     }
 }
 
+private fun previewDate(text: String): Long {
+    val format = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    format.timeZone = TimeZone.getTimeZone("UTC")
+    return format.parse(text)!!.time
+}
+
 // Just generated random values using Claude for the preview as I'm developing
 @Preview(showBackground = true)
 @Composable
@@ -288,30 +295,30 @@ fun CampsiteListViewPreview() {
     val lotteries = arrayListOf(
         // waitlistMax - waitlist.size = 0  -> "Closed - No Space Left"
         Lottery(
-            campsiteId = 1,
+            campsiteIds = listOf("1"),
             numWinners = 5,
-            lotteryStartDate = "2026-09-16",
-            lotteryEndDate = "2026-09-23",
+            lotteryStartDate = previewDate("2026-09-16"),
+            lotteryEndDate = previewDate("2026-09-23"),
             waitlistMax = 2,
             waitlist = arrayListOf("abc123", "xyz789"),
             campsite = campsiteA
         ),
         // 1 left -> "Open - 2 Spaces remaining"
         Lottery(
-            campsiteId = 2,
+            campsiteIds = listOf("2"),
             numWinners = 3,
-            lotteryStartDate = "2026-09-18",
-            lotteryEndDate = "2026-09-25",
+            lotteryStartDate = previewDate("2026-09-18"),
+            lotteryEndDate = previewDate("2026-09-25"),
             waitlistMax = 3,
             waitlist = arrayListOf("abc123", "xyz789"),
             campsite = campsiteB
         ),
         // many left -> "Open - Many Spots"
         Lottery(
-            campsiteId = 3,
+            campsiteIds = listOf("3"),
             numWinners = 5,
-            lotteryStartDate = "2026-09-20",
-            lotteryEndDate = "2026-09-27",
+            lotteryStartDate = previewDate("2026-09-20"),
+            lotteryEndDate = previewDate("2026-09-27"),
             waitlistMax = 50,
             waitlist = arrayListOf("abc123", "xyz789"),
             campsite = campsiteA

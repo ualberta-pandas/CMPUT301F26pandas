@@ -1,17 +1,9 @@
 package com.example.campsiteapp.view
 
-import android.app.Dialog
-import android.net.Uri
 import android.os.Build
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
@@ -44,33 +35,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.example.campsiteapp.controller.MapLocationPicker
 import com.example.campsiteapp.controller.OwnerCampsiteController
-import com.example.campsiteapp.data.Campsite
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
+import com.example.campsiteapp.model.Campsite
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
-import java.util.Properties
 
 /*
 class OwnerCampsiteDetailsScreen {
@@ -163,27 +140,18 @@ class OwnerCampsiteDetailsScreen {
                         Column(
                             modifier = Modifier.width(200.dp).height(200.dp)
                         ) {
-                            val location = LatLng(selectedCampsiteDetails?.latitude?.toDouble() ?: 0.0, selectedCampsiteDetails?.longitude?.toDouble()?:0.0)
-
-                            val cameraPositionState = rememberCameraPositionState {
-                                position = CameraPosition.fromLatLngZoom(location, 15f)
-                            }
-
-                            GoogleMap(
-                                modifier = Modifier.fillMaxSize(),
-                                cameraPositionState = cameraPositionState
-                            ) {
-                                Marker(
-                                    state = rememberMarkerState(position = location),
-                                    title = "Campsite Location"
-                                )
-                            }
+                            MapLocationPicker(
+                                onLocationSelected = { lat, long ->
+                                    latitude = lat
+                                    longitude = long
+                                }
+                            )
                         }
 
 
                         Column() {
                             AsyncImage(
-                                model = selectedCampsiteDetails?.image?:"Campsite Image",
+                                model = selectedCampsiteDetails?.image,
                                 contentDescription = "Edit",
                                 modifier = Modifier
                                     .width(200.dp)
@@ -267,7 +235,7 @@ class OwnerCampsiteDetailsScreen {
                         )
 
                         TextField(
-                            value = occupancy.toString(),
+                            value = occupancy,
                             onValueChange = { occupancy = it },
                             label = { Text("Occupancy") },
                             modifier = Modifier.border(
