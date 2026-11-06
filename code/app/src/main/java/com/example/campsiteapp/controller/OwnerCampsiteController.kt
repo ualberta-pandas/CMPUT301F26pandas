@@ -10,7 +10,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,7 +40,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -69,8 +67,10 @@ import java.util.Locale
 import java.util.UUID
 import android.location.Geocoder
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
@@ -251,7 +251,7 @@ class OwnerCampsiteController (
 
                         TextField(
                             value = availableDates,
-                            onValueChange = {},
+                            onValueChange = {availableDates = it},
                             label = { Text("Available Dates") },
                             modifier = Modifier.border(
                                 width = 1.dp,
@@ -333,13 +333,38 @@ class OwnerCampsiteController (
 
                     if (showMap) {
 
-                        MapLocationPicker(
-                            onLocationSelected = { lat, long ->
-                                latitude = lat
-                                longitude = long
-                                showMap = false
+                        Dialog(
+                            onDismissRequest = {showMap =false}
+                        ) {
+
+                            Card() {
+
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+
+                                    Row(
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.Top
+                                    ){
+
+                                        Button(
+                                            onClick = onDismissRequest
+                                        ) {Text("X") }
+                                    }
+
+                                    MapLocationPicker(
+                                        onLocationSelected = { lat, long ->
+                                            latitude = lat
+                                            longitude = long
+                                            showMap = false
+                                        }
+                                    )
+                                }
                             }
-                        )
+
+                        }
 
                     }
 
