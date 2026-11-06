@@ -476,7 +476,7 @@ class OwnerCampsiteController (
                                             Campsite(
                                                 name = campName,
                                                 location = location,
-                                                occupancy = occupancy.toInt(),
+                                                occupancy = occupancy.toDouble(),
                                                 owner = owner,
                                                 price = price,
                                                 latitude = latitude.toString(),
@@ -962,7 +962,7 @@ class OwnerCampsiteController (
                                                 selectedCampsiteDetails?.id ?: "",
                                                 selectedCampsiteDetails?.name ?: "",
                                                 selectedCampsiteDetails?.location ?: "",
-                                                selectedCampsiteDetails?.occupancy ?: 0,
+                                                selectedCampsiteDetails?.occupancy ?: 0.0,
                                                 selectedCampsiteDetails?.owner ?: "",
                                                 selectedCampsiteDetails?.latitude ?: "",
                                                 selectedCampsiteDetails?.longitude?:"",
@@ -980,7 +980,7 @@ class OwnerCampsiteController (
                                             Campsite(
                                                 name = campName,
                                                 location = location,
-                                                occupancy = occupancy as Int,
+                                                occupancy = occupancy as Double,
                                                 owner = owner,
                                                 latitude = latitude.toString(),
                                                 longitude = longitude.toString(),
