@@ -6,7 +6,7 @@ data class Campsite(
     val id: String = "",
     var name: String = "",
     var location: String = "",
-    var occupancy: Int = 0,
+    var occupancy: Double = 0.0,
     var owner: String = "",
     val latitude: String = "",
     val longitude: String = "",

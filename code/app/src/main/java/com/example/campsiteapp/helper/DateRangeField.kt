@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.dp
  * a one-day range.
  *
  * @param label what the range is for (Lottery, Booking, etc.)
- * @param start the range start as epoch millis at UTC midnight, or null if not set
- * @param end the range end as epoch millis at UTC midnight, or null if not set
+ * @param start the range start as String in YYYY-MM-DD format, or null if not set
+ * @param end the range end as String in YYYY-MM-DD format, or null if not set
  * @param onChange called with the new start and end when the owner confirms the picker
  * @param tag prefix for the test tag; the button is tagged "<tag>Button"
  */
@@ -39,9 +39,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun DateRangeField(
     label: String,
-    start: Long?,
-    end: Long?,
-    onChange: (start: Long?, end: Long?) -> Unit,
+    start: String,
+    end: String,
+    onChange: (start: String, end: String) -> Unit,
     tag: String
 ) {
     var pickerOpen by remember { mutableStateOf(false) }
@@ -54,8 +54,8 @@ fun DateRangeField(
         Column {
             Text(label, fontWeight = FontWeight.Bold)
             Text(
-                if (start == null || end == null) "Not set"
-                else "${formatDate(start)} to ${formatDate(end)}"
+                if (start.isBlank() || end.isBlank()) "Not set"
+                else "$start to $end"
             )
         }
         OutlinedButton(
@@ -66,8 +66,8 @@ fun DateRangeField(
 
     if (pickerOpen) {
         val pickerState = rememberDateRangePickerState(
-            initialSelectedStartDateMillis = start,
-            initialSelectedEndDateMillis = end
+            initialSelectedStartDateMillis = parseDate(start),
+            initialSelectedEndDateMillis = parseDate(end)
         )
         DatePickerDialog(
             onDismissRequest = { pickerOpen = false },
@@ -75,9 +75,11 @@ fun DateRangeField(
                 TextButton(
                     enabled = pickerState.selectedStartDateMillis != null,
                     onClick = {
-                        val chosenStart = pickerState.selectedStartDateMillis
-                        onChange(chosenStart, pickerState.selectedEndDateMillis ?: chosenStart)
-                        pickerOpen = false
+                        pickerState.selectedStartDateMillis?.let { chosenStart ->
+                            val chosenEnd = pickerState.selectedEndDateMillis ?: chosenStart
+                            onChange(formatDate(chosenStart), formatDate(chosenEnd))
+                            pickerOpen = false
+                        }
                     }
                 ) { Text("OK") }
             },

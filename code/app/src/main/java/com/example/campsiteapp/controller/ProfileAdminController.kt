@@ -14,7 +14,7 @@ package com.example.campsiteapp.controller
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import com.example.campsiteapp.model.Campsite
-import com.example.campsiteapp.model.CampsitesDatabase
+import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore

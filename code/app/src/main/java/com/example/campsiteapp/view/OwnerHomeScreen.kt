@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OwnerHomeScreen(
@@ -37,6 +38,7 @@ fun OwnerHomeScreen(
 ) {
     val tabs = listOf("Manage", "Lottery", "Reservations")
     var selectedIndex by remember { mutableIntStateOf(0) }
+
 
     Column {
 
