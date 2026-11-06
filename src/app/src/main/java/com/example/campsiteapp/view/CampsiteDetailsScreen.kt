@@ -1,4 +1,4 @@
-package com.example.campsiteapp.ui.lottery
+package com.example.campsiteapp.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -33,13 +33,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.IntentCompat
 import com.example.campsiteapp.data.Campsite
 import com.example.campsiteapp.data.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
-private val dateFormat = DateTimeFormatter.ofPattern("MMM d")
 private val pill = RoundedCornerShape(50)
 
 class CampsiteDetailsScreen : ComponentActivity() {
@@ -48,9 +46,8 @@ class CampsiteDetailsScreen : ComponentActivity() {
         enableEdgeToEdge()
 
         // TODO: get these from your controllers / intent
-        val campsite = intent.getSerializableExtra("campsite") as Campsite
-        val lottery = intent.getSerializableExtra("lottery") as Lottery?
-        val isJoined = intent.getBooleanExtra("isJoined", false)
+        val campsite = IntentCompat.getSerializableExtra(intent, "campsite", Campsite::class.java)!!
+        val lottery = IntentCompat.getSerializableExtra(intent, "lottery", Lottery::class.java)
 
         setContent {
             CampsiteAppTheme {
@@ -58,7 +55,9 @@ class CampsiteDetailsScreen : ComponentActivity() {
                     CampsiteView(
                         campsiteSelection = campsite,
                         lottery = lottery,
-                        isJoined = isJoined,
+                        isJoined = {
+                            true
+                        },
                         onJoinClick = {
                             /*
                             if (isJoined) waitlistController.leave(campsite, lottery!!)
@@ -78,7 +77,7 @@ class CampsiteDetailsScreen : ComponentActivity() {
 fun CampsiteView(
     campsiteSelection: Campsite,
     lottery: Lottery?,
-    isJoined: Boolean,
+    isJoined: () -> Boolean,
     onJoinClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -116,7 +115,7 @@ fun CampsiteView(
 
             lottery?.let { // if the lottery is not nan then show this
                 Text(
-                    text = "${it.lotteryStartDate.format(dateFormat)} - ${it.lotteryEndDate.format(dateFormat)}",
+                    text = "${lottery.lotteryStartDate} - ${lottery.lotteryEndDate}",
                     modifier = Modifier
                         .border(1.dp, Color.Black, pill)
                         .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -127,7 +126,7 @@ fun CampsiteView(
 
             lottery?.let{
                 Text(
-                    text = "Guest Count: ${campsiteSelection.maxOccupancy}",
+                    text = "Guest Count: ${campsiteSelection.occupancy}",
                     modifier = Modifier
                         .border(1.dp, Color.Black, pill)
                         .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -155,7 +154,7 @@ fun CampsiteView(
             text = """
                 ${campsiteSelection.name}
                 ${campsiteSelection.location}
-                ${campsiteSelection.maxOccupancy} people maximum occupancy
+                ${campsiteSelection.occupancy} people maximum occupancy
                 ${campsiteSelection.rating}/5 ★
             """.trimIndent(),
             fontSize = 12.sp,
@@ -195,7 +194,7 @@ fun CampsiteView(
         }
 
         Text(
-            text = "Available starting ${campsiteSelection.startDate.format(dateFormat)}",
+            text = "Available starting ${campsiteSelection.startDate}",
             modifier = Modifier
                 .border(1.dp, Color.Black, pill)
                 .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -204,7 +203,7 @@ fun CampsiteView(
         if (lottery != null) {
             Button(
                 onClick = onJoinClick,
-                enabled = isJoined || !lottery.isFull(),
+                enabled = isJoined() || !lottery.isFull(),
                 shape = pill,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFB5C7BE),
@@ -212,7 +211,7 @@ fun CampsiteView(
                 ),
                 modifier = Modifier.padding(16.dp)
             ) {
-                Text(if (isJoined) "Leave Waitlist" else "Join Waitlist", fontSize = 20.sp)
+                Text(if (isJoined()) "Leave Waitlist" else "Join Waitlist", fontSize = 20.sp)
             }
         }
     }
@@ -220,35 +219,43 @@ fun CampsiteView(
 
 @Preview(showBackground = true)
 @Composable
-fun CampsiteViewPreview() {
+fun CampsiteDetailsScreenPreview() {
     val campsite = Campsite(
         id = "1",
         name = "Campsite Location A",
-        owner = "dana_device_id",
         location = "123 Jasper, Edmonton, AB",
-        startDate = LocalDate.of(2026, 9, 22),
-        endDate = LocalDate.of(2026, 10, 30),
+        occupancy = 8.0,
+        owner = "dana_device_id",
+        latitude = "53.5461",
+        longitude = "-113.4938",
+        price = "25.00",
+        startDate = "2026-09-22",
+        endDate = "2026-10-30",
+        description = "Open campsite near the lake.\n\nAmenities\n• Running water on site\n• Grill on site\n• Great views",
+        tags = "lake,quiet",
+        rules = "No loud music after 10pm",
+        image = "",
+        status = "open",
         rating = 4.4,
-        maxOccupancy = 8,
-        description = "Open campsite near the lake.\n\nAmenities\n• Running water on site\n• Grill on site\n• Great views"
+        address = "6702 280 Bays Drive"
     )
 
     val lottery = Lottery(
         campsiteId = 1,
         numWinners = 5,
-        lotteryStartDate = LocalDate.of(2026, 9, 16),
-        lotteryEndDate = LocalDate.of(2026, 9, 23),
+        lotteryStartDate = "2026-09-22",
+        lotteryEndDate = "2026-10-30",
         waitlistCount = 12,
         waitlistMax = 50,
         waitlist = arrayListOf("abc123", "xyz789"),
-        campsite = campsite
+        campsite = campsite,
     )
 
     CampsiteAppTheme {
         CampsiteView(
             campsiteSelection = campsite,
             lottery = lottery,
-            isJoined = false,
+            isJoined = {false},
             onJoinClick = {}
         )
     }

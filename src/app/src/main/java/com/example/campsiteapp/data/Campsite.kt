@@ -6,17 +6,18 @@ data class Campsite(
     val id: String,
     var name: String,
     var location: String,
-    var occupancy:String,
+    var occupancy: Double,
     var owner: String,
     val latitude: String,
     val longitude: String,
     val price: String,
-    val startDate: LocalDate,
-    val endDate: LocalDate,
-    val description: String = " ",
+    val startDate: String,
+    val endDate: String,
+    val description: String = "",
     val tags: String,
     val rules: String,
     val image: String,
     val status: String,
-    var rating: Double = 0.0
-)
+    var rating: Double = 0.0,
+    var address: String
+): java.io.Serializable

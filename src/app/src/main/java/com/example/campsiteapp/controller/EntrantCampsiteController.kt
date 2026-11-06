@@ -2,17 +2,24 @@ package com.example.campsiteapp.controller
 
 import android.content.Context
 import android.content.Intent
-import com.example.campsiteapp.CampsiteDatabase
-import com.example.campsiteapp.data.Campsite
-import com.example.campsiteapp.ui.lottery.CampsiteDetailsScreen
+import com.example.campsiteapp.data.Lottery
+
+import com.example.campsiteapp.view.CampsiteDetailsScreen
+import com.example.campsiteapp.view.CampsiteListScreen
+
 
 object EntrantCampsiteController {
-    fun getCampsiteById(id: String): Campsite? {
-        return CampsiteDatabase.getCampsiteById(id)
+
+    /**
+     Returns a list of the lotteries that have their campsites matching
+     the user result. Probably going to be done by some regex
+     **/
+    fun getResultsBySearch(searchResult: String): ArrayList<Lottery>{
+        return ArrayList()
     }
 
-    fun toggleCampsiteSearch(context: Context, userSearch: String){
-        val intent = Intent(context, CampsiteDetailsScreen::class.java)
+    fun toggleSearchResultsScreen(context: Context, userSearch: String){
+        val intent = Intent(context, CampsiteListScreen::class.java)
         intent.putExtra("search", userSearch)
         context.startActivity(intent)
     }

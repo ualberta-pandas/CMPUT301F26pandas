@@ -65,6 +65,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.Properties
 
+/*
 class OwnerCampsiteDetailsScreen {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -547,3 +548,5 @@ class OwnerCampsiteDetailsScreen {
     }
 
 }
+
+ */

@@ -1,4 +1,4 @@
-package com.example.campsiteapp.ui.CampsiteLists
+package com.example.campsiteapp.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -40,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campsiteapp.controller.EntrantCampsiteController
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
-import java.time.format.DateTimeFormatter
+
 private val pill = RoundedCornerShape(50)
 
 class EntrantHomeScreen : ComponentActivity() {
@@ -55,7 +59,7 @@ class EntrantHomeScreen : ComponentActivity() {
                     EntrantHomeScreenView(
                         modifier = Modifier.padding(innerPadding),
                         updateByUserSearch = { search ->
-                            EntrantCampsiteController.toggleCampsiteSearch(this@EntrantHomeScreen, search)
+                            EntrantCampsiteController.toggleSearchResultsScreen(this@EntrantHomeScreen, search)
                         }
 
                     )
@@ -73,19 +77,18 @@ fun EntrantHomeScreenView(
     var entrantSearch by remember { mutableStateOf("") }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+        .padding(top = 5.dp),
         verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         IconButton(
-            onClick = {},
-            modifier = Modifier.padding(start = 8.dp)
-        ) {
+            modifier = Modifier,
+            onClick = {}) {
             Icon(
-                imageVector = Icons.Outlined.Home,
-                contentDescription = "Home",
-                modifier = Modifier.size(32.dp)
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu"
             )
         }
 
@@ -94,24 +97,27 @@ fun EntrantHomeScreenView(
             onValueChange = { entrantSearch = it },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(
-                onSearch = {
-                    updateByUserSearch(entrantSearch)
-                }
-            ),
-
+            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
             textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .border(1.dp, Color.Black, pill)
-                .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 11.dp),
+                .border(1.dp, Color.LightGray, pill)
+                .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
             decorationBox = { innerTextField ->
-                if (entrantSearch.isEmpty()) {
-                    Text("search campsites                                                               ⌕",
-                        color = Color.Gray, fontSize = 14.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        if (entrantSearch.isEmpty()) {
+                            Text("search campsites", color = Color.Gray, fontSize = 14.sp)
+                        }
+                        innerTextField()
+                    }
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
-                innerTextField()
             }
         )
 
@@ -157,6 +163,6 @@ fun EntrantHomeScreenView(
 
 @Preview(showBackground = true)
 @Composable
-fun CampsiteViewPreview() {
+fun EntrantHomeScreenViewPreview() {
     EntrantHomeScreenView(updateByUserSearch = {})
 }
