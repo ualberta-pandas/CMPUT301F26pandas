@@ -18,8 +18,10 @@ class CampsiteAdminController(private val campsitesDatabase: CampsitesDatabase) 
 
     /**
      * Removes the campsite with [id].
+     *
+     * @param onFailure called if the removal fails.
      */
-    fun removeCampsite(id: String) {
-        //campsitesDatabase.deleteCampsite(id)
+    fun removeCampsite(id: String, onFailure: (Exception) -> Unit) {
+        campsitesDatabase.deleteCampsite(id).addOnFailureListener(onFailure)
     }
 }

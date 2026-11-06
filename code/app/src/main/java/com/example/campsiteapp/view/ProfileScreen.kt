@@ -52,7 +52,7 @@ import com.example.campsiteapp.data.ProfileDatabase
 import com.example.campsiteapp.data.DeviceIDs
 import kotlinx.coroutines.launch
 import com.example.campsiteapp.model.User
-import com.example.campsiteapp.model.ImageUploadService
+import com.example.campsiteapp.controller.ImageUploadService
 import com.example.campsiteapp.view.components.CancelOrProceedTextButtonsPair
 import com.example.campsiteapp.view.components.CustomPopup
 import com.example.campsiteapp.view.components.ProfilePicture
@@ -241,24 +241,24 @@ fun ProfileScreen(
                             .fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
+                        //clicking cancels editing
+                        Icon(
+                            imageVector = Icons.Default.ChevronLeft,
+                            "Back button",
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Color.DarkGray)
+                                .padding(8.dp)
+                                .clickable {
+                                    profileScreenMode = "My Profile"
+                                    currentProfileScreenState = ProfileScreenState.VIEWOWN
+                                },
+                            tint = Color.White
+                        )
                         //Only if editing
                         if (currentProfileScreenState == ProfileScreenState.EDIT) {
-                            //clicking cancels editing
-                            Icon(
-                                imageVector = Icons.Default.ChevronLeft,
-                                "Back button",
-                                modifier = Modifier
-                                    .align(Alignment.TopStart)
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.DarkGray)
-                                    .padding(8.dp)
-                                    .clickable {
-                                        profileScreenMode = "My Profile"
-                                        currentProfileScreenState = ProfileScreenState.VIEWOWN
-                                    },
-                                tint = Color.White
-                            )
                             //clicking opens a window to confirm deletion
                             Icon(
                                 imageVector = Icons.Default.Delete,
@@ -442,21 +442,21 @@ fun ProfileScreen(
                                         },
                                     tint = Color.White
                                 )
-                                Icon(
-                                    imageVector = Icons.Default.ChevronLeft,
-                                    "Back button",
-                                    modifier = Modifier
-                                        .align(Alignment.TopStart)
-                                        .size(40.dp)
-                                        .clip(CircleShape)
-                                        .background(Color.DarkGray)
-                                        .padding(8.dp)
-                                        .clickable {
-                                            navController.popBackStack()
-                                        },
-                                    tint = Color.White
-                                )
                             }
+                            Icon(
+                                imageVector = Icons.Default.ChevronLeft,
+                                "Back button",
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.DarkGray)
+                                    .padding(8.dp)
+                                    .clickable {
+                                        navController.popBackStack()
+                                    },
+                                tint = Color.White
+                            )
                             //profile picture
                             ProfilePicture(
                                 Modifier.Companion,

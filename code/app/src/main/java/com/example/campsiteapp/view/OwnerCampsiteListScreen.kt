@@ -1,10 +1,10 @@
 package com.example.campsiteapp.view
 
+/*
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,6 +39,8 @@ import coil.compose.AsyncImage
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.controller.OwnerCampsiteController
 
+
+
 class OwnerCampsiteListScreen {
 
     val ownerController = OwnerCampsiteController()
@@ -53,6 +55,18 @@ class OwnerCampsiteListScreen {
         onEditCampsite: (Campsite, Campsite) -> Unit
 
     ) {
+
+
+        /**
+         * This lists all the owner's campsites' names, occupancies,
+         * locations and availability statuses
+         *
+         * @param campsites this is the list of campsites to be shown
+         * @param onAddCampsite is passed to OwnerCampsiteController to
+         * add new campsites
+         * @param onEditCampsite is passed to CampsiteDetailsScreen and
+         * then to EditCampsite to edit campsites
+         */
 
 
         var showDetails by remember { mutableStateOf(false) }
@@ -84,9 +98,11 @@ class OwnerCampsiteListScreen {
                             .combinedClickable(
                                 onDoubleClick = {
 
-                                },
-                                onClick = {     selectedCampsite = campsite
-                                    showDetails = true}
+                                    selectedCampsite = campsite
+                                    showDetails = true
+
+                                      },
+                                onClick = {}
                             ),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
@@ -104,7 +120,7 @@ class OwnerCampsiteListScreen {
                             )
 
                             Text(
-                                text = campsite.occupancy.toString(),
+                                text = campsite.occupancy,
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -118,12 +134,6 @@ class OwnerCampsiteListScreen {
                                         shape = RoundedCornerShape(size = 20.dp)
                                     )
                             )
-
-                            Text(
-                                text = "# Slots available",
-
-
-                                )
                         }
 
                         Spacer(modifier = Modifier.width(80.dp))
@@ -184,17 +194,17 @@ class OwnerCampsiteListScreen {
                         usePlatformDefaultWidth = false
                     )
                 ) {
-                    ownerDetailsScreen.CampsiteDetailsScreen(
+                   ownerDetailsScreen.CampsiteDetailsScreen(
 
-                        selectedCampsiteDetails = selectedCampsite,
-                        onEditCampsite = onEditCampsite,
+                       selectedCampsiteDetails = selectedCampsite,
+                       onEditCampsite = onEditCampsite,
 
 
-                        onDismissRequest = {
-                            showDetails = false
-                            selectedCampsite = null
-                        }
-                    )
+                       onDismissRequest = {
+                           showDetails = false
+                           selectedCampsite = null
+                       }
+                   )
 
 
                 }
@@ -206,3 +216,4 @@ class OwnerCampsiteListScreen {
     }
 
 }
+*/

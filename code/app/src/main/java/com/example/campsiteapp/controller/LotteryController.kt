@@ -3,6 +3,8 @@ package com.example.campsiteapp.controller
 import com.example.campsiteapp.data.LotteryStorage
 import com.example.campsiteapp.model.Lottery
 
+/*
+
 /**
  * Creates and updates lottery from the details an owner enters
  *
@@ -75,3 +77,5 @@ class LotteryController(private val storage: LotteryStorage) {
         }
     }
 }
+
+ */
