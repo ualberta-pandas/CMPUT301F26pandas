@@ -1,4 +1,4 @@
-package com.example.campsiteapp.data
+package com.example.campsiteapp.model
 
 import androidx.compose.runtime.mutableStateListOf
 import com.example.campsiteapp.model.Campsite
@@ -133,7 +133,6 @@ class CampsitesDatabase {
         )
 
     }
-
 
 
     /** Deletes the campsite with [id]. */

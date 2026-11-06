@@ -4,7 +4,7 @@
 package com.example.campsiteapp.controller
 
 import com.example.campsiteapp.model.Campsite
-import com.example.campsiteapp.data.CampsitesDatabase
+import com.example.campsiteapp.model.CampsitesDatabase
 
 /**
  * Lets an admin browse and remove campsites.
@@ -20,6 +20,6 @@ class CampsiteAdminController(private val campsitesDatabase: CampsitesDatabase) 
      * Removes the campsite with [id].
      */
     fun removeCampsite(id: String) {
-        campsitesDatabase.deleteCampsite(id)
+        //campsitesDatabase.deleteCampsite(id)
     }
 }

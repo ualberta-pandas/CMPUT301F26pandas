@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -48,6 +49,7 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
+/*
 class OwnerCampsiteDetailsScreen {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -106,6 +108,14 @@ class OwnerCampsiteDetailsScreen {
                     var campName by remember(selectedCampsiteDetails) {
                         mutableStateOf(selectedCampsiteDetails?.name?:"") }
 
+                    var longitude by remember(selectedCampsiteDetails) {
+                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble()
+                            ?: 0.0) }
+                    var latitude by remember(selectedCampsiteDetails) {
+                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble() ?:0.0) }
+
+
+
                     TextField(
                         value = campName,
                         onValueChange = { campName = it },
@@ -125,15 +135,31 @@ class OwnerCampsiteDetailsScreen {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Column() {
-                        AsyncImage(
-                            model = selectedCampsiteDetails?.image,
-                            contentDescription = "Edit",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp),
-                            contentScale = ContentScale.Crop
-                        )
+                    Row() {
+
+                        Column(
+                            modifier = Modifier.width(200.dp).height(200.dp)
+                        ) {
+                            MapLocationPicker(
+                                onLocationSelected = { lat, long ->
+                                    latitude = lat
+                                    longitude = long
+                                }
+                            )
+                        }
+
+
+                        Column() {
+                            AsyncImage(
+                                model = selectedCampsiteDetails?.image,
+                                contentDescription = "Edit",
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .height(200.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
                     }
 
 
@@ -314,50 +340,16 @@ class OwnerCampsiteDetailsScreen {
 
                     var showMap by remember { mutableStateOf(false) }
 
-                    var longitude by remember(selectedCampsiteDetails) {
-                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble()
-                            ?: 0.0) }
-                    var latitude by remember(selectedCampsiteDetails) {
-                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble() ?:0.0) }
 
 
-                    if (showMap) {
 
-                        MapLocationPicker(
-                            onLocationSelected = { lat, long ->
-                                latitude = lat
-                                longitude = long
-                                showMap = false
-                            }
-                        )
 
-                    }
 
 
 
                     val coordinates = "$latitude,$longitude"
 
                     mapLocation = coordinates
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Row() {
-                        TextField(
-                            value = mapLocation,
-                            onValueChange = { mapLocation = it },
-                            label = { Text("Map Location") },
-                            modifier = Modifier.border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                        )
-
-                        Button(
-                            onClick = {
-                                showMap = true
-                            }
-                        ) { Text("Choose Location") }
-                    }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -530,3 +522,5 @@ class OwnerCampsiteDetailsScreen {
     }
 
 }
+
+ */

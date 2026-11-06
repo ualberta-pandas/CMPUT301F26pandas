@@ -38,6 +38,7 @@ import coil.compose.AsyncImage
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.controller.OwnerCampsiteController
 
+/*
 class OwnerCampsiteListScreen {
 
     val ownerController = OwnerCampsiteController()
@@ -213,3 +214,5 @@ class OwnerCampsiteListScreen {
     }
 
 }
+
+ */

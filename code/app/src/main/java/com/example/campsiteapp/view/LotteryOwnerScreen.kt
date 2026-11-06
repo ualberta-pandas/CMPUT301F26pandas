@@ -108,3 +108,44 @@ private fun LotteryCard(
         }
     }
 }
+
+private fun previewDate(text: String): Long {
+    val format = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    format.timeZone = TimeZone.getTimeZone("UTC")
+    return format.parse(text)!!.time
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LotteryListPreview() {
+    LotteryOwnerScreen().LotteryList(
+        lotteries = listOf(
+            Lottery(
+                id = "1",
+                campsiteIds = listOf("a", "b"),
+                lotteryStartDate = previewDate("2026-11-10"),
+                lotteryEndDate = previewDate("2026-11-20"),
+                bookingStartDate = previewDate("2026-12-01"),
+                bookingEndDate = previewDate("2026-12-05"),
+                numWinners = 2,
+                waitlistCapacity = 10,
+                status = "Registration open"
+            ),
+            Lottery(
+                id = "2",
+                campsiteIds = listOf("a"),
+                lotteryStartDate = previewDate("2026-12-01"),
+                lotteryEndDate = previewDate("2026-12-10"),
+                bookingStartDate = previewDate("2027-01-05"),
+                bookingEndDate = previewDate("2027-01-09"),
+                numWinners = 1
+            )
+        ),
+        campsites = listOf(
+            Campsite(id = "a", name = "Elk Island Site"),
+            Campsite(id = "b", name = "Cooking Lake Site")
+        ),
+        onCreateClick = {},
+        onLotteryClick = {}
+    )
+}

@@ -1,6 +1,5 @@
-package com.example.campsiteapp
+package com.example.campsiteapp.view.components
 
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,10 +28,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 
 /**
  * Displays a styled popup
@@ -171,16 +172,18 @@ fun CancelOrProceedTextButtonsPair(
 @Composable
 fun ProfilePicture(
     modifier: Modifier,
-    image: Uri?,
+    image: String,
     size: Dp,
     contentDescription: String,
     customContent: @Composable () -> Unit
 ){
+
     Box(
         modifier
             .size(size)
+            .padding(5.dp)
     ) {
-        if(image==null){
+        if((image=="null")or(image=="")){
             Box(
                 modifier
                     .size(size)
@@ -199,8 +202,13 @@ fun ProfilePicture(
                 )
             }
         }else{
+            val context=LocalContext.current
             Image(
-                painter = rememberAsyncImagePainter(image),
+                painter = rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(context)
+                        .data(image)
+                        .build()
+                ),
                 contentDescription = contentDescription,
                 modifier
                     .fillMaxSize()
