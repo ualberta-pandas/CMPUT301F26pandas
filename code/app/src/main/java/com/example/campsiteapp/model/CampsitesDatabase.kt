@@ -2,6 +2,7 @@ package com.example.campsiteapp.model
 
 import androidx.compose.runtime.mutableStateListOf
 import com.example.campsiteapp.model.Campsite
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
@@ -136,7 +137,5 @@ class CampsitesDatabase {
 
 
     /** Deletes the campsite with [id]. */
-    fun deleteCampsite(id: String) {
-        campsitesRef.document(id).delete()
-    }
+    fun deleteCampsite(id: String): Task<Void> = campsitesRef.document(id).delete()
 }

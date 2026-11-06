@@ -40,6 +40,7 @@ fun AdminProfileListScreen(profiles: List<User>, onProfileClick: (User) -> Unit,
                         .padding(16.dp),
                 ) {
                     Text(profile.name, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    Text(profile.roles.joinToString(), color = Color.Gray)
                 }
                 HorizontalDivider()
             }
