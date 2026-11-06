@@ -23,12 +23,16 @@ class MainActivity : ComponentActivity() {
 
                 //check deviceIDs class for usage documentation
         deviceIds = DeviceIDs(applicationContext) // Do not delete IMPORTANT(device id)
-        startActivity(Intent(this, EntrantHomeScreen::class.java))
-        finish()
+
         setContent {
             val campsitesDatabase = CampsitesDatabase()
 
+
             CampsiteAppTheme {
+
+                startActivity(Intent(this, EntrantHomeScreen::class.java))
+
+
                 OwnerHomeScreen (
                     campsites = campsitesDatabase.campsites,
                     onAddCampsite = {campsite -> campsitesDatabase.addCampsite(campsite)},
@@ -39,6 +43,8 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 )
+
+                finish()
             }
         }
     }
