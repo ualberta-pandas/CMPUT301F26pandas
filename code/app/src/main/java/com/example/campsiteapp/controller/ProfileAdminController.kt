@@ -10,7 +10,7 @@
 package com.example.campsiteapp.controller
 
 import androidx.compose.runtime.mutableStateListOf
-import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.model.CampsitesDatabase
 import com.example.campsiteapp.model.User
 import com.google.firebase.Firebase

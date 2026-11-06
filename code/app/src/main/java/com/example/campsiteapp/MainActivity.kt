@@ -1,17 +1,10 @@
 package com.example.campsiteapp
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import com.example.campsiteapp.controller.EntrantWaitlistController
 
-
-import com.example.campsiteapp.data.Campsite
-import com.example.campsiteapp.model.CampsitesDatabase
-
-import com.example.campsiteapp.data.Lottery
-import com.example.campsiteapp.model.LotteryDatabase
 
 import com.example.campsiteapp.view.EntrantHomeScreen
 import com.example.campsiteapp.data.DeviceIDs
@@ -33,7 +26,3 @@ class MainActivity : ComponentActivity() {
 
 
 }
-
-
-
-
