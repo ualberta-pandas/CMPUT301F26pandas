@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -79,14 +80,9 @@ class EntrantHomeScreen : ComponentActivity() {
                         },
                         deviceId = deviceId,
 
-                        openProfileScreen = {
-
-                        },
-
-                        openOwnerScreen = {},
-
-                        openAdminScreen = {}
-
+                        openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@EntrantHomeScreen) },
+                        openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@EntrantHomeScreen) },
+                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@EntrantHomeScreen) },
                     )
                 }
             }
@@ -129,7 +125,8 @@ fun EntrantHomeScreenView(
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     DropdownMenuItem(
                         text = { Text("Admin") },
-                        onClick = { menuOpen = false }
+                        onClick = { menuOpen = false
+                            openAdminScreen()}
                     )
                     DropdownMenuItem(
                         text = { Text("Owner") },

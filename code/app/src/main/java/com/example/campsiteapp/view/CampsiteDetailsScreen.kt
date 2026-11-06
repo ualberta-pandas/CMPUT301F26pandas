@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,16 +20,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -49,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
+import com.example.campsiteapp.controller.EntrantCampsiteController
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.model.Lottery
@@ -99,6 +105,10 @@ class CampsiteDetailsScreen : ComponentActivity() {
                         },
 
                         onBack = { finish() },
+
+                        openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@CampsiteDetailsScreen) },
+                        openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@CampsiteDetailsScreen) },
+                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@CampsiteDetailsScreen) },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -117,21 +127,62 @@ fun CampsiteView(
     onBack: () -> Unit,
 
     updateByUserSearch: (search: String) -> Unit,
+
+    openProfileScreen: () -> Unit,
+    openOwnerScreen: () -> Unit,
+    openAdminScreen: () -> Unit,
+
     modifier: Modifier = Modifier
 ) {
     var entrantSearch by remember { mutableStateOf("") }
+    var menuOpen by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+            .padding(top = 5.dp),
         verticalArrangement = Arrangement.Top
     ) {
         Spacer(modifier = Modifier.height(5.dp))
 
-        IconButton(onClick = {}) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu"
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
+            Box {
+                IconButton(onClick = { menuOpen = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Menu"
+                    )
+                }
+
+                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    DropdownMenuItem(
+                        text = { Text("Admin") },
+                        onClick = { menuOpen = false
+                            openAdminScreen()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Owner") },
+                        onClick = { menuOpen = false }
+                    )
+                }
+            }
+
+
+            IconButton(
+                modifier = Modifier.background(Color(0xFFE8DEF8), CircleShape),
+                onClick = {
+                    openProfileScreen()
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Profile",
+                    tint = Color(0xFF4F378B)
+                )
+            }
         }
 
         BasicTextField(

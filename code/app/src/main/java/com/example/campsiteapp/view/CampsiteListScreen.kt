@@ -25,6 +25,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 
@@ -81,8 +83,13 @@ class CampsiteListScreen : ComponentActivity() {
                         },
 
                         lotteries = EntrantCampsiteController.getResultsBySearch(searchResult), // Know that campsites is based on the lottery database
-                        searchResult
+                        searchResult = searchResult,
+                        openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@CampsiteListScreen) },
+                        openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@CampsiteListScreen) },
+                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@CampsiteListScreen) }
+
                     )
+
                 }
             }
         }
@@ -98,188 +105,128 @@ fun CampsiteListView(
     updateByUserSearch: (search: String) -> Unit,
     onLotteryClick: (String) -> Unit,
 
+    openProfileScreen: () -> Unit,
+    openOwnerScreen: () -> Unit,
+    openAdminScreen: () -> Unit,
+
     lotteries: List<Lottery>,
     searchResult: String
-){
+) {
     var entrantSearch by remember { mutableStateOf("") }
+    var menuOpen by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+            .padding(top = 5.dp),
         verticalArrangement = Arrangement.Top
     ) {
         Spacer(modifier = Modifier.height(5.dp))
 
-        IconButton(onClick = {}) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu"
-            )
-        }
-
-        BasicTextField(
-            value = entrantSearch,
-            onValueChange = { entrantSearch = it },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
-            textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .border(1.dp, Color.LightGray, pill)
-                .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
-            decorationBox = { innerTextField ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (entrantSearch.isEmpty()) {
-                            Text("search campsites", color = Color.Gray, fontSize = 14.sp)
-                        }
-                        innerTextField()
-                    }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box {
+                IconButton(onClick = { menuOpen = true }) {
                     Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        modifier = Modifier.size(20.dp)
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Menu"
+                    )
+                }
+
+                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    DropdownMenuItem(
+                        text = { Text("Admin") },
+                        onClick = {
+                            menuOpen = false
+                            openAdminScreen()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Owner") },
+                        onClick = { menuOpen = false }
                     )
                 }
             }
-        )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-
-            Text(
-                text = "No Dates Filter",
+            BasicTextField(
+                value = entrantSearch,
+                onValueChange = { entrantSearch = it },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
+                textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
                 modifier = Modifier
-                    .border(1.dp, Color.Black, pill)
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .border(1.dp, Color.LightGray, pill)
+                    .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+                decorationBox = { innerTextField ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            if (entrantSearch.isEmpty()) {
+                                Text("search campsites", color = Color.Gray, fontSize = 14.sp)
+                            }
+                            innerTextField()
+                        }
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
             )
 
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "No Guest Filter",
+            Row(
                 modifier = Modifier
-                    .border(1.dp, Color.Black, pill)
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
-            )
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
 
+                Text(
+                    text = "No Dates Filter",
+                    modifier = Modifier
+                        .border(1.dp, Color.Black, pill)
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = "No Guest Filter",
+                    modifier = Modifier
+                        .border(1.dp, Color.Black, pill)
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+
+
+            }
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            displayCampsitesAsCards(
+                Modifier, lotteries = lotteries, onLotteryClick,
+                getTextAttributes = { lottery ->
+                    val currSize = lottery.waitlistMax - lottery.waitlist.size
+                    if (currSize == 0) {
+                        Pair("Closed - No Space Left", Color(0xFFD9B8B8))
+                    } else if (currSize < 2) {
+                        Pair("Open - 2 Spaces remaining", Color(0xFFE6DDB0))
+                    } else {
+                        Pair("Open - Many Spots", Color(0xFFB5C7BE))
+                    }
+                })
+
+            Spacer(modifier = Modifier.height(12.dp))
 
         }
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        displayCampsitesAsCards(Modifier, lotteries = lotteries, onLotteryClick,
-            getTextAttributes = {lottery ->
-                val currSize = lottery.waitlistMax - lottery.waitlist.size
-                if (currSize == 0) {
-                    Pair("Closed - No Space Left", Color(0xFFD9B8B8))
-                } else if (currSize < 2) {
-                    Pair("Open - 2 Spaces remaining", Color(0xFFE6DDB0))
-                } else {
-                    Pair("Open - Many Spots", Color(0xFFB5C7BE))
-                }
-            })
-
-        Spacer(modifier = Modifier.height(12.dp))
-
     }
 }
 
-/*
-// Just generated random values using Claude for the preview as I'm developing
-@Preview(showBackground = true)
-@Composable
-fun CampsiteListViewPreview() {
-    val campsiteA = Campsite(
-        id = "1",
-        name = "Campsite Location A",
-        owner = "dana_device_id",
-        location = "123 Jasper, Edmonton, AB",
-        startDate = "2026-09-22",
-        endDate = "2026-10-30",
-        rating = 4.4,
-        occupancy = 8.0,
-        description = "Open campsite near the lake.",
-        latitude = "53.54",
-        longitude = "-113.49",
-        price = "45.0",
-        tags = "",
-        rules = "Quiet hours after 10pm",
-        image = "",
-        status = "open",
-        address = "6702 280 Bays Drive"
-    )
-
-    val campsiteB = Campsite(
-        id = "2",
-        name = "Campsite Location B",
-        owner = "dana_device_id",
-        location = "45 Banff Ave, Banff, AB",
-        startDate = "2026-09-25",
-        endDate = "2026-11-01",
-        rating = 3.9,
-        occupancy = 4.0,
-        description = "Quiet site in the trees.",
-        latitude = "51.18",
-        longitude = "-115.57",
-        price = "30.0",
-        tags = "",
-        rules = "No fires",
-        image = "",
-        status = "open",
-        address = "5678 Southbay West"
-    )
-
-    val lotteries = arrayListOf(
-        // waitlistMax - waitlist.size = 0  -> "Closed - No Space Left"
-        Lottery(
-            campsiteId = 1,
-            numWinners = 5,
-            lotteryStartDate = "2026-09-16",
-            lotteryEndDate = "2026-09-23",
-            waitlistMax = 2,
-            waitlist = arrayListOf("abc123", "xyz789"),
-            campsite = campsiteA
-        ),
-        // 1 left -> "Open - 2 Spaces remaining"
-        Lottery(
-            campsiteId = 2,
-            numWinners = 3,
-            lotteryStartDate = "2026-09-18",
-            lotteryEndDate = "2026-09-25",
-            waitlistMax = 3,
-            waitlist = arrayListOf("abc123", "xyz789"),
-            campsite = campsiteB
-        ),
-        // many left -> "Open - Many Spots"
-        Lottery(
-            campsiteId = 3,
-            numWinners = 5,
-            lotteryStartDate = "2026-09-20",
-            lotteryEndDate = "2026-09-27",
-            waitlistMax = 50,
-            waitlist = arrayListOf("abc123", "xyz789"),
-            campsite = campsiteA
-        )
-    )
-
-    CampsiteAppTheme {
-        CampsiteListView(
-            updateByUserSearch = {},
-            onLotteryClick = {},
-            lotteries = lotteries,
-            searchResult = "e"
-        )
-    }
-}
-*/
 /*
 Prompts to
 okay, I know that if you change something in a list, when there's a lazy_column that's relying on it, its going to recompose because of

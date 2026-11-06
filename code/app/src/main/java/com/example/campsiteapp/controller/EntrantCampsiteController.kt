@@ -6,6 +6,7 @@ import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.data.Reservation
 import com.example.campsiteapp.data.LotteryDatabase
 import com.example.campsiteapp.model.ReservationDatabase
+import com.example.campsiteapp.view.AdminActivity
 
 import com.example.campsiteapp.view.CampsiteDetailsScreen
 import com.example.campsiteapp.view.CampsiteListScreen
@@ -82,5 +83,24 @@ object EntrantCampsiteController {
         intent.putExtra("lottery", lottery)
         intent.putExtra("campsite", lottery.campsite)
         context.startActivity(intent)
+    }
+
+    fun toggleAdminScreen(context: Context) {
+        context.startActivity(Intent(context, AdminActivity::class.java))
+    }
+
+    fun toggleProfileScreen(context: Context, deviceId: String = "") {
+        /*
+        val intent = Intent(context, ProfileActivity::class.java)
+        intent.putExtra("deviceId", deviceId)
+        context.startActivity(intent)
+
+         */
+    }
+
+    fun toggleOwnerScreen(context: Context) {
+        /*
+        context.startActivity(Intent(context, OwnerActivity::class.java))
+         */
     }
 }
