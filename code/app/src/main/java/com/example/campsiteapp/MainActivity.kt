@@ -1,5 +1,6 @@
 package com.example.campsiteapp
 
+import OwnerHomeScreen
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CampsiteAppTheme {
-                OwnerCampsiteListScreen().CampsitesList(
+                OwnerHomeScreen (
                     campsites = campsitesDatabase.campsites,
                     onAddCampsite = {campsite -> campsitesDatabase.addCampsite(campsite)},
                     onEditCampsite = {oldCampsiteDetails, newCampsiteDetails ->
