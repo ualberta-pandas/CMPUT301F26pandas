@@ -135,7 +135,6 @@ class CampsitesDatabase {
     }
 
 
-
     /** Deletes the campsite with [id]. */
     fun deleteCampsite(id: String) {
         campsitesRef.document(id).delete()
