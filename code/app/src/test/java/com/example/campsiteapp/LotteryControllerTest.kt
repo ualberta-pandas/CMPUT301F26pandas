@@ -1,7 +1,6 @@
 package com.example.campsiteapp
 
 import com.example.campsiteapp.controller.LotteryController
-import com.example.campsiteapp.model.Lottery
 import java.time.LocalDate
 import java.time.ZoneOffset
 import org.junit.Assert.assertNotNull

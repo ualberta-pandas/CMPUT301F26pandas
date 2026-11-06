@@ -63,9 +63,6 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-firestore")
-    implementation("androidx.navigation:navigation-compose:2.10.2")
 
-    implementation(platform("com.google.firebase:firebase-bom:<latest>"))
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+    implementation("androidx.navigation:navigation-compose:2.8.0")
 }

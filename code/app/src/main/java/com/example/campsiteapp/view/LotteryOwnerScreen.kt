@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+/*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.helper.formatDate
 import com.example.campsiteapp.model.Campsite
-import com.example.campsiteapp.model.Lottery
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.campsiteapp.model.Lottery
 
 
 /**
@@ -179,3 +180,5 @@ private fun LotteryListPreview() {
         onUpdateLottery = { null }
     )
 }
+
+ */

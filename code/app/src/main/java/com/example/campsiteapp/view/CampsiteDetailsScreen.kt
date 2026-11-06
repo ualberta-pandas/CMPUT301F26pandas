@@ -1,13 +1,16 @@
 package com.example.campsiteapp.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.BorderStroke
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,30 +20,51 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
+import com.example.campsiteapp.controller.EntrantCampsiteController
+import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
 
+import com.example.campsiteapp.controller.EntrantWaitlistController.addEntrantToWaitlist
+import com.example.campsiteapp.controller.EntrantWaitlistController.verifyUserOnWaitlist
+import com.example.campsiteapp.controller.EntrantWaitlistController.removeEntrantFromWaitlist
+
+import com.example.campsiteapp.data.DeviceIDs
 private val pill = RoundedCornerShape(50)
 
 class CampsiteDetailsScreen : ComponentActivity() {
@@ -53,21 +77,38 @@ class CampsiteDetailsScreen : ComponentActivity() {
         val lottery = IntentCompat.getSerializableExtra(intent, "lottery", Lottery::class.java)
 
         setContent {
+            val context = LocalContext.current
+            val deviceId by produceState(initialValue = "") {
+                value = DeviceIDs(context).fetchDeviceId() ?: ""
+            }
+
+
             CampsiteAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     CampsiteView(
                         campsiteSelection = campsite,
                         lottery = lottery,
-                        isJoined = {
-                            true
+                        userOnWaitlist = {
+                            verifyUserOnWaitlist(lottery, deviceId)
                         },
-                        onJoinClick = {
-                            /*
-                            if (isJoined) waitlistController.leave(campsite, lottery!!)
-                            else waitlistController.join(campsite, lottery!!)
 
-                             */
+                        waitlistSelectionClick = { userOnWaitList ->
+                            if (userOnWaitList) {
+                                addEntrantToWaitlist(lottery, deviceId)
+                            } else {
+                                removeEntrantFromWaitlist(lottery, deviceId)
+                            }
                         },
+
+                        updateByUserSearch = {search ->
+                            toggleSearchResultsScreen(this@CampsiteDetailsScreen, search)
+                        },
+
+                        onBack = { finish() },
+
+                        openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@CampsiteDetailsScreen) },
+                        openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@CampsiteDetailsScreen) },
+                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@CampsiteDetailsScreen) },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -80,33 +121,98 @@ class CampsiteDetailsScreen : ComponentActivity() {
 fun CampsiteView(
     campsiteSelection: Campsite,
     lottery: Lottery?,
-    isJoined: () -> Boolean,
-    onJoinClick: () -> Unit,
+
+    userOnWaitlist: () -> Boolean,
+    waitlistSelectionClick: (userOnWaitlist: Boolean) -> Unit,
+    onBack: () -> Unit,
+
+    updateByUserSearch: (search: String) -> Unit,
+
+    openProfileScreen: () -> Unit,
+    openOwnerScreen: () -> Unit,
+    openAdminScreen: () -> Unit,
+
     modifier: Modifier = Modifier
 ) {
+    var entrantSearch by remember { mutableStateOf("") }
+    var menuOpen by remember { mutableStateOf(false) }
+
     Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.fillMaxSize()
+            .padding(top = 5.dp),
         verticalArrangement = Arrangement.Top
     ) {
+        Spacer(modifier = Modifier.height(5.dp))
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ){
+            Box {
+                IconButton(onClick = { menuOpen = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Menu"
+                    )
+                }
+
+                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    DropdownMenuItem(
+                        text = { Text("Admin") },
+                        onClick = { menuOpen = false
+                            openAdminScreen()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Owner") },
+                        onClick = { menuOpen = false }
+                    )
+                }
+            }
+
+
             IconButton(
-                onClick = {},
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier.background(Color(0xFFE8DEF8), CircleShape),
+                onClick = {
+                    openProfileScreen()
+                }
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Home,
-                    contentDescription = "Home",
-                    modifier = Modifier.size(32.dp)
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Profile",
+                    tint = Color(0xFF4F378B)
                 )
             }
         }
+
+        BasicTextField(
+            value = entrantSearch,
+            onValueChange = { entrantSearch = it },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
+            textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .border(1.dp, Color.LightGray, pill)
+                .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+            decorationBox = { innerTextField ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        if (entrantSearch.isEmpty()) {
+                            Text("search campsites", color = Color.Gray, fontSize = 14.sp)
+                        }
+                        innerTextField()
+                    }
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        )
 
         Row(
             modifier = Modifier
@@ -121,18 +227,20 @@ fun CampsiteView(
                     text = "${lottery.lotteryStartDate} - ${lottery.lotteryEndDate}",
                     modifier = Modifier
                         .border(1.dp, Color.Black, pill)
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    fontSize = 13.sp
                 )
             }
 
             Spacer(modifier = Modifier.width(5.dp))
 
-            lottery?.let{
+            lottery?.let {
                 Text(
-                    text = "Guest Count: ${campsiteSelection.occupancy}",
+                    text = "Guest Count: ${campsiteSelection.occupancy.toInt()}",
                     modifier = Modifier
                         .border(1.dp, Color.Black, pill)
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    fontSize = 12.sp
                 )
             }
         }
@@ -142,16 +250,15 @@ fun CampsiteView(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp)
         ) {
-            Button(
-                onClick = onJoinClick,
-                shape = pill,
-                border = BorderStroke(1.dp, Color.Black),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.Black)
-            ) {
-                Text("< back to results")
-            }
+            Text(
+                "< back to results",
+                fontSize = 10.sp,
+                modifier = Modifier
+                    .clickable { onBack() }
+                    .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
+                    .size(width = 100.dp, height = 30.dp)
+            )
         }
-
 
         Text(
             text = """
@@ -182,50 +289,52 @@ fun CampsiteView(
         ) {
             Text(text = campsiteSelection.name, fontSize = 22.sp)
 
-            Text(text = """
+            Text(
+                text = """
                 
                 
                 IMAGE GOES HERE 
                 
                 
     
-            """.trimIndent()) // TODO: promo image
+            """.trimIndent()
+            ) // TODO: promo image
 
             Spacer(Modifier.height(10.dp))
 
             Text(text = campsiteSelection.description)
         }
 
-        Text(
-            text = "Available starting ${campsiteSelection.startDate}",
-            modifier = Modifier
-                .border(1.dp, Color.Black, pill)
-                .padding(horizontal = 12.dp, vertical = 4.dp)
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Available starting ${campsiteSelection.startDate}",
+                modifier = Modifier
+                    .border(1.dp, Color.Black, pill)
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            )
 
-        if (lottery != null) {
-            Button(
-                onClick = onJoinClick,
-                enabled = isJoined() || !lottery.isFull(),
-                shape = pill,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFB5C7BE),
-                    contentColor = Color(0xFF2F5240)
-                ),
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(if (isJoined()) "Leave Waitlist" else "Join Waitlist", fontSize = 20.sp)
+            if (lottery != null) {
+                Button(
+                    onClick = { waitlistSelectionClick(userOnWaitlist()) },
+                    enabled = userOnWaitlist() || !lottery.isFull(),
+                    shape = pill,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFB5C7BE),
+                        contentColor = Color(0xFF2F5240)
+                    ),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(if (userOnWaitlist()) "Leave Waitlist" else "Join Waitlist", fontSize = 20.sp)
+                }
             }
         }
     }
 }
 
-private fun previewDate(text: String): Long {
-    val format = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-    format.timeZone = TimeZone.getTimeZone("UTC")
-    return format.parse(text)!!.time
-}
-
+/*
 @Preview(showBackground = true)
 @Composable
 fun CampsiteDetailsScreenPreview() {
@@ -250,10 +359,10 @@ fun CampsiteDetailsScreenPreview() {
     )
 
     val lottery = Lottery(
-        campsiteIds = listOf("1"),
+        campsiteId = 1,
         numWinners = 5,
-        lotteryStartDate = previewDate("2026-09-22"),
-        lotteryEndDate = previewDate("2026-10-30"),
+        lotteryStartDate = "2026-09-22",
+        lotteryEndDate = "2026-10-30",
         waitlistMax = 50,
         waitlist = arrayListOf("abc123", "xyz789"),
         campsite = campsite,
@@ -263,8 +372,12 @@ fun CampsiteDetailsScreenPreview() {
         CampsiteView(
             campsiteSelection = campsite,
             lottery = lottery,
-            isJoined = {false},
-            onJoinClick = {}
+            userOnWaitlist = {true},
+            waitlistSelectionClick = {},
+            onBack = {},
+            updateByUserSearch = {}
         )
     }
 }
+
+ */
