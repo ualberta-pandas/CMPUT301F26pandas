@@ -143,12 +143,12 @@ fun ProfileScreen(
     }
 
     suspend {
-        deviceId = DeviceIDs().fetchDeviceId()?:DeviceIds().registerDeviceId()
+        //deviceId = DeviceIDs().fetchDeviceId()?:DeviceIds().registerDeviceId()
     }
     //State and related variables must be determined inside LaunchedEffect so they are decided before rendering something other than LOADING screen
     LaunchedEffect(key1 = deviceId) {
         //Return profile with specified device id if it exists
-        userProfile = profileDatabase.getProfileDocument(deviceId)
+        userProfile = profileDatabase.getProfile(deviceId)
 
         //Display profile if something is passed in, display own profile if it exists, else, prompt to create profile
         profileToDisplay = profile ?: userProfile ?: User()

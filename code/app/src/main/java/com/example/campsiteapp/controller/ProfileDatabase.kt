@@ -70,7 +70,7 @@ class ProfileDatabase {
      * @param documentId the requested document’s id
      * @return User if successful, null if not
      */
-    suspend fun getProfileDocument(documentId: String): User? {
+    suspend fun getProfile(documentId: String): User? {
 
         val documentReference = profilesRef.document("profiles")
         return try {
