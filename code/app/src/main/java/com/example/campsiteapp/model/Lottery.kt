@@ -7,7 +7,7 @@ import java.time.LocalDate
  *
  * @property id Firestore document id
  * @property ownerId Owner who created lottery
- * @property campsiteId Campsite lottery is for
+ * @property campsiteIds Campsites lottery is for
  * @property bookingStartDate First date of booking period being raffled
  * @property bookingEndDate Last date of booking period being raffled
  * @property lotteryStartDate First date entrants may join lottery
@@ -19,13 +19,13 @@ import java.time.LocalDate
 data class Lottery(
     val id: String = "",
     val ownerId: String = "",
-    val campsiteId: String = "",
+    val campsiteIds: List<String> = emptyList(),
     var bookingStartDate: Long = 0L,
     var bookingEndDate: Long = 0L,
     var lotteryStartDate: Long = 0L,
     var lotteryEndDate: Long = 0L,
     var numWinners: Int,
-    var waitlistCapacity: Int,
+    var waitlistCapacity: Int? = null, //null means unlimited
     var status: String = ""
 ) {
 
