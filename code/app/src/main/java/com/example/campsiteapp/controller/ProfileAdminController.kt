@@ -31,18 +31,10 @@ class ProfileAdminController(private val campsitesDatabase: CampsitesDatabase) {
 
     init {
         profilesRef.addSnapshotListener { snapshots, error ->
-            if (error != null) {
-                return@addSnapshotListener
-            }
-
+            if (error != null) return@addSnapshotListener
             _profiles.clear()
-
             snapshots?.documents?.forEach { document ->
-
-                val profile = document.toObject(User::class.java)
-                if (profile != null) {
-                    _profiles.add(profile)
-                }
+                document.toObject(User::class.java)?.let { _profiles.add(it) }
             }
         }
     }

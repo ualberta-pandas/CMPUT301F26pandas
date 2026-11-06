@@ -67,15 +67,23 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import android.location.Geocoder
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class OwnerCampsiteController (
 
 ) {
 
-    /**
-     * This is our owner campsite controller.
-     * It has register campsite and edit campsite functions
-     */
+
 
     @Composable
     fun RegisterCampsite(
@@ -85,17 +93,6 @@ class OwnerCampsiteController (
     ) {
 
 
-        /**
-         * This function is used to add new campsites to our database
-         * It takes the owner's input in textfields, image, datepicker and mapLocation
-         * and sends it to addCampsite function in the CampsiteDatabase
-         *
-         * All fields are required to be filled, including uploading image choosing the dates,
-         * and map location.
-         *
-         * @param onAddCampsite - used to send new campsite details to CampsiteDatabase
-         * @param onDismissRequest - handles closing the window
-         */
 
         val scope = rememberCoroutineScope()
         var isUploading by remember { mutableStateOf(false) }
@@ -189,7 +186,7 @@ class OwnerCampsiteController (
                     var description by remember { mutableStateOf("") }
                     var tags by remember { mutableStateOf("") }
                     var rules by remember { mutableStateOf("") }
-                    var status by remember { mutableStateOf("Available") }
+                    var status by remember{mutableStateOf("Available")}
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -327,6 +324,31 @@ class OwnerCampsiteController (
 
                     }
 
+
+                    var showMap by remember { mutableStateOf(false) }
+
+                    var longitude by remember { mutableDoubleStateOf(0.0) }
+                    var latitude by remember { mutableDoubleStateOf(0.0) }
+
+
+                    if (showMap) {
+
+                        MapLocationPicker(
+                            onLocationSelected = { lat, long ->
+                                latitude = lat
+                                longitude = long
+                                showMap = false
+                            }
+                        )
+
+                    }
+
+
+
+                    val coordinates = "$latitude,$longitude"
+
+                    mapLocation = coordinates
+
                     Spacer(modifier = Modifier.height(10.dp))
                     Row() {
                         TextField(
@@ -342,9 +364,9 @@ class OwnerCampsiteController (
 
                         Button(
                             onClick = {
-
+                                showMap = true
                             }
-                        ) { Text("Change") }
+                        ) { Text("Choose Location") }
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -399,7 +421,7 @@ class OwnerCampsiteController (
 
                     TextField(
                         value = status,
-                        onValueChange = {status=it},
+                        onValueChange = { status = it },
                         label = { Text("Status") },
                         modifier = Modifier
                             .border(
@@ -408,7 +430,6 @@ class OwnerCampsiteController (
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                             .fillMaxWidth()
-
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -464,7 +485,8 @@ class OwnerCampsiteController (
                                                 occupancy = occupancy,
                                                 owner = owner,
                                                 price = price,
-                                                mapLocation = mapLocation,
+                                                latitude = latitude.toString(),
+                                                longitude = longitude.toString(),
                                                 startDate = startDate,
                                                 endDate = endDate,
                                                 description = description,
@@ -513,18 +535,6 @@ class OwnerCampsiteController (
         onEditCampsite: (Campsite, Campsite) -> Unit
 
     ){
-
-        /**
-         * This is used to edit existing campsite details which were selected
-         * by owner with the new ones put now.
-         *
-         *
-         * @param onDismissRequest used to close the window
-         * @param selectedCampsiteDetails - the campsite to be edited.
-         * @param onEditCampsite - used to pass old and new campsite details to
-         * the database
-         *
-         */
 
         val scope = rememberCoroutineScope()
         var isUploading by remember { mutableStateOf(false) }
@@ -628,7 +638,7 @@ class OwnerCampsiteController (
                     var price by remember (selectedCampsiteDetails){
                         mutableStateOf(selectedCampsiteDetails?.price?:"") }
                     var mapLocation by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.mapLocation?:"") }
+                        mutableStateOf("${selectedCampsiteDetails?.latitude}, ${selectedCampsiteDetails?.longitude}") }
                     var availableDates by remember(selectedCampsiteDetails) {
                         mutableStateOf(
                             selectedCampsiteDetails?.startDate+'-'+selectedCampsiteDetails?.endDate) }
@@ -667,7 +677,7 @@ class OwnerCampsiteController (
                         mutableStateOf(selectedCampsiteDetails?.tags?:"") }
                     var rules by remember(selectedCampsiteDetails) {
                         mutableStateOf(selectedCampsiteDetails?.rules?:"") }
-                    var status by remember (selectedCampsiteDetails){
+                    var status by remember(selectedCampsiteDetails){
                         mutableStateOf(selectedCampsiteDetails?.status?:"")
                     }
 
@@ -750,7 +760,7 @@ class OwnerCampsiteController (
 
                             }
                         ) {
-                            Text("View Dates")
+                            Text("Change Dates")
                         }
 
                         if (showDatePicker) {
@@ -782,6 +792,55 @@ class OwnerCampsiteController (
                         }
 
 
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    var showMap by remember { mutableStateOf(false) }
+
+                    var longitude by remember(selectedCampsiteDetails) {
+                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble()
+                        ?: 0.0) }
+                    var latitude by remember(selectedCampsiteDetails) {
+                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble() ?:0.0) }
+
+
+                    if (showMap) {
+
+                        MapLocationPicker(
+                            onLocationSelected = { lat, long ->
+                                latitude = lat
+                                longitude = long
+                                showMap = false
+                            }
+                        )
+
+                    }
+
+
+
+                    val coordinates = "$latitude,$longitude"
+
+                    mapLocation = coordinates
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row() {
+                        TextField(
+                            value = mapLocation,
+                            onValueChange = { mapLocation = it },
+                            label = { Text("Map Location") },
+                            modifier = Modifier.border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        )
+
+                        Button(
+                            onClick = {
+                                showMap = true
+                            }
+                        ) { Text("Choose Location") }
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -838,6 +897,7 @@ class OwnerCampsiteController (
                         value = status,
                         onValueChange = { status = it },
                         label = { Text("Status") },
+                        maxLines = 4,
                         modifier = Modifier
                             .border(
                                 width = 1.dp,
@@ -848,8 +908,6 @@ class OwnerCampsiteController (
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
-
-
 
                     val context = LocalContext.current
                     val qrScanScreen = remember { QrScanScreen() }
@@ -867,7 +925,7 @@ class OwnerCampsiteController (
                                     occupancy.isBlank() || owner.isBlank() ||
                                     price.isBlank() || mapLocation.isBlank() ||
                                     description.isBlank() || tags.isBlank() ||
-                                    rules.isBlank()
+                                    rules.isBlank() || status.isBlank()
                                 ) {
                                     Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT)
                                         .show()
@@ -892,7 +950,8 @@ class OwnerCampsiteController (
                                                selectedCampsiteDetails?.location ?: "",
                                                selectedCampsiteDetails?.occupancy ?: "",
                                                selectedCampsiteDetails?.owner ?: "",
-                                               selectedCampsiteDetails?.mapLocation ?: "",
+                                               selectedCampsiteDetails?.latitude ?: "",
+                                               selectedCampsiteDetails?.longitude?:"",
                                                selectedCampsiteDetails?.price ?: "",
                                                selectedCampsiteDetails?.startDate ?: "",
                                                selectedCampsiteDetails?.endDate ?: "",
@@ -900,6 +959,7 @@ class OwnerCampsiteController (
                                                selectedCampsiteDetails?.tags ?: "",
                                                selectedCampsiteDetails?.rules ?: "",
                                                selectedCampsiteDetails?.image ?: "",
+                                               selectedCampsiteDetails?.status?:""
 
 
                                            ),
@@ -908,17 +968,22 @@ class OwnerCampsiteController (
                                                location = location,
                                                occupancy = occupancy,
                                                owner = owner,
-                                               mapLocation = mapLocation,
+                                               latitude = latitude.toString(),
+                                               longitude = longitude.toString(),
                                                price = price,
                                                startDate = startDate.toString(),
                                                endDate = endDate.toString(),
                                                description = description,
                                                tags = tags,
                                                rules = rules,
-                                               image = imageUrl
+                                               image = imageUrl,
+                                               status = status
 
                                            )
                                        )
+
+                                        Toast.makeText(context, "Successfully Edited", Toast.LENGTH_LONG).show()
+                                        onDismissRequest()
 
 
 
