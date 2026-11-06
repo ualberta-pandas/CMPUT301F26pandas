@@ -7,8 +7,6 @@ Outstanding issues:
 package com.example.campsiteapp.view
 
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,7 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.campsiteapp.controller.ProfileDatabase
+import com.example.campsiteapp.data.ProfileDatabase
 import com.example.campsiteapp.data.DeviceIDs
 import kotlinx.coroutines.launch
 import com.example.campsiteapp.model.User

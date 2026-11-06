@@ -3,7 +3,7 @@
  */
 package com.example.campsiteapp.controller
 
-import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.model.CampsitesDatabase
 
 /**

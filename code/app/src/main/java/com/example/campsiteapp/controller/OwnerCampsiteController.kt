@@ -50,7 +50,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.QrScanScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

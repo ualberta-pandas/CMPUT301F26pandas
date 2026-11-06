@@ -34,9 +34,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
-import com.example.campsiteapp.data.Campsite
-import com.example.campsiteapp.data.Lottery
+import com.example.campsiteapp.model.Campsite
+import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 private val pill = RoundedCornerShape(50)
 
@@ -217,6 +220,12 @@ fun CampsiteView(
     }
 }
 
+private fun previewDate(text: String): Long {
+    val format = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    format.timeZone = TimeZone.getTimeZone("UTC")
+    return format.parse(text)!!.time
+}
+
 @Preview(showBackground = true)
 @Composable
 fun CampsiteDetailsScreenPreview() {
@@ -241,10 +250,10 @@ fun CampsiteDetailsScreenPreview() {
     )
 
     val lottery = Lottery(
-        campsiteId = 1,
+        campsiteIds = listOf("1"),
         numWinners = 5,
-        lotteryStartDate = "2026-09-22",
-        lotteryEndDate = "2026-10-30",
+        lotteryStartDate = previewDate("2026-09-22"),
+        lotteryEndDate = previewDate("2026-10-30"),
         waitlistMax = 50,
         waitlist = arrayListOf("abc123", "xyz789"),
         campsite = campsite,
