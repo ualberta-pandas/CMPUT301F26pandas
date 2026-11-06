@@ -59,7 +59,7 @@ fun AdminCampsiteDialog(campsite: Campsite, onRemove: () -> Unit, onDismiss: () 
                     modifier = Modifier.fillMaxWidth().height(160.dp),
                     contentScale = ContentScale.Crop,
                 )
-                FieldRow(R.string.label_location, campsite.location, R.string.label_occupancy, campsite.occupancy.toString())
+                FieldRow(R.string.label_location, campsite.location, R.string.label_occupancy, campsite.occupancy.toInt().toString())
                 FieldRow(R.string.label_owner, campsite.owner, R.string.label_price, campsite.price)
                 FieldRow(R.string.label_available_dates, "${campsite.startDate} - ${campsite.endDate}", R.string.label_map_location, "${campsite.latitude}, ${campsite.longitude}")
                 LabelledField(stringResource(R.string.label_description), campsite.description)
