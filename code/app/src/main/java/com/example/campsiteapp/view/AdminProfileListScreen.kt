@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.R
-import com.example.campsiteapp.User
+import com.example.campsiteapp.model.User
 import com.example.campsiteapp.view.components.ScreenScaffold
 
 /**
