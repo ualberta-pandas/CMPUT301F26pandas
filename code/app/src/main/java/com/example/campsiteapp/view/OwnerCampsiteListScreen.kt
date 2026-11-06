@@ -84,11 +84,9 @@ class OwnerCampsiteListScreen {
                             .combinedClickable(
                                 onDoubleClick = {
 
-                                    selectedCampsite = campsite
-                                    showDetails = true
-
                                       },
-                                onClick = {}
+                                onClick = {     selectedCampsite = campsite
+                                    showDetails = true}
                             ),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
@@ -106,7 +104,7 @@ class OwnerCampsiteListScreen {
                             )
 
                             Text(
-                                text = campsite.occupancy,
+                                text = campsite.occupancy.toString(),
                                 fontWeight = FontWeight.Bold
                             )
 
@@ -119,6 +117,12 @@ class OwnerCampsiteListScreen {
                                         color = Color.Green,
                                         shape = RoundedCornerShape(size = 20.dp)
                                     )
+                            )
+
+                            Text(
+                                text = "# Slots available",
+
+
                             )
                         }
 
