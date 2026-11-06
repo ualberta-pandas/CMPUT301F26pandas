@@ -58,8 +58,6 @@ fun CampsiteListView(
         verticalArrangement = Arrangement.Top
     ) {
 
-        // TODO: "Hello, Name" and search bar
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()

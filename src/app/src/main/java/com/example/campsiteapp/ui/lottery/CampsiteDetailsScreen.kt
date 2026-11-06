@@ -15,10 +15,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,7 +87,24 @@ fun CampsiteView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        // TODO: "Hello, Name" and search bar
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ){
+            IconButton(
+                onClick = {},
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Home,
+                    contentDescription = "Home",
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
 
         Row(
             modifier = Modifier
@@ -90,6 +112,8 @@ fun CampsiteView(
                 .padding(horizontal = 16.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
+
             lottery?.let { // if the lottery is not nan then show this
                 Text(
                     text = "${it.lotteryStartDate.format(dateFormat)} - ${it.lotteryEndDate.format(dateFormat)}",
@@ -114,8 +138,8 @@ fun CampsiteView(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-
-        ){
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+        ) {
             Button(
                 onClick = onJoinClick,
                 shape = pill,
@@ -125,7 +149,6 @@ fun CampsiteView(
                 Text("< back to results")
             }
         }
-
 
 
         Text(
@@ -205,7 +228,7 @@ fun CampsiteViewPreview() {
         location = "123 Jasper, Edmonton, AB",
         startDate = LocalDate.of(2026, 9, 22),
         endDate = LocalDate.of(2026, 10, 30),
-        rating = 4.4f,
+        rating = 4.4,
         maxOccupancy = 8,
         description = "Open campsite near the lake.\n\nAmenities\n• Running water on site\n• Grill on site\n• Great views"
     )
