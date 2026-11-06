@@ -1,5 +1,6 @@
 package com.example.campsiteapp
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -16,6 +17,16 @@ import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
 import com.example.campsiteapp.view.OwnerCampsiteDetailsScreen
 import com.example.campsiteapp.data.DeviceIDs
+
+
+import com.example.campsiteapp.data.Campsite
+import com.example.campsiteapp.model.CampsitesDatabase
+
+import com.example.campsiteapp.data.Lottery
+import com.example.campsiteapp.model.LotteryDatabase
+
+import com.example.campsiteapp.view.EntrantHomeScreen
+
 class MainActivity : ComponentActivity() {
 
 
@@ -28,16 +39,8 @@ class MainActivity : ComponentActivity() {
         //check deviceIDs class for usage documentation
         deviceIds = DeviceIDs(applicationContext) // Do not delete IMPORTANT(device id)
 
-        val campsitesDatabase = CampsitesDatabase()
-        enableEdgeToEdge()
-
-        setContent {
-            CampsiteAppTheme {
 
 
-
-            }
-        }
 
 //         Uncomment to show the admin screens
 //         setContent {
@@ -45,6 +48,15 @@ class MainActivity : ComponentActivity() {
 //                 com.example.campsiteapp.view.AdminApp(campsitesDatabase)
 //             }
 //         }
+
+
+
+        startActivity(Intent(this, EntrantHomeScreen::class.java))
+        finish()
+        main
     }
+
+
 }
+
 

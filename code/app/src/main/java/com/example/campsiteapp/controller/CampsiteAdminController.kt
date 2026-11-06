@@ -4,7 +4,7 @@
 package com.example.campsiteapp.controller
 
 import com.example.campsiteapp.data.Campsite
-import com.example.campsiteapp.data.CampsitesDatabase
+import com.example.campsiteapp.model.CampsitesDatabase
 
 /**
  * Lets an admin browse and remove campsites.
