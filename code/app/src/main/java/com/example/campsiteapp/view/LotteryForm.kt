@@ -1,6 +1,6 @@
 package com.example.campsiteapp.view
 
-/*
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,10 +40,10 @@ fun LotteryForm(
     onClose: () -> Unit,
 ) {
     var selectedIds by remember(initial) { mutableStateOf(initial?.campsiteIds?.toSet() ?: emptySet()) }
-    var lotteryStart by remember(initial) { mutableStateOf(initial?.lotteryStartDate.takeIf { it != 0L }) }
-    var lotteryEnd by remember(initial) { mutableStateOf(initial?.lotteryEndDate.takeIf { it != 0L }) }
-    var bookingStart by remember(initial) { mutableStateOf(initial?.bookingStartDate.takeIf { it != 0L }) }
-    var bookingEnd by remember(initial) { mutableStateOf(initial?.bookingEndDate.takeIf { it != 0L }) }
+    var lotteryStart by remember(initial) { mutableStateOf(initial?.lotteryStartDate ?: "") }
+    var lotteryEnd by remember(initial) { mutableStateOf(initial?.lotteryEndDate ?: "") }
+    var bookingStart by remember(initial) { mutableStateOf(initial?.bookingStartDate ?: "") }
+    var bookingEnd by remember(initial) { mutableStateOf(initial?.bookingEndDate ?: "") }
     var winners by remember(initial) { mutableStateOf((initial?.numWinners ?: 1).toString()) }
     var capacity by remember(initial) { mutableStateOf(initial?.waitlistMax?.toString() ?: "")}
     var error by remember { mutableStateOf<String?>(null) }
@@ -142,10 +142,10 @@ fun LotteryForm(
                             id = initial?.id ?: "",
                             ownerId = initial?.ownerId ?: campsites.firstOrNull { it.id in selectedIds }?.owner ?: "",
                             campsiteIds = selectedIds.toList(),
-                            lotteryStartDate = lotteryStart ?: 0L,
-                            lotteryEndDate = lotteryEnd ?: 0L,
-                            bookingStartDate = bookingStart ?: 0L,
-                            bookingEndDate = bookingEnd ?: 0L,
+                            lotteryStartDate = lotteryStart,
+                            lotteryEndDate = lotteryEnd,
+                            bookingStartDate = bookingStart,
+                            bookingEndDate = bookingEnd,
                             numWinners = winners.toIntOrNull() ?: 0,
                             waitlistMax = capacity.toIntOrNull() ?: 0,
                             status = initial?.status ?: ""
@@ -177,4 +177,3 @@ private fun LotteryFormPreview() {
         onClose = {}
     )
 }
-*/
