@@ -25,6 +25,7 @@ import kotlinx.coroutines.tasks.await
  */
 class ProfileDatabase {
     private val _profiles = mutableStateListOf<User>()
+    private val profilesRef = Firebase.firestore.collection("profiles")
 
     /**
      * Adds a profile to the database
@@ -34,19 +35,23 @@ class ProfileDatabase {
      * @param profile a User object whose data is mapped to a document
      */
     fun addProfile(profile: User){
-        profilesRef.document(profile.deviceId).set(profile)
+        if(profile.deviceId!=""){
+            profilesRef.document(profile.deviceId).set(profile)
+        }
     }
 
     /**
      * Updates a profile in the database
      *
-     * Replaces the data in the database document associated with [userId] with the data of [newProfile]
+     * Replaces the data in the database document associated with [deviceId] with the data of [newProfile]
      *
      * @param deviceId the id of the User to be replaced
      * @param newProfile a User object whose data will be stored in a document, replacing the data of oldProfile
      */
     fun updateProfile(deviceId: String, newProfile: User){
-        profilesRef.document(deviceId).set(newProfile)
+        if(deviceId!=""){
+            profilesRef.document(deviceId).set(newProfile)
+        }
     }
 
     /**
@@ -57,7 +62,9 @@ class ProfileDatabase {
      * @param profile a User object whose data is stored in a document, to be deleted from the database
      */
     fun deleteProfile(profile: User){
-        profilesRef.document(profile.deviceId).delete()
+        if(profile.deviceId!="") {
+            profilesRef.document(profile.deviceId).delete()
+        }
     }
 
     /**
@@ -71,8 +78,10 @@ class ProfileDatabase {
      * @return User if successful, null if not
      */
     suspend fun getProfile(documentId: String): User? {
-
-        val documentReference = profilesRef.document("profiles")
+        if(documentId==""){
+            return null
+        }
+        val documentReference = profilesRef.document(documentId)
         return try {
             val snapshot = documentReference.get().await()
             if (snapshot.exists()) {
@@ -82,12 +91,10 @@ class ProfileDatabase {
                 null
             }
         } catch (e: Exception) {
-            Log.e("getProfileDocument", "Error fetching document: ${e.localizedMessage}", e)
+            Log.e("getProfile", "Error fetching document: ${e.localizedMessage}", e)
             null
         }
     }
-
-    private val profilesRef = Firebase.firestore.collection("profiles")
 
     init {
         profilesRef.addSnapshotListener { snapshots, error ->

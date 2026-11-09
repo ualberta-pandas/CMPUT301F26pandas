@@ -6,7 +6,10 @@ Outstanding issues:
  */
 package com.example.campsiteapp.view
 
+import android.content.Intent
 import android.net.Uri
+import android.util.Log
+import android.util.Log.w
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +50,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import com.example.campsiteapp.data.ProfileDatabase
 import com.example.campsiteapp.data.DeviceIDs
@@ -119,7 +123,7 @@ fun ProfileScreen(
     var profileScreenMode by remember { mutableStateOf("") }
     var userProfile by remember { mutableStateOf<User?>(null) }
     var profileToDisplay: User by remember { mutableStateOf(User()) }
-    var deviceId = ""
+    var deviceId by remember {mutableStateOf("")}
 
     var newUserName by remember { mutableStateOf("") }
     var newUserEmail by remember { mutableStateOf("") }
@@ -142,12 +146,14 @@ fun ProfileScreen(
     }
 
     val context = LocalContext.current
-    suspend {
+
+    //State and related variables must be determined inside LaunchedEffect so they are decided before rendering something other than LOADING screen
+    LaunchedEffect(key1 = context) {
+
         val deviceIds = DeviceIDs(context)
         deviceId = deviceIds.fetchDeviceId()?:deviceIds.registerDeviceId()
-    }
-    //State and related variables must be determined inside LaunchedEffect so they are decided before rendering something other than LOADING screen
-    LaunchedEffect(key1 = deviceId) {
+        //get deviceId
+
         //Return profile with specified device id if it exists
         userProfile = profileDatabase.getProfile(deviceId)
 
@@ -453,7 +459,8 @@ fun ProfileScreen(
                                     .background(Color.DarkGray)
                                     .padding(8.dp)
                                     .clickable {
-                                        navController.popBackStack()
+                                        val intent = Intent(context, EntrantHomeScreen::class.java)
+                                        startActivity(context, intent, null)
                                     },
                                 tint = Color.White
                             )
