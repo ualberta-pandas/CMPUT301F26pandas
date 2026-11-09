@@ -1,0 +1,2 @@
+Claude was used to generate UML with the following prompt: "Take note of uploaded uml and make an uml based on the files given, under controller, data, help and model and view. black and white, simple in drawio"
+all classes were then provided. After shared and checked by team.
