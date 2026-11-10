@@ -387,7 +387,8 @@ fun ProfileScreen(
                                         if (imageUri != null) {
                                             newUserProfileImage=imageUploadService.uploadImage(
                                                 context,
-                                                imageUri!!
+                                                imageUri!!,
+                                                deviceId
                                             )
                                         }
                                         //copy values to an empty User object

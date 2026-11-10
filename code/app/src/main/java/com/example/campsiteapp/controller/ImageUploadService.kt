@@ -24,6 +24,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.example.campsiteapp.data.ImageLog
+import com.example.campsiteapp.model.ImageLogEntry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -108,19 +110,21 @@ class ImageUploadService {
     }
 
     // Upload selected image to Cloudinary
+
+    /**
+     * This function is used to upload images to Cloudinary, so we can
+     * store it there for future use.
+     *
+     * @param context is the LocalContext and gives the info available for
+     * this function.
+     * @param uri is the uri of the image that is to uploaded
+     * @param uploader the deviceId of the user uploading the image
+     */
     suspend fun uploadImage(
         context: Context,
-        uri: Uri
+        uri: Uri,
+        uploader: String
     ): String = withContext(Dispatchers.IO) {
-
-        /**
-         * This function is used to upload images to Cloudinary, so we can
-         * store it there for future use.
-         *
-         * @param context is the LocalContext and gives the info available for
-         * this function.
-         * @param uri is the uri of the image that is to uplaoded
-         */
 
         val cloudName = "lgwzmfuq"
         val uploadPreset = "campsite_upload"
@@ -139,6 +143,7 @@ class ImageUploadService {
             "https://api.cloudinary.com/v1_1/$cloudName/image/upload"
         ).openConnection() as HttpURLConnection
 
+        var imageResult:String?=null
         try {
 
             connection.requestMethod = "POST"
@@ -186,11 +191,18 @@ class ImageUploadService {
                 throw Exception("Cloudinary error: $response")
             }
 
-            JSONObject(response).getString("secure_url")
+            imageResult = JSONObject(response).getString("secure_url")
+                if (imageResult != null) {
+                    val logEntry = ImageLogEntry()
+                    logEntry.image = imageResult
+                    logEntry.deviceId = uploader
+                    ImageLog().addImageLogEntry(logEntry)
+                }
+            imageResult.toString()
+            } finally {
+                connection.disconnect()
+            }
 
-        } finally {
-            connection.disconnect()
-        }
     }
 
     // Clear selected image
