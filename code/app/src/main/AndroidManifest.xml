@@ -51,6 +51,8 @@
             android:exported="false" />
 
         <activity android:name=".view.ProfileActivity" android:exported="false" />
+        <activity android:name=".view.OwnerHomeScreen" android:exported="false" />
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
