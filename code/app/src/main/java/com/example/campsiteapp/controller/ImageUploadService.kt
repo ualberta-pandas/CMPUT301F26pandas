@@ -192,12 +192,12 @@ class ImageUploadService {
             }
 
             imageResult = JSONObject(response).getString("secure_url")
-                if (imageResult != null) {
-                    val logEntry = ImageLogEntry()
-                    logEntry.image = imageResult
-                    logEntry.deviceId = uploader
-                    ImageLog().addImageLogEntry(logEntry)
-                }
+            if (imageResult != null) {
+                val logEntry = ImageLogEntry()
+                logEntry.image = imageResult
+                logEntry.deviceId = uploader
+                ImageLog().addImageLogEntry(logEntry)
+            }
             imageResult.toString()
             } finally {
                 connection.disconnect()
