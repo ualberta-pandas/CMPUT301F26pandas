@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 
+@RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
 
 ) {
@@ -520,7 +521,6 @@ class OwnerCampsiteController (
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
 
     fun EditCampsite(

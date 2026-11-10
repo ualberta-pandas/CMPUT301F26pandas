@@ -72,10 +72,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.Properties
 
+@RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteDetailsScreen {
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
 
     fun CampsiteDetailsScreen(

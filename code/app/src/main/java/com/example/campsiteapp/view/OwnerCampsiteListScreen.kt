@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -40,12 +39,11 @@ import coil.compose.AsyncImage
 import com.example.campsiteapp.controller.OwnerCampsiteController
 import com.example.campsiteapp.model.Campsite
 
+@RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteListScreen {
 
     val ownerController = OwnerCampsiteController()
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CampsitesList(
 
