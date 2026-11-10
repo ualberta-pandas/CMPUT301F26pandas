@@ -1,3 +1,8 @@
+/*
+Monitor and/or read/write log entry documents from database
+Outstanding issues:
+- lacks a proper listener method, so dynamic updates in compose are not automatically triggered (potential issue when viewing logs as admin)
+ */
 package com.example.campsiteapp.data
 
 import android.util.Log
@@ -8,6 +13,17 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Allows for access to and modification of logged images
+ *
+ * Contains [addImageLogEntry] and [deleteImageLogEntry] functions to modify and write to documents in database
+ * Has access to state of database once initialized
+ * Reads and state of profile database and allows collaborators to access it
+ *
+ *
+ * @property _imageLogEntries a mutableStateListOf log entries (ImageLogEntry class objects), updated with values from imageLogRef
+ * @property imageLogRef has the collection of log entries stored in the database, updated via snapshot listener
+ */
 class ImageLog {
     private val _imageLogEntries = mutableStateListOf<ImageLogEntry>()
     private val imageLogRef = Firebase.firestore.collection("imageLog")
