@@ -113,7 +113,7 @@ fun EntrantHomeScreenView(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
-        ){
+        ) {
             Box {
                 IconButton(onClick = { menuOpen = true }) {
                     Icon(
@@ -130,7 +130,9 @@ fun EntrantHomeScreenView(
                     )
                     DropdownMenuItem(
                         text = { Text("Owner") },
-                        onClick = { menuOpen = false }
+                        onClick = { menuOpen = false
+                            openOwnerScreen()
+                        }
                     )
                 }
             }

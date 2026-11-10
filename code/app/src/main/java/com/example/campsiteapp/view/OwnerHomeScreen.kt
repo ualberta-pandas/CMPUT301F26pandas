@@ -1,8 +1,10 @@
+package com.example.campsiteapp.view
+
+
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,7 +31,6 @@ import androidx.compose.ui.unit.sp
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
-@RequiresApi(Build.VERSION_CODES.O)
 class OwnerHomeScreen : ComponentActivity() {
 
     // Replace this with your ViewModel/repository when you have one
