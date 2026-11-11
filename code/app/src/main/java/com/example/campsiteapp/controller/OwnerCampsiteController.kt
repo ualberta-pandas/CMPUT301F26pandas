@@ -47,7 +47,9 @@ import java.util.Locale
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import com.example.campsiteapp.data.DeviceIDs
 
+@RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
 
 ) {
@@ -467,9 +469,20 @@ class OwnerCampsiteController (
                                             return@launch
                                         }
 
+                                        // TODO: Reformat  this call to imageUploadService (especially this use of DeviceIds()), to be more efficient/conventional
+                                        val deviceIds = DeviceIDs(context)
+                                        var deviceId=""
+                                        val getDeviceId = launch{
+                                            deviceId = deviceIds.fetchDeviceId()?:deviceIds.registerDeviceId()
+
+                                        }
+                                        //get deviceId
+                                        getDeviceId.join()
+
                                         val imageUrl = imageUploadService.uploadImage(
                                             context,
-                                            selectedImage
+                                            selectedImage,
+                                            deviceId
                                         )
 
                                         onAddCampsite(
@@ -520,7 +533,6 @@ class OwnerCampsiteController (
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
 
     fun EditCampsite(
@@ -954,7 +966,16 @@ class OwnerCampsiteController (
                                         val imageUrl = if (imageUri.toString() == originalImageUrl) {
                                             originalImageUrl
                                         } else {
-                                            imageUploadService.uploadImage(context, imageUri!!)
+                                            // TODO: Reformat  this call to imageUploadService (especially this use of DeviceIds()), to be more efficient/conventional
+                                            val deviceIds = DeviceIDs(context)
+                                            var deviceId=""
+                                            val getDeviceId = launch{
+                                                deviceId = deviceIds.fetchDeviceId()?:deviceIds.registerDeviceId()
+
+                                            }
+                                            //get deviceId
+                                            getDeviceId.join()
+                                            imageUploadService.uploadImage(context, imageUri!!, deviceId)
                                         }
 
                                         onEditCampsite(

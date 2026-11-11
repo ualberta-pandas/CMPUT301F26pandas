@@ -6,7 +6,11 @@ Outstanding issues:
  */
 package com.example.campsiteapp.view
 
+import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import com.example.campsiteapp.data.ProfileDatabase
 import com.example.campsiteapp.data.DeviceIDs
@@ -119,7 +124,7 @@ fun ProfileScreen(
     var profileScreenMode by remember { mutableStateOf("") }
     var userProfile by remember { mutableStateOf<User?>(null) }
     var profileToDisplay: User by remember { mutableStateOf(User()) }
-    var deviceId = ""
+    var deviceId by remember {mutableStateOf("")}
 
     var newUserName by remember { mutableStateOf("") }
     var newUserEmail by remember { mutableStateOf("") }
@@ -142,12 +147,14 @@ fun ProfileScreen(
     }
 
     val context = LocalContext.current
-    suspend {
+
+    //State and related variables must be determined inside LaunchedEffect so they are decided before rendering something other than LOADING screen
+    LaunchedEffect(key1 = context) {
+
         val deviceIds = DeviceIDs(context)
         deviceId = deviceIds.fetchDeviceId()?:deviceIds.registerDeviceId()
-    }
-    //State and related variables must be determined inside LaunchedEffect so they are decided before rendering something other than LOADING screen
-    LaunchedEffect(key1 = deviceId) {
+        //get deviceId
+
         //Return profile with specified device id if it exists
         userProfile = profileDatabase.getProfile(deviceId)
 
@@ -290,6 +297,14 @@ fun ProfileScreen(
                                 120.dp,
                                 "Selected image",
                                 {
+                                    fun onImageSelected(uri:Uri?){
+                                        imageUri=uri
+                                    }
+                                    val imagePicker = rememberLauncherForActivityResult(
+                                        contract = ActivityResultContracts.PickVisualMedia()
+                                    ) { uri ->
+                                        onImageSelected(uri)
+                                    }
                                     //click to change image/open image picker
                                     Icon(
                                         imageVector = Icons.Default.Edit,
@@ -301,7 +316,11 @@ fun ProfileScreen(
                                             .padding(8.dp)
                                             .align(Alignment.BottomEnd)
                                             .clickable {
-                                                showImagePicker = true
+                                                imagePicker.launch(
+                                                    PickVisualMediaRequest(
+                                                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                    )
+                                                )
                                             },
                                         tint = Color.White
                                     )
@@ -366,14 +385,15 @@ fun ProfileScreen(
                                     scope.launch {
                                         //Upload image if one was chosen
                                         if (imageUri != null) {
-                                            imageUploadService.uploadImage(
+                                            newUserProfileImage=imageUploadService.uploadImage(
                                                 context,
-                                                imageUri!!
+                                                imageUri!!,
+                                                deviceId
                                             )
                                         }
                                         //copy values to an empty User object
                                         val newProfile = User()
-                                        newProfile.roles=newUserRoles
+                                        newProfile.roles = newUserRoles
                                         newProfile.deviceId = deviceId
                                         newProfile.name = newUserName
                                         newProfile.email = newUserEmail
@@ -386,7 +406,7 @@ fun ProfileScreen(
                                             profileDatabase.addProfile(newProfile)
                                             //Update existing profile if in edit mode
                                         } else {
-                                            profileDatabase.updateProfile(deviceId,newProfile)
+                                            profileDatabase.updateProfile(deviceId, newProfile)
                                         }
                                         //display new/updated profile
                                         profileScreenMode = "My Profile"
@@ -453,7 +473,8 @@ fun ProfileScreen(
                                     .background(Color.DarkGray)
                                     .padding(8.dp)
                                     .clickable {
-                                        navController.popBackStack()
+                                        val intent = Intent(context, EntrantHomeScreen::class.java)
+                                        startActivity(context, intent, null)
                                     },
                                 tint = Color.White
                             )

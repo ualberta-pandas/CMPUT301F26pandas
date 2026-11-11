@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,7 +34,6 @@ import androidx.compose.ui.unit.dp
  * @param onChange called with the new start and end when the owner confirms the picker
  * @param tag prefix for the test tag; the button is tagged "<tag>Button"
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateRangeField(
     label: String,
