@@ -3,7 +3,7 @@
  *
  * Outstanding issues:
  * - Still need the way to navigate between entrant/owner/admin for testing.
- * - Browse images and the notification and message logs are not implemented yet.
+ * - The notification and message logs are not implemented yet.
  */
 package com.example.campsiteapp.view
 
@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.R
 import com.example.campsiteapp.controller.CampsiteAdminController
+import com.example.campsiteapp.controller.ImageAdminController
 import com.example.campsiteapp.controller.ProfileAdminController
 import com.example.campsiteapp.view.components.ScreenScaffold
 
@@ -36,6 +37,7 @@ private sealed interface Destination {
     data object Menu : Destination
     data object Campsites : Destination
     data object Profiles : Destination
+    data object Images : Destination
     data class Profile(val deviceId: String) : Destination
 }
 
@@ -48,6 +50,7 @@ private sealed interface Destination {
 fun AdminApp(campsitesDatabase: CampsitesDatabase) {
     val campsiteAdminController = remember { CampsiteAdminController(campsitesDatabase) }
     val profileAdminController = remember { ProfileAdminController(campsitesDatabase) }
+    val imageAdminController = remember { ImageAdminController() }
     var backStack by remember { mutableStateOf(listOf<Destination>(Destination.Menu)) }
     val navigate = { destination: Destination -> backStack = backStack + destination }
     val goBack = { backStack = backStack.dropLast(1) }
@@ -62,6 +65,7 @@ fun AdminApp(campsitesDatabase: CampsitesDatabase) {
         Destination.Menu -> AdminMenu(
             onBrowseCampsites = { navigate(Destination.Campsites) },
             onBrowseProfiles = { navigate(Destination.Profiles) },
+            onBrowseImages = { navigate(Destination.Images) },
         )
 
         Destination.Campsites -> AdminCampsiteListScreen(
@@ -73,6 +77,14 @@ fun AdminApp(campsitesDatabase: CampsitesDatabase) {
         Destination.Profiles -> AdminProfileListScreen(
             profiles = profileAdminController.profiles,
             onProfileClick = { navigate(Destination.Profile(it.deviceId)) },
+            onBack = goBack,
+        )
+
+        Destination.Images -> AdminImageListScreen(
+            images = imageAdminController.images,
+            profiles = profileAdminController.profiles,
+            onUploaderClick = { navigate(Destination.Profile(it.deviceId)) },
+            onRemoveImage = { imageAdminController.removeImage(it, showRemoveFailed) },
             onBack = goBack,
         )
 
@@ -100,11 +112,12 @@ fun AdminApp(campsitesDatabase: CampsitesDatabase) {
  * Admin menu linking to the browse screens.
  */
 @Composable
-private fun AdminMenu(onBrowseCampsites: () -> Unit, onBrowseProfiles: () -> Unit) {
+private fun AdminMenu(onBrowseCampsites: () -> Unit, onBrowseProfiles: () -> Unit, onBrowseImages: () -> Unit) {
     ScreenScaffold(title = stringResource(R.string.admin_title), onBack = null) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             MenuItem(stringResource(R.string.browse_campsites), "browseCampsites", onBrowseCampsites)
             MenuItem(stringResource(R.string.browse_profiles), "browseProfiles", onBrowseProfiles)
+            MenuItem(stringResource(R.string.browse_images), "browseImages", onBrowseImages)
         }
     }
 }
