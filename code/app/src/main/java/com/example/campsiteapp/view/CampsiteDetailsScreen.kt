@@ -1,11 +1,9 @@
 package com.example.campsiteapp.view
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
@@ -73,8 +70,13 @@ class CampsiteDetailsScreen : ComponentActivity() {
         enableEdgeToEdge()
 
         // TODO: get these from your controllers / intent
-        val campsite = IntentCompat.getSerializableExtra(intent, "campsite", Campsite::class.java)!!
+        val campsite = IntentCompat.getSerializableExtra(intent, "campsite", Campsite::class.java)
         val lottery = IntentCompat.getSerializableExtra(intent, "lottery", Lottery::class.java)
+
+        if (campsite == null || lottery == null) {
+            finish()
+            return
+        }
 
         setContent {
             val context = LocalContext.current
@@ -93,7 +95,7 @@ class CampsiteDetailsScreen : ComponentActivity() {
                         },
 
                         waitlistSelectionClick = { userOnWaitList ->
-                            if (userOnWaitList) {
+                            if (!userOnWaitList) {
                                 addEntrantToWaitlist(lottery, deviceId)
                             } else {
                                 removeEntrantFromWaitlist(lottery, deviceId)
@@ -120,7 +122,7 @@ class CampsiteDetailsScreen : ComponentActivity() {
 @Composable
 fun CampsiteView(
     campsiteSelection: Campsite,
-    lottery: Lottery?,
+    lottery: Lottery,
 
     userOnWaitlist: () -> Boolean,
     waitlistSelectionClick: (userOnWaitlist: Boolean) -> Unit,
@@ -136,6 +138,7 @@ fun CampsiteView(
 ) {
     var entrantSearch by remember { mutableStateOf("") }
     var menuOpen by remember { mutableStateOf(false) }
+    var onWaitlist by remember { mutableStateOf(userOnWaitlist()) }
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -222,7 +225,7 @@ fun CampsiteView(
         ) {
 
 
-            lottery?.let { // if the lottery is not nan then show this
+            lottery.let { // if the lottery is not nan then show this
                 Text(
                     text = "${lottery.lotteryStartDate} - ${lottery.lotteryEndDate}",
                     modifier = Modifier
@@ -234,7 +237,7 @@ fun CampsiteView(
 
             Spacer(modifier = Modifier.width(5.dp))
 
-            lottery?.let {
+            lottery.let {
                 Text(
                     text = "Guest Count: ${campsiteSelection.occupancy.toInt()}",
                     modifier = Modifier
@@ -316,19 +319,25 @@ fun CampsiteView(
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
 
-            if (lottery != null) {
-                Button(
-                    onClick = { waitlistSelectionClick(userOnWaitlist()) },
-                    enabled = userOnWaitlist() || !lottery.isFull(),
-                    shape = pill,
-                    colors = ButtonDefaults.buttonColors(
+
+            Button(
+                onClick = { waitlistSelectionClick(onWaitlist); onWaitlist = !onWaitlist },
+                enabled = onWaitlist || !lottery.isFull(),
+                shape = pill,
+                colors = if (onWaitlist) {
+                    ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFC0392B),
+                        contentColor = Color.White
+                    )
+                } else {
+                    ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFB5C7BE),
                         contentColor = Color(0xFF2F5240)
-                    ),
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(if (userOnWaitlist()) "Leave Waitlist" else "Join Waitlist", fontSize = 20.sp)
-                }
+                    )
+                },
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(if (onWaitlist) "Leave Waitlist" else "Join Waitlist", fontSize = 20.sp)
             }
         }
     }
@@ -365,7 +374,7 @@ fun CampsiteDetailsScreenPreview() {
         lotteryEndDate = "2026-10-30",
         waitlistMax = 50,
         waitlist = arrayListOf("abc123", "xyz789"),
-        campsite = campsite,
+        campsite = campsite
     )
 
     CampsiteAppTheme {

@@ -42,10 +42,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
 import com.example.campsiteapp.model.Lottery
@@ -83,7 +81,6 @@ class CampsiteListScreen : ComponentActivity() {
                         },
 
                         lotteries = EntrantCampsiteController.getResultsBySearch(searchResult), // Know that campsites is based on the lottery database
-                        searchResult = searchResult,
                         openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@CampsiteListScreen) },
                         openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@CampsiteListScreen) },
                         openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@CampsiteListScreen) }
@@ -105,12 +102,11 @@ fun CampsiteListView(
     updateByUserSearch: (search: String) -> Unit,
     onLotteryClick: (String) -> Unit,
 
-    openProfileScreen: () -> Unit,
+    openProfileScreen: () -> Unit, // confirm if the user should be able to open their profile screen from here
     openOwnerScreen: () -> Unit,
     openAdminScreen: () -> Unit,
 
     lotteries: List<Lottery>,
-    searchResult: String
 ) {
     var entrantSearch by remember { mutableStateOf("") }
     var menuOpen by remember { mutableStateOf(false) }
@@ -144,7 +140,10 @@ fun CampsiteListView(
                     )
                     DropdownMenuItem(
                         text = { Text("Owner") },
-                        onClick = { menuOpen = false }
+                        onClick = {
+                            menuOpen = false
+                            openOwnerScreen()
+                        }
                     )
                 }
             }

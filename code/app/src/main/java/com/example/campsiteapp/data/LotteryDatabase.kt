@@ -54,6 +54,4 @@ class LotteryDatabase : LotteryStorage {
 
         lotteriesRef.document(lottery.id).set(lottery.copy(id = ""))
     }
-
-
 }
