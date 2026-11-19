@@ -115,7 +115,7 @@ class CampsitesDatabase {
             _campsites[index] = updatedCampsite
         }
 
-        campsitesRef.document(updatedCampsite.id).set(
+        campsitesRef.document(updatedCampsite.id).update(
             mapOf(
                 "name" to updatedCampsite.name,
                 "location" to updatedCampsite.location,
