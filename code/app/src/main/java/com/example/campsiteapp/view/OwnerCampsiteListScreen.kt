@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,6 +39,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.campsiteapp.controller.OwnerCampsiteController
+import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.Campsite
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -48,8 +51,20 @@ class OwnerCampsiteListScreen {
     fun CampsitesList(
         campsites: List<Campsite>,
         onAddCampsite: (Campsite) -> Unit,
-        onEditCampsite: (Campsite, Campsite) -> Unit
+        onEditCampsite: (Campsite, Campsite) -> Unit,
+        deviceId: String
     ) {
+
+        val myCampsites = mutableListOf<Campsite>()
+
+        for (campsite in campsites){
+            if (campsite.ownerId == deviceId){
+                myCampsites.add(campsite)
+            }
+
+        }
+
+
 
         var showDetails by remember { mutableStateOf(false) }
         var selectedCampsite by remember { mutableStateOf<Campsite?>(null) }
@@ -62,7 +77,7 @@ class OwnerCampsiteListScreen {
                     .weight(0.8f)
                     .testTag("campsiteList")
             ) {
-                itemsIndexed(campsites) { index, campsite ->
+                itemsIndexed(myCampsites) { index, campsite ->
                     Spacer(modifier = Modifier.height(30.dp))
                     Row(
                         modifier = Modifier

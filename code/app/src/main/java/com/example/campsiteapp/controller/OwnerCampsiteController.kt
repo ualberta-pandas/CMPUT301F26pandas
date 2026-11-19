@@ -48,6 +48,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import com.example.campsiteapp.data.DeviceIDs
+import java.time.Instant
+import java.time.ZoneOffset
 
 @RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
@@ -485,6 +487,15 @@ class OwnerCampsiteController (
                                             deviceId
                                         )
 
+
+
+                                        var ownerId = DeviceIDs(context).fetchDeviceId()?:""
+
+                                        if (ownerId == ""){
+
+                                            ownerId = DeviceIDs(context).registerDeviceId()
+                                        }
+
                                         onAddCampsite(
                                             Campsite(
                                                 name = campName,
@@ -500,7 +511,8 @@ class OwnerCampsiteController (
                                                 tags = tags,
                                                 rules = rules,
                                                 image = imageUrl,
-                                                status = status
+                                                status = status,
+                                                ownerId = ownerId
                                             )
                                         )
 
@@ -509,6 +521,7 @@ class OwnerCampsiteController (
                                             "Campsite added!",
                                             Toast.LENGTH_SHORT
                                         ).show()
+
                                         onDismissRequest()
 
                                     } catch (e: Exception) {
@@ -665,14 +678,14 @@ class OwnerCampsiteController (
                     val dateRangePickerState = rememberDateRangePickerState(
                         initialSelectedStartDateMillis = runCatching {
                             LocalDate.parse(startDate, formatter)
-                                .atStartOfDay(java.time.ZoneOffset.UTC)
+                                .atStartOfDay(ZoneOffset.UTC)
                                 .toInstant()
                                 .toEpochMilli()
                         }.getOrNull(),
 
                         initialSelectedEndDateMillis = runCatching {
                             LocalDate.parse(endDate, formatter)
-                                .atStartOfDay(java.time.ZoneOffset.UTC)
+                                .atStartOfDay(ZoneOffset.UTC)
                                 .toInstant()
                                 .toEpochMilli()
                         }.getOrNull()
@@ -784,13 +797,13 @@ class OwnerCampsiteController (
 
                                             if (start != null && end != null) {
 
-                                                startDate = java.time.Instant.ofEpochMilli(start)
-                                                    .atZone(java.time.ZoneOffset.UTC)
+                                                startDate = Instant.ofEpochMilli(start)
+                                                    .atZone(ZoneOffset.UTC)
                                                     .toLocalDate()
                                                     .format(formatter)
 
-                                                endDate = java.time.Instant.ofEpochMilli(end)
-                                                    .atZone(java.time.ZoneOffset.UTC)
+                                                endDate = Instant.ofEpochMilli(end)
+                                                    .atZone(ZoneOffset.UTC)
                                                     .toLocalDate()
                                                     .format(formatter)
 
