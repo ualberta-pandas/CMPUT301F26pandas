@@ -1,13 +1,12 @@
 package com.example.campsiteapp.view
 
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,32 +48,27 @@ class OwnerCampsiteListScreen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CampsitesList(
-
         campsites: List<Campsite>,
         onAddCampsite: (Campsite) -> Unit,
         onEditCampsite: (Campsite, Campsite) -> Unit
-
     ) {
-
 
         var showDetails by remember { mutableStateOf(false) }
         var selectedCampsite by remember { mutableStateOf<Campsite?>(null) }
         var showRegistration by remember { mutableStateOf(false) }
 
-
-
-
-        Column() {
+        Column {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.8f)
-
+                    .testTag("campsiteList")
             ) {
                 itemsIndexed(campsites) { index, campsite ->
                     Spacer(modifier = Modifier.height(30.dp))
                     Row(
                         modifier = Modifier
+                            .testTag("campsiteRow_$index")
                             .fillMaxWidth()
                             .padding(10.dp)
                             .border(
@@ -83,11 +78,11 @@ class OwnerCampsiteListScreen {
                             )
                             .padding(vertical = 20.dp)
                             .combinedClickable(
-                                onDoubleClick = {
-
-                                },
-                                onClick = {     selectedCampsite = campsite
-                                    showDetails = true}
+                                onDoubleClick = {},
+                                onClick = {
+                                    selectedCampsite = campsite
+                                    showDetails = true
+                                }
                             ),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
@@ -97,21 +92,25 @@ class OwnerCampsiteListScreen {
                         ) {
                             Text(
                                 text = campsite.name,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.testTag("campsiteName_$index")
                             )
 
                             Text(
-                                text = campsite.location
+                                text = campsite.location,
+                                modifier = Modifier.testTag("campsiteLocation_$index")
                             )
 
                             Text(
                                 text = campsite.occupancy.toString(),
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.testTag("campsiteOccupancy_$index")
                             )
 
                             Text(
                                 text = campsite.status,
                                 modifier = Modifier
+                                    .testTag("campsiteStatus_$index")
                                     .background(Color.Green)
                                     .border(
                                         width = 1.dp,
@@ -122,19 +121,19 @@ class OwnerCampsiteListScreen {
 
                             Text(
                                 text = "# Slots available",
-
-
-                                )
+                                modifier = Modifier.testTag("campsiteSlots_$index")
+                            )
                         }
 
                         Spacer(modifier = Modifier.width(80.dp))
 
                         val url = campsite.image
-                        Column() {
+                        Column {
                             AsyncImage(
                                 model = url,
                                 contentDescription = "Campsite image",
                                 modifier = Modifier
+                                    .testTag("campsiteImage_$index")
                                     .fillMaxWidth()
                                     .height(200.dp),
                                 contentScale = ContentScale.Crop
@@ -144,8 +143,6 @@ class OwnerCampsiteListScreen {
                         if (index < campsites.lastIndex) {
                             HorizontalDivider()
                         }
-
-
                     }
                 }
             }
@@ -157,24 +154,24 @@ class OwnerCampsiteListScreen {
                 verticalAlignment = Alignment.Bottom
             ) {
                 FloatingActionButton(
-                    onClick = {
-                        showRegistration = true
-
-                    }
+                    onClick = { showRegistration = true },
+                    modifier = Modifier.testTag("addCampsiteButton")
                 ) { Text(text = "+", fontSize = 20.sp) }
             }
 
-            if (showRegistration){
+            if (showRegistration) {
                 Dialog(
-                    onDismissRequest = {showRegistration = false},
+                    onDismissRequest = { showRegistration = false },
                     properties = DialogProperties(
                         usePlatformDefaultWidth = false
                     )
                 ) {
-                    ownerController.RegisterCampsite(
-                        onDismissRequest = { showRegistration = false },
-                        onAddCampsite = onAddCampsite
-                    )
+                    Box(modifier = Modifier.testTag("registrationDialog")) {
+                        ownerController.RegisterCampsite(
+                            onDismissRequest = { showRegistration = false },
+                            onAddCampsite = onAddCampsite
+                        )
+                    }
                 }
             }
 
@@ -185,25 +182,16 @@ class OwnerCampsiteListScreen {
                         usePlatformDefaultWidth = false
                     )
                 ) {
-                   OwnerCampsiteDetailsScreen().CampsiteDetailsScreen(
-
+                    OwnerCampsiteDetailsScreen().CampsiteDetailsScreen(
                         selectedCampsiteDetails = selectedCampsite,
                         onEditCampsite = onEditCampsite,
-
-
                         onDismissRequest = {
                             showDetails = false
                             selectedCampsite = null
                         }
                     )
-
-
                 }
             }
-
         }
-
-
     }
-
 }

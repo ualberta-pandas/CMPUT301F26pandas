@@ -1,17 +1,9 @@
 package com.example.campsiteapp.view
 
-import android.app.Dialog
-import android.net.Uri
 import android.os.Build
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
@@ -44,17 +35,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import com.example.campsiteapp.controller.MapLocationPicker
 import com.example.campsiteapp.controller.OwnerCampsiteController
 import com.example.campsiteapp.model.Campsite
 import com.google.android.gms.maps.model.CameraPosition
@@ -63,41 +49,29 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
-import java.util.Properties
 
 class OwnerCampsiteDetailsScreen {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-
     fun CampsiteDetailsScreen(
         onDismissRequest: () -> Unit,
         selectedCampsiteDetails: Campsite?,
         onEditCampsite: (Campsite, Campsite) -> Unit
-
-    ){
+    ) {
         Column(
             modifier = Modifier.fillMaxWidth()
-
         ) {
             Card(
-                modifier = Modifier
-                    .fillMaxSize()
-
+                modifier = Modifier.fillMaxSize()
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize()
-
                 ) {
-
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -105,11 +79,10 @@ class OwnerCampsiteDetailsScreen {
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.Top
                     ) {
-
                         TextButton(
-                            onClick = onDismissRequest
+                            onClick = onDismissRequest,
+                            modifier = Modifier.testTag("closeButton")
                         ) { Text("x") }
-
                     }
 
                     Row(
@@ -117,33 +90,33 @@ class OwnerCampsiteDetailsScreen {
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-
-                        Text("${selectedCampsiteDetails?.name} Details Screen")
-
+                        Text(
+                            "${selectedCampsiteDetails?.name} Details Screen",
+                            modifier = Modifier.testTag("detailsTitle")
+                        )
                     }
-
-
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-
                     var campName by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.name?:"") }
+                        mutableStateOf(selectedCampsiteDetails?.name ?: "")
+                    }
 
                     var longitude by remember(selectedCampsiteDetails) {
-                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble()
-                            ?: 0.0) }
+                        mutableDoubleStateOf(
+                            selectedCampsiteDetails?.latitude?.toDouble() ?: 0.0
+                        )
+                    }
                     var latitude by remember(selectedCampsiteDetails) {
-                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble() ?:0.0) }
-
-
+                        mutableDoubleStateOf(
+                            selectedCampsiteDetails?.longitude?.toDouble() ?: 0.0
+                        )
+                    }
 
                     TextField(
                         value = campName,
                         onValueChange = { campName = it },
-                        label = {
-                            Text("Campsite Name")
-                        },
+                        label = { Text("Campsite Name") },
                         modifier = Modifier
                             .testTag("campName")
                             .border(
@@ -157,19 +130,26 @@ class OwnerCampsiteDetailsScreen {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Row() {
+                    Row {
 
                         Column(
-                            modifier = Modifier.width(200.dp).height(200.dp)
+                            modifier = Modifier
+                                .width(200.dp)
+                                .height(200.dp)
                         ) {
-                            val location = LatLng(selectedCampsiteDetails?.latitude?.toDouble() ?: 0.0, selectedCampsiteDetails?.longitude?.toDouble()?:0.0)
+                            val location = LatLng(
+                                selectedCampsiteDetails?.latitude?.toDouble() ?: 0.0,
+                                selectedCampsiteDetails?.longitude?.toDouble() ?: 0.0
+                            )
 
                             val cameraPositionState = rememberCameraPositionState {
                                 position = CameraPosition.fromLatLngZoom(location, 15f)
                             }
 
                             GoogleMap(
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .testTag("campsiteMap"),
                                 cameraPositionState = cameraPositionState
                             ) {
                                 Marker(
@@ -179,38 +159,41 @@ class OwnerCampsiteDetailsScreen {
                             }
                         }
 
-
-                        Column() {
+                        Column {
                             AsyncImage(
-                                model = selectedCampsiteDetails?.image?:"Campsite Image",
-                                contentDescription = "Edit",
+                                model = selectedCampsiteDetails?.image ?: "Campsite Image",
+                                contentDescription = "Campsite image",
                                 modifier = Modifier
+                                    .testTag("campsiteImage")
                                     .width(200.dp)
                                     .height(200.dp),
                                 contentScale = ContentScale.Crop
                             )
                         }
-
                     }
 
-
-
-                    // other text fields and buttons
-
                     var location by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.location?:"") }
+                        mutableStateOf(selectedCampsiteDetails?.location ?: "")
+                    }
                     var occupancy by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.occupancy?:"") }
+                        mutableStateOf(selectedCampsiteDetails?.occupancy?.toString() ?: "")
+                    }
                     var owner by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.owner?:"") }
-                    var price by remember (selectedCampsiteDetails){
-                        mutableStateOf(selectedCampsiteDetails?.price?:"") }
+                        mutableStateOf(selectedCampsiteDetails?.owner ?: "")
+                    }
+                    var price by remember(selectedCampsiteDetails) {
+                        mutableStateOf(selectedCampsiteDetails?.price ?: "")
+                    }
                     var mapLocation by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.latitude+','+selectedCampsiteDetails?.longitude) }
+                        mutableStateOf(
+                            selectedCampsiteDetails?.latitude + ',' + selectedCampsiteDetails?.longitude
+                        )
+                    }
                     var availableDates by remember(selectedCampsiteDetails) {
                         mutableStateOf(
-                            selectedCampsiteDetails?.startDate+'-'+selectedCampsiteDetails?.endDate) }
-
+                            selectedCampsiteDetails?.startDate + '-' + selectedCampsiteDetails?.endDate
+                        )
+                    }
 
                     val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
 
@@ -230,67 +213,70 @@ class OwnerCampsiteDetailsScreen {
                         initialSelectedStartDateMillis = startDate?.atStartOfDay(
                             ZoneOffset.UTC
                         )?.toInstant()?.toEpochMilli(),
-
                         initialSelectedEndDateMillis = endDate?.atStartOfDay(
                             ZoneOffset.UTC
                         )?.toInstant()?.toEpochMilli(),
+                    )
 
-
-                        )
-
-
-                    var description by remember(selectedCampsiteDetails)
-                    { mutableStateOf(selectedCampsiteDetails?.description?:"") }
+                    var description by remember(selectedCampsiteDetails) {
+                        mutableStateOf(selectedCampsiteDetails?.description ?: "")
+                    }
                     var tags by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.tags?:"") }
+                        mutableStateOf(selectedCampsiteDetails?.tags ?: "")
+                    }
                     var rules by remember(selectedCampsiteDetails) {
-                        mutableStateOf(selectedCampsiteDetails?.rules?:"") }
-                    var status by remember(selectedCampsiteDetails){
-                        mutableStateOf(selectedCampsiteDetails?.status?:"")
+                        mutableStateOf(selectedCampsiteDetails?.rules ?: "")
+                    }
+                    var status by remember(selectedCampsiteDetails) {
+                        mutableStateOf(selectedCampsiteDetails?.status ?: "")
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Row() {
+                    Row {
                         TextField(
                             value = location,
                             onValueChange = { location = it },
                             label = { Text("Location") },
-                            modifier = Modifier.border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            ),
+                            modifier = Modifier
+                                .testTag("location")
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(16.dp)
+                                ),
                             readOnly = true
-
                         )
 
                         TextField(
-                            value = occupancy.toString(),
+                            value = occupancy,
                             onValueChange = { occupancy = it },
                             label = { Text("Occupancy") },
-                            modifier = Modifier.border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            ),
+                            modifier = Modifier
+                                .testTag("occupancy")
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(16.dp)
+                                ),
                             readOnly = true
                         )
-
                     }
 
-
                     Spacer(modifier = Modifier.height(10.dp))
-                    Row() {
+
+                    Row {
                         TextField(
                             value = owner,
                             onValueChange = { owner = it },
                             label = { Text("Owner") },
-                            modifier = Modifier.border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            ),
+                            modifier = Modifier
+                                .testTag("owner")
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(16.dp)
+                                ),
                             readOnly = true
                         )
 
@@ -298,11 +284,13 @@ class OwnerCampsiteDetailsScreen {
                             value = price,
                             onValueChange = { price = it },
                             label = { Text("Price") },
-                            modifier = Modifier.border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            ),
+                            modifier = Modifier
+                                .testTag("price")
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(16.dp)
+                                ),
                             readOnly = true
                         )
                     }
@@ -311,27 +299,24 @@ class OwnerCampsiteDetailsScreen {
 
                     var showDatePicker by remember { mutableStateOf(false) }
 
-                    Row() {
-
+                    Row {
                         TextField(
                             value = availableDates,
-                            onValueChange = {availableDates = it},
+                            onValueChange = { availableDates = it },
                             label = { Text("Available Dates") },
-                            modifier = Modifier.border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            ),
+                            modifier = Modifier
+                                .testTag("availableDates")
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Black,
+                                    shape = RoundedCornerShape(16.dp)
+                                ),
                             readOnly = true
-
                         )
 
                         Button(
-                            onClick = {
-
-                                showDatePicker = true
-
-                            }
+                            onClick = { showDatePicker = true },
+                            modifier = Modifier.testTag("viewDatesButton")
                         ) {
                             Text("View Dates")
                         }
@@ -339,47 +324,30 @@ class OwnerCampsiteDetailsScreen {
                         if (showDatePicker) {
                             DatePickerDialog(
                                 onDismissRequest = { showDatePicker = false },
-
                                 confirmButton = {
                                     Button(
-                                        onClick = {
-
-                                            showDatePicker = false
-                                        }
+                                        onClick = { showDatePicker = false },
+                                        modifier = Modifier.testTag("datePickerOk")
                                     ) { Text("Ok") }
                                 },
-
                                 dismissButton = {
                                     Button(
-                                        onClick = {
-                                            showDatePicker = false
-                                        }
-                                    ) {
-                                        Text("Cancel")
-                                    }
+                                        onClick = { showDatePicker = false },
+                                        modifier = Modifier.testTag("datePickerCancel")
+                                    ) { Text("Cancel") }
                                 }
                             ) {
-
-                                DateRangePicker(state = dateRangePickerState)
+                                DateRangePicker(
+                                    state = dateRangePickerState,
+                                    modifier = Modifier.testTag("dateRangePicker")
+                                )
                             }
                         }
-
-
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    var showMap by remember { mutableStateOf(false) }
-
-
-
-
-
-
-
-
                     val coordinates = "$latitude,$longitude"
-
                     mapLocation = coordinates
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -390,10 +358,11 @@ class OwnerCampsiteDetailsScreen {
                         label = { Text("Description") },
                         maxLines = 4,
                         modifier = Modifier
+                            .testTag("description")
                             .border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(16.dp)
                             )
                             .fillMaxWidth(),
                         readOnly = true
@@ -407,10 +376,11 @@ class OwnerCampsiteDetailsScreen {
                         maxLines = 3,
                         label = { Text("Tags") },
                         modifier = Modifier
+                            .testTag("tags")
                             .border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(16.dp)
                             )
                             .fillMaxWidth(),
                         readOnly = true
@@ -424,10 +394,11 @@ class OwnerCampsiteDetailsScreen {
                         maxLines = 3,
                         label = { Text("Rules and terms of use") },
                         modifier = Modifier
+                            .testTag("rules")
                             .border(
                                 width = 1.dp,
                                 color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(16.dp)
                             )
                             .fillMaxWidth(),
                         readOnly = true
@@ -437,21 +408,20 @@ class OwnerCampsiteDetailsScreen {
 
                     TextField(
                         value = status,
-                        onValueChange = {status = it},
+                        onValueChange = { status = it },
                         label = { Text("Status") },
-                        modifier = Modifier.border(
-                            width = 1.dp,
-                            color = Color.Black,
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                        ),
+                        modifier = Modifier
+                            .testTag("status")
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = RoundedCornerShape(16.dp)
+                            ),
                         readOnly = true
-
                     )
-
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    val context = LocalContext.current
                     val qrScanScreen = remember { QrScanScreen() }
                     var showQrScanScreen by remember { mutableStateOf(false) }
 
@@ -460,11 +430,8 @@ class OwnerCampsiteDetailsScreen {
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Button(
-                            onClick = {
-
-                                showQrScanScreen = true
-                            }
-
+                            onClick = { showQrScanScreen = true },
+                            modifier = Modifier.testTag("shareButton")
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Share,
@@ -473,23 +440,18 @@ class OwnerCampsiteDetailsScreen {
                             )
                         }
 
-
-                        if (showQrScanScreen && selectedCampsiteDetails != null){
-
+                        if (showQrScanScreen && selectedCampsiteDetails != null) {
                             Dialog(
-                                onDismissRequest = {showQrScanScreen = false},
+                                onDismissRequest = { showQrScanScreen = false },
                                 properties = DialogProperties(
                                     usePlatformDefaultWidth = false
                                 )
-
                             ) {
-
-                                Card(
-
-                                ) {
+                                Card {
                                     Column(
                                         verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier.testTag("shareDialog")
                                     ) {
                                         qrScanScreen.QrScan(
                                             campsiteId = selectedCampsiteDetails.id
@@ -497,18 +459,13 @@ class OwnerCampsiteDetailsScreen {
                                     }
                                 }
                             }
-
-
                         }
 
                         var showEdit by remember { mutableStateOf(false) }
+
                         Button(
-                            onClick = {
-
-                                showEdit = true
-
-                            }
-
+                            onClick = { showEdit = true },
+                            modifier = Modifier.testTag("editButton")
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
@@ -518,24 +475,19 @@ class OwnerCampsiteDetailsScreen {
                             )
                         }
 
-                        if (showEdit && selectedCampsiteDetails != null){
+                        if (showEdit && selectedCampsiteDetails != null) {
                             Dialog(
-                                onDismissRequest = {showEdit = false
-                                },
+                                onDismissRequest = { showEdit = false },
                                 properties = DialogProperties(
                                     usePlatformDefaultWidth = false
                                 )
-
                             ) {
-
-                                Card(
-
-                                ) {
+                                Card {
                                     Column(
                                         verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        modifier = Modifier.testTag("editDialog")
                                     ) {
-
                                         OwnerCampsiteController().EditCampsite(
                                             onDismissRequest = { showEdit = false },
                                             selectedCampsiteDetails,
@@ -545,11 +497,9 @@ class OwnerCampsiteDetailsScreen {
                                 }
                             }
                         }
-
                     }
                 }
-
-            }}
+            }
+        }
     }
-
 }
