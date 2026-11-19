@@ -168,8 +168,7 @@ class OwnerCampsiteListScreen {
             Spacer(modifier = Modifier.height(20.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.Bottom
+                horizontalArrangement = Arrangement.Center
             ) {
                 FloatingActionButton(
                     onClick = { showRegistration = true },
