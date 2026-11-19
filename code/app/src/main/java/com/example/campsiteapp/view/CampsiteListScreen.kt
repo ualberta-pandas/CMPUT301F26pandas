@@ -157,7 +157,7 @@ fun CampsiteListView(
                 keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
                 textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .weight(1f)
                     .padding(horizontal = 16.dp)
                     .border(1.dp, Color.LightGray, pill)
                     .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
@@ -177,53 +177,52 @@ fun CampsiteListView(
                     }
                 }
             )
+        }
 
-            Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Text(
+                text = "No Dates Filter",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+                    .border(1.dp, Color.Black, pill)
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            )
 
-                Text(
-                    text = "No Dates Filter",
-                    modifier = Modifier
-                        .border(1.dp, Color.Black, pill)
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                )
+            Spacer(modifier = Modifier.width(6.dp))
 
-                Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "No Guest Filter",
+                modifier = Modifier
+                    .border(1.dp, Color.Black, pill)
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            )
 
-                Text(
-                    text = "No Guest Filter",
-                    modifier = Modifier
-                        .border(1.dp, Color.Black, pill)
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                )
-
-
-            }
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            displayCampsitesAsCards(
-                Modifier, lotteries = lotteries, onLotteryClick,
-                getTextAttributes = { lottery ->
-                    val currSize = lottery.waitlistMax - lottery.waitlist.size
-                    if (currSize == 0) {
-                        Pair("Closed - No Space Left", Color(0xFFD9B8B8))
-                    } else if (currSize < 2) {
-                        Pair("Open - 2 Spaces remaining", Color(0xFFE6DDB0))
-                    } else {
-                        Pair("Open - Many Spots", Color(0xFFB5C7BE))
-                    }
-                })
-
-            Spacer(modifier = Modifier.height(12.dp))
 
         }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        displayCampsitesAsCards(
+            Modifier, lotteries = lotteries, onLotteryClick,
+            getTextAttributes = { lottery ->
+                val currSize = lottery.waitlistMax - lottery.waitlist.size
+                if (currSize == 0) {
+                    Pair("Closed - No Space Left", Color(0xFFD9B8B8))
+                } else if (currSize < 2) {
+                    Pair("Open - 2 Spaces remaining", Color(0xFFE6DDB0))
+                } else {
+                    Pair("Open - Many Spots", Color(0xFFB5C7BE))
+                }
+            })
+
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 
