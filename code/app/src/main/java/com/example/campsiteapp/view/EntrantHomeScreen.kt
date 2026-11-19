@@ -208,17 +208,23 @@ fun EntrantHomeScreenView(
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
         }
-
+ 
         Spacer(modifier = Modifier.height(64.dp))
 
-        LazyColumn( modifier = modifier.fillMaxSize(),
+        val reservations = EntrantCampsiteController.getReservationsById(deviceId)
+        val lotteries = EntrantCampsiteController.getLotteriesById(deviceId)
+        android.util.Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
+
+        Text("Your Confirmed Bookings", modifier = Modifier.padding(start = 16.dp))
+        LazyColumn(
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(EntrantCampsiteController.getReservationsById(deviceId)) { reservation ->
+            items(reservations) { reservation ->
                 val campsite: Campsite = reservation.campsite
 
-                Box(modifier = modifier
+                Box(modifier = Modifier
                     .size(width = 350.dp, height = 140.dp)
                     .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
                 ){
@@ -229,7 +235,7 @@ fun EntrantHomeScreenView(
                         Text(text = campsite.name, fontSize = 18.sp)
                         Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
                         Text(text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
-                            fontSize = 12.sp, lineHeight = 10.sp)
+                            fontSize = 12.sp)
                         Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
 
                         val status: Pair<String, Color> = Pair("Booked - Cancel Before ${campsite.startDate}", Color(0xFFB5C7BE))
@@ -252,15 +258,20 @@ fun EntrantHomeScreenView(
 
 
         Spacer(modifier = Modifier.height(32.dp))
-        Text("      Your Pending Bookings")
-        displayCampsitesAsCards(modifier, EntrantCampsiteController.getLotteriesById(deviceId),
-            {}, getTextAttributes = { lottery ->
+        Text("Your Pending Bookings", modifier = Modifier.padding(start = 16.dp))
+
+        displayCampsitesAsCards(
+            modifier = Modifier.weight(1f),
+            lotteries = lotteries,
+            onClickEvent = {},
+            getTextAttributes = { lottery ->
                 if (lottery.winner == deviceId) {
                     Pair("Campsite won - respond before ${lottery.bookingEndDate}", Color(0xFFE6DDB0))
                 } else {
                     Pair("Entered in lottery", Color(0xFFD9D9D9))
                 }
-            })
+            }
+        )
 
         Row(
             modifier = Modifier
@@ -301,7 +312,7 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
             val campsite: Campsite = lottery.campsite
 
             Box(modifier = modifier
-                .size(width = 350.dp, height = 140.dp)
+                .size(width = 350.dp, height = 170.dp)
                 .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
                 .clickable { onClickEvent(lottery.id) }
             ){
@@ -312,7 +323,7 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
                     Text(text = campsite.name, fontSize = 18.sp)
                     Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
                     Text(text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
-                        fontSize = 12.sp, lineHeight = 10.sp)
+                        fontSize = 12.sp)
                     Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
 
                     val status = getTextAttributes(lottery)
@@ -322,7 +333,7 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
                         color = Color.Black,
                         modifier = Modifier
                             .width(300.dp)
-                            .height(60.dp)
+                            .height(32.dp)
                             .background(status.second, RoundedCornerShape(50))
                             .padding(horizontal = 12.dp, vertical = 4.dp),
                         fontSize = 12.sp

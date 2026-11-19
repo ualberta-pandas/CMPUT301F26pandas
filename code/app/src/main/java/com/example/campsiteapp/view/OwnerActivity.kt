@@ -19,7 +19,7 @@ class OwnerActivity: ComponentActivity() {
         val campsitesDatabase = CampsitesDatabase()
         setContent {
             CampsiteAppTheme {
-                OwnerHomeScreen(campsitesDatabase)
+                OwnerHomeScreen(campsitesDatabase, onBack = {finish()})
             }
         }
     }

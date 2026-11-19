@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
@@ -34,7 +35,7 @@ import com.example.campsiteapp.view.OwnerCampsiteListScreen
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 
-fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase){
+fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit){
 
 
 
@@ -47,6 +48,11 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase){
     Column {
         Spacer(modifier = Modifier.height(50.dp))
         Row(horizontalArrangement = Arrangement.Center) {
+            Button(
+                onClick = {
+
+                }
+            ) { Text("<-") }
             Text(text = "My Campsites")
         }
 

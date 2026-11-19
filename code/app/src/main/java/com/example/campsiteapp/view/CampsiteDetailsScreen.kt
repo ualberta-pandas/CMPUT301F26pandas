@@ -111,6 +111,7 @@ class CampsiteDetailsScreen : ComponentActivity() {
                         openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@CampsiteDetailsScreen) },
                         openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@CampsiteDetailsScreen) },
                         openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@CampsiteDetailsScreen) },
+                        openMenuScreen = {EntrantCampsiteController.toggleMenuScreen(this@CampsiteDetailsScreen)},
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -133,6 +134,7 @@ fun CampsiteView(
     openProfileScreen: () -> Unit,
     openOwnerScreen: () -> Unit,
     openAdminScreen: () -> Unit,
+    openMenuScreen: () -> Unit,
 
     modifier: Modifier = Modifier
 ) {
@@ -168,7 +170,16 @@ fun CampsiteView(
                     )
                     DropdownMenuItem(
                         text = { Text("Owner") },
-                        onClick = { menuOpen = false }
+                        onClick = { menuOpen = false
+                            openOwnerScreen()
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Main Menu") },
+                        onClick = { menuOpen = false
+                            openMenuScreen()
+                        }
                     )
                 }
             }
