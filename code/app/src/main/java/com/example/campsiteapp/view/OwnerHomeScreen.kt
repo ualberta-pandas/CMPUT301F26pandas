@@ -35,7 +35,7 @@ import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
 fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase){
 
-    val myCampsites = campsitesDatabase.campsites.filter()
+
 
 
 
