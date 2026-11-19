@@ -45,6 +45,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import com.example.campsiteapp.data.DeviceIDs
@@ -435,10 +437,10 @@ class OwnerCampsiteController (
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val context = LocalContext.current
-                    val ownerId by produceState(initialValue = "") {
-                        val deviceIDs = DeviceIDs(context)
-                        value = deviceIDs.fetchDeviceId() ?: deviceIDs.registerDeviceId()
-                    }
+//                    val ownerId by produceState(initialValue = "") {
+//                        val deviceIDs = DeviceIDs(context)
+//                        value = deviceIDs.fetchDeviceId() ?: deviceIDs.registerDeviceId()
+//                    }
 
                     Row(
                         horizontalArrangement = Arrangement.Center
@@ -509,7 +511,8 @@ class OwnerCampsiteController (
                                                 rules = rules,
                                                 image = imageUrl,
                                                 status = status,
-                                                ownerId = ownerId
+//                                                ownerId = ownerId
+                                                ownerId = deviceId
                                             )
                                         )
 
@@ -577,8 +580,9 @@ class OwnerCampsiteController (
 
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize()
-
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
                 ) {
 
 
@@ -835,10 +839,10 @@ class OwnerCampsiteController (
                     var showMap by remember { mutableStateOf(false) }
 
                     var longitude by remember(selectedCampsiteDetails) {
-                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble()
+                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble()
                             ?: 0.0) }
                     var latitude by remember(selectedCampsiteDetails) {
-                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble() ?:0.0) }
+                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble() ?:0.0) }
 
 
                     if (showMap) {
