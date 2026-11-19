@@ -50,6 +50,8 @@ import androidx.compose.ui.Alignment
 import com.example.campsiteapp.data.DeviceIDs
 import java.time.Instant
 import java.time.ZoneOffset
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.getValue
 
 @RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
@@ -433,8 +435,9 @@ class OwnerCampsiteController (
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val context = LocalContext.current
-                    var ownerId by produceState(initialValue = "") {
-                        value = DeviceIDs(context).fetchDeviceId() ?: ""
+                    val ownerId by produceState(initialValue = "") {
+                        val deviceIDs = DeviceIDs(context)
+                        value = deviceIDs.fetchDeviceId() ?: deviceIDs.registerDeviceId()
                     }
 
                     Row(
@@ -490,14 +493,6 @@ class OwnerCampsiteController (
                                             deviceId
                                         )
 
-
-
-
-
-                                        if (ownerId == ""){
-
-                                            ownerId = DeviceIDs(context).registerDeviceId()
-                                        }
 
                                         onAddCampsite(
                                             Campsite(
