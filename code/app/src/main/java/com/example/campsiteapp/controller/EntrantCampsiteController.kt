@@ -10,6 +10,7 @@ import com.example.campsiteapp.view.AdminActivity
 
 import com.example.campsiteapp.view.CampsiteDetailsScreen
 import com.example.campsiteapp.view.CampsiteListScreen
+import com.example.campsiteapp.view.EntrantHomeScreen
 import com.example.campsiteapp.view.ProfileActivity
 import com.example.campsiteapp.view.OwnerHomeScreen
 
@@ -97,6 +98,11 @@ object EntrantCampsiteController {
 
     fun toggleOwnerScreen(context: Context) {
         val intent = Intent(context, OwnerHomeScreen::class.java)
+        context.startActivity(intent)
+    }
+
+    fun toggleMenuScreen(context: Context) {
+        val intent = Intent(context, EntrantHomeScreen::class.java)
         context.startActivity(intent)
     }
 }
