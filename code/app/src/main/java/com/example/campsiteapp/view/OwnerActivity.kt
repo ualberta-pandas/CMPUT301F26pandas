@@ -1,6 +1,6 @@
 package com.example.campsiteapp.view
 
-import OwnerHomeScreen
+
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
