@@ -53,6 +53,7 @@ import java.time.ZoneOffset
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
 
@@ -178,6 +179,13 @@ class OwnerCampsiteController (
 
                         )
 
+
+                    }
+
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         TextField(
                             value = occupancy,
                             onValueChange = { occupancy = it },
@@ -188,11 +196,10 @@ class OwnerCampsiteController (
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
-
                     }
 
-
                     Spacer(modifier = Modifier.height(10.dp))
+
                     Row() {
                         TextField(
                             value = owner,
@@ -237,6 +244,13 @@ class OwnerCampsiteController (
 
                         )
 
+
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         Button(
                             onClick = {
 
@@ -296,9 +310,7 @@ class OwnerCampsiteController (
                             }
                         }
 
-
                     }
-
 
                     var showMap by remember { mutableStateOf(false) }
 
@@ -362,6 +374,12 @@ class OwnerCampsiteController (
                             )
                         )
 
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         Button(
                             onClick = {
                                 showMap = true
@@ -441,7 +459,8 @@ class OwnerCampsiteController (
                     }
 
                     Row(
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.Bottom
                     ) {
                         Button(
                             onClick = {
@@ -714,6 +733,14 @@ class OwnerCampsiteController (
 
                         )
 
+
+
+                    }
+
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row() {
                         TextField(
                             value = occupancy.toString(),
                             onValueChange = { occupancy = it },
@@ -724,11 +751,10 @@ class OwnerCampsiteController (
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
-
                     }
 
-
                     Spacer(modifier = Modifier.height(10.dp))
+
                     Row() {
                         TextField(
                             value = owner,
@@ -771,6 +797,13 @@ class OwnerCampsiteController (
 
                         )
 
+
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         Button(
                             onClick = {
 
@@ -827,10 +860,7 @@ class OwnerCampsiteController (
                             }
                         }
 
-
                     }
-
-                    Spacer(modifier = Modifier.height(10.dp))
 
                     var showMap by remember { mutableStateOf(false) }
 
@@ -872,14 +902,20 @@ class OwnerCampsiteController (
                             )
                         )
 
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
+
                         Button(
                             onClick = {
                                 showMap = true
                             }
                         ) { Text("Choose Location") }
-                    }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    }
 
                     TextField(
                         value = description,
@@ -950,7 +986,8 @@ class OwnerCampsiteController (
                     var showQrScanScreen by remember { mutableStateOf(false) }
 
                     Row(
-                        horizontalArrangement = Arrangement.Center
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.Bottom
                     ) {
 
                         Button(
