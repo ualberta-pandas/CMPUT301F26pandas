@@ -77,13 +77,9 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase){
                 campsites = campsitesDatabase.campsites,
                 onAddCampsite = { campsitesDatabase.addCampsite(it) },
                 onEditCampsite = { old, new ->
-                    val i = campsitesDatabase.campsites.indexOf(old)
-                    if (i != -1) {
-                        campsitesDatabase.campsites =
-                            campsitesDatabase.campsites.toMutableList().apply {
-                                set(i, new)
-                            }
-                    }
+
+                        campsitesDatabase.updateCampsite(old, new)
+
                       }
             )
             // 1 -> LotteryContent()
