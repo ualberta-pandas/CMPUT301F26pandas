@@ -7,15 +7,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
 /**
-
-    * This is the database, and it stores and retrieves data from Firestore database
-
-
-    * @property db stores the database
+ * This is the database, and it stores and retrieves data from Firestore database
+ * @property db stores the database
  * @property campsitesRef stores the campsite collection for future use
  * @property _campsites is an empty mutable list to store campsites
  * @property campsites converts _campsites mutable into normal List
-
  */
 
 class CampsitesDatabase {
