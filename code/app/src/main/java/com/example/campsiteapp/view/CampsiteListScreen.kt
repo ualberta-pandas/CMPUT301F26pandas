@@ -83,8 +83,8 @@ class CampsiteListScreen : ComponentActivity() {
                         lotteries = EntrantCampsiteController.getResultsBySearch(searchResult), // Know that campsites is based on the lottery database
                         openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@CampsiteListScreen) },
                         openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@CampsiteListScreen) },
-                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@CampsiteListScreen) }
-
+                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@CampsiteListScreen) },
+                        openMenuScreen = {EntrantCampsiteController.toggleMenuScreen(this@CampsiteListScreen)},
                     )
 
                 }
@@ -105,6 +105,7 @@ fun CampsiteListView(
     openProfileScreen: () -> Unit, // confirm if the user should be able to open their profile screen from here
     openOwnerScreen: () -> Unit,
     openAdminScreen: () -> Unit,
+    openMenuScreen: () -> Unit,
 
     lotteries: List<Lottery>,
 ) {
@@ -143,6 +144,14 @@ fun CampsiteListView(
                         onClick = {
                             menuOpen = false
                             openOwnerScreen()
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text("Main Menu") },
+                        onClick = {
+                            menuOpen = false
+                            openMenuScreen()
                         }
                     )
                 }
