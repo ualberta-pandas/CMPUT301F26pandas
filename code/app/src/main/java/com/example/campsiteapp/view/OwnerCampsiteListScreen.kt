@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,11 +52,15 @@ class OwnerCampsiteListScreen {
     fun CampsitesList(
         campsites: List<Campsite>,
         onAddCampsite: (Campsite) -> Unit,
-        onEditCampsite: (Campsite, Campsite) -> Unit,
-        deviceId: String
+        onEditCampsite: (Campsite, Campsite) -> Unit
     ) {
 
         val myCampsites = mutableListOf<Campsite>()
+
+        val context = LocalContext.current
+        val deviceId by produceState(initialValue = "") {
+            value = DeviceIDs(context).fetchDeviceId() ?: ""
+        }
 
         for (campsite in campsites){
             if (campsite.ownerId == deviceId){

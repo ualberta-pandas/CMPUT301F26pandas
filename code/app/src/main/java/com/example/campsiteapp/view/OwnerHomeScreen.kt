@@ -80,10 +80,9 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase){
                 onAddCampsite = { campsitesDatabase.addCampsite(it) },
                 onEditCampsite = { old, new ->
 
-                        campsitesDatabase.updateCampsite(old, new)
+                    campsitesDatabase.updateCampsite(old, new)
 
-                      }
-            )
+                })
             // 1 -> LotteryContent()
             // 2 -> ReservationsContent()
         }

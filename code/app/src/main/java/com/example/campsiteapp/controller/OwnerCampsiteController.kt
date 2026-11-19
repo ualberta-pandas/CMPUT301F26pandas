@@ -433,6 +433,9 @@ class OwnerCampsiteController (
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val context = LocalContext.current
+                    var ownerId by produceState(initialValue = "") {
+                        value = DeviceIDs(context).fetchDeviceId() ?: ""
+                    }
 
                     Row(
                         horizontalArrangement = Arrangement.End,
@@ -489,7 +492,7 @@ class OwnerCampsiteController (
 
 
 
-                                        var ownerId = DeviceIDs(context).fetchDeviceId()?:""
+
 
                                         if (ownerId == ""){
 
