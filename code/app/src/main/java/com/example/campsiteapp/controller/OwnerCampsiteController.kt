@@ -53,6 +53,7 @@ import java.time.ZoneOffset
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 
+
 @RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
 
@@ -441,8 +442,8 @@ class OwnerCampsiteController (
                     }
 
                     Row(
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.Bottom
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Button(
                             onClick = {
@@ -951,8 +952,8 @@ class OwnerCampsiteController (
                     var showQrScanScreen by remember { mutableStateOf(false) }
 
                     Row(
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.Bottom
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
 
                         Button(
