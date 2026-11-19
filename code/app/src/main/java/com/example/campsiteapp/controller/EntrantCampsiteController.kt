@@ -1,7 +1,10 @@
 package com.example.campsiteapp.controller
 
+
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.data.Reservation
 import com.example.campsiteapp.data.LotteryDatabase
@@ -10,8 +13,9 @@ import com.example.campsiteapp.view.AdminActivity
 
 import com.example.campsiteapp.view.CampsiteDetailsScreen
 import com.example.campsiteapp.view.CampsiteListScreen
+import com.example.campsiteapp.view.OwnerActivity
 import com.example.campsiteapp.view.ProfileActivity
-import com.example.campsiteapp.view.OwnerHomeScreen
+
 
 object EntrantCampsiteController {
 
@@ -96,7 +100,8 @@ object EntrantCampsiteController {
     }
 
     fun toggleOwnerScreen(context: Context) {
-        val intent = Intent(context, OwnerHomeScreen::class.java)
-        context.startActivity(intent)
+
+        context.startActivity(Intent(context, OwnerActivity::class.java))
+
     }
 }

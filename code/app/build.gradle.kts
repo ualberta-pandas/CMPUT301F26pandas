@@ -10,6 +10,8 @@ android {
         version = release(37)
     }
 
+
+
     defaultConfig {
         applicationId = "com.example.campsiteapp"
         minSdk = 26
@@ -34,6 +36,10 @@ android {
     buildFeatures {
         compose = true
     }
+
+   testOptions {
+       unitTests { isIncludeAndroidResources = true }
+   }
 }
 
 dependencies {
@@ -45,6 +51,8 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core")
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.espresso.core)
+    testImplementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("androidx.compose.material:material-icons-extended")
@@ -54,12 +62,19 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:19.0.0")
 
     testImplementation(libs.junit)
+
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    testImplementation("org.robolectric:robolectric:4.12.2")
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("androidx.test:core-ktx:1.5.0")
+    testImplementation("androidx.test.ext:junit:1.2.1")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-firestore")
