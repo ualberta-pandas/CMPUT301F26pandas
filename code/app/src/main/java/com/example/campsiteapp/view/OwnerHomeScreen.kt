@@ -30,12 +30,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campsiteapp.model.Campsite
+import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
+import com.example.campsiteapp.view.LotteryOwnerScreen
 
 class OwnerHomeScreen : ComponentActivity() {
 
     // Replace this with your ViewModel/repository when you have one
     private val campsites = mutableStateListOf<Campsite>()
+    private val lotteries = mutableStateListOf<Lottery>()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +90,16 @@ class OwnerHomeScreen : ComponentActivity() {
                                 if (i != -1) campsites[i] = new
                             }
                         )
-                        // 1 -> LotteryContent()
+
+//                         1 -> LotteryOwnerScreen().LotteryList(
+//                             lotteries = lotteries,
+//                             campsites = campsites,
+//                             onCreateLottery = {},
+//                             onUpdateLottery = {}
+//                         )
+
+
+
                         // 2 -> ReservationsContent()
                     }
                 }
