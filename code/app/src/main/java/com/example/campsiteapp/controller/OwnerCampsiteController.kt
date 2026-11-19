@@ -441,8 +441,8 @@ class OwnerCampsiteController (
                     }
 
                     Row(
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.Bottom
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Button(
                             onClick = {
@@ -951,8 +951,8 @@ class OwnerCampsiteController (
                     var showQrScanScreen by remember { mutableStateOf(false) }
 
                     Row(
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.Bottom
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
 
                         Button(
