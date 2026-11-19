@@ -1,10 +1,12 @@
 package com.example.campsiteapp.view
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -61,6 +63,7 @@ import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 private val pill = RoundedCornerShape(50)
 
 class EntrantHomeScreen : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -130,7 +133,8 @@ fun EntrantHomeScreenView(
                     )
                     DropdownMenuItem(
                         text = { Text("Owner") },
-                        onClick = { menuOpen = false }
+                        onClick = { menuOpen = false
+                        openOwnerScreen()}
                     )
                 }
             }
