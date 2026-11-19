@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.data.CampsitesDatabase
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
 
@@ -34,6 +35,7 @@ import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
 fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase){
 
+    val myCampsites = campsitesDatabase.campsites.filter()
 
 
 

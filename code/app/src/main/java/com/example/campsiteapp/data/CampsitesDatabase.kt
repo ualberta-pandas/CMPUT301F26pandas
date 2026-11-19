@@ -57,7 +57,8 @@ class CampsitesDatabase {
 
 
 
-    var campsites: List<Campsite> = _campsites
+    val campsites: List<Campsite>
+        get() = _campsites
 
 
     fun addCampsite(campsite: Campsite){
