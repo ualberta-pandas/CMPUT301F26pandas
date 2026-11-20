@@ -17,7 +17,9 @@ object EntrantWaitlistController {
     }
 
     fun removeEntrantFromWaitlist(lottery: Lottery?, deviceId: String) {
-        lottery?.waitlist?.remove(deviceId)
+        if (lottery == null) return
+        lottery.waitlist.remove(deviceId)
+        lotteryDatabase.updateLottery(lottery)
     }
 
     fun verifyUserOnWaitlist(lottery: Lottery?, deviceId: String): Boolean {

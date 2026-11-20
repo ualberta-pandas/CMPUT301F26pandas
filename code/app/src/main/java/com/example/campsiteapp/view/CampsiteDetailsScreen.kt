@@ -84,16 +84,14 @@ class CampsiteDetailsScreen : ComponentActivity() {
                 value = DeviceIDs(context).fetchDeviceId() ?: ""
             }
 
-
             CampsiteAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    CampsiteView(
+                    if (deviceId.isNotEmpty()) CampsiteView(
                         campsiteSelection = campsite,
                         lottery = lottery,
                         userOnWaitlist = {
                             verifyUserOnWaitlist(lottery, deviceId)
                         },
-
                         waitlistSelectionClick = { userOnWaitList ->
                             if (!userOnWaitList) {
                                 addEntrantToWaitlist(lottery, deviceId)
