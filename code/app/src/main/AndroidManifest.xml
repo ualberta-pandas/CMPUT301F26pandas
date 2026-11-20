@@ -50,6 +50,10 @@
             android:name=".view.AdminActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".view.OwnerActivity"
+            android:exported="false" />
+
         <activity android:name=".view.ProfileActivity" android:exported="false" />
         <activity android:name=".view.OwnerHomeScreen" android:exported="false" />
 
