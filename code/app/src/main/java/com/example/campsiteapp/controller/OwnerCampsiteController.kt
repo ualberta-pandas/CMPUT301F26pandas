@@ -45,9 +45,16 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import com.example.campsiteapp.data.DeviceIDs
+import java.time.Instant
+import java.time.ZoneOffset
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.getValue
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
@@ -174,6 +181,13 @@ class OwnerCampsiteController (
 
                         )
 
+
+                    }
+
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         TextField(
                             value = occupancy,
                             onValueChange = { occupancy = it },
@@ -184,11 +198,10 @@ class OwnerCampsiteController (
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
-
                     }
 
-
                     Spacer(modifier = Modifier.height(10.dp))
+
                     Row() {
                         TextField(
                             value = owner,
@@ -233,6 +246,13 @@ class OwnerCampsiteController (
 
                         )
 
+
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         Button(
                             onClick = {
 
@@ -292,9 +312,7 @@ class OwnerCampsiteController (
                             }
                         }
 
-
                     }
-
 
                     var showMap by remember { mutableStateOf(false) }
 
@@ -358,6 +376,12 @@ class OwnerCampsiteController (
                             )
                         )
 
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         Button(
                             onClick = {
                                 showMap = true
@@ -431,6 +455,10 @@ class OwnerCampsiteController (
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val context = LocalContext.current
+//                    val ownerId by produceState(initialValue = "") {
+//                        val deviceIDs = DeviceIDs(context)
+//                        value = deviceIDs.fetchDeviceId() ?: deviceIDs.registerDeviceId()
+//                    }
 
                     Row(
                         horizontalArrangement = Arrangement.End,
@@ -485,6 +513,7 @@ class OwnerCampsiteController (
                                             deviceId
                                         )
 
+
                                         onAddCampsite(
                                             Campsite(
                                                 name = campName,
@@ -500,7 +529,9 @@ class OwnerCampsiteController (
                                                 tags = tags,
                                                 rules = rules,
                                                 image = imageUrl,
-                                                status = status
+                                                status = status,
+//                                                ownerId = ownerId
+                                                ownerId = deviceId
                                             )
                                         )
 
@@ -509,6 +540,7 @@ class OwnerCampsiteController (
                                             "Campsite added!",
                                             Toast.LENGTH_SHORT
                                         ).show()
+
                                         onDismissRequest()
 
                                     } catch (e: Exception) {
@@ -567,8 +599,9 @@ class OwnerCampsiteController (
 
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize()
-
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
                 ) {
 
 
@@ -665,14 +698,14 @@ class OwnerCampsiteController (
                     val dateRangePickerState = rememberDateRangePickerState(
                         initialSelectedStartDateMillis = runCatching {
                             LocalDate.parse(startDate, formatter)
-                                .atStartOfDay(java.time.ZoneOffset.UTC)
+                                .atStartOfDay(ZoneOffset.UTC)
                                 .toInstant()
                                 .toEpochMilli()
                         }.getOrNull(),
 
                         initialSelectedEndDateMillis = runCatching {
                             LocalDate.parse(endDate, formatter)
-                                .atStartOfDay(java.time.ZoneOffset.UTC)
+                                .atStartOfDay(ZoneOffset.UTC)
                                 .toInstant()
                                 .toEpochMilli()
                         }.getOrNull()
@@ -704,6 +737,14 @@ class OwnerCampsiteController (
 
                         )
 
+
+
+                    }
+
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row() {
                         TextField(
                             value = occupancy.toString(),
                             onValueChange = { occupancy = it },
@@ -714,11 +755,10 @@ class OwnerCampsiteController (
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
-
                     }
 
-
                     Spacer(modifier = Modifier.height(10.dp))
+
                     Row() {
                         TextField(
                             value = owner,
@@ -761,6 +801,13 @@ class OwnerCampsiteController (
 
                         )
 
+
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         Button(
                             onClick = {
 
@@ -784,13 +831,13 @@ class OwnerCampsiteController (
 
                                             if (start != null && end != null) {
 
-                                                startDate = java.time.Instant.ofEpochMilli(start)
-                                                    .atZone(java.time.ZoneOffset.UTC)
+                                                startDate = Instant.ofEpochMilli(start)
+                                                    .atZone(ZoneOffset.UTC)
                                                     .toLocalDate()
                                                     .format(formatter)
 
-                                                endDate = java.time.Instant.ofEpochMilli(end)
-                                                    .atZone(java.time.ZoneOffset.UTC)
+                                                endDate = Instant.ofEpochMilli(end)
+                                                    .atZone(ZoneOffset.UTC)
                                                     .toLocalDate()
                                                     .format(formatter)
 
@@ -817,18 +864,15 @@ class OwnerCampsiteController (
                             }
                         }
 
-
                     }
-
-                    Spacer(modifier = Modifier.height(10.dp))
 
                     var showMap by remember { mutableStateOf(false) }
 
                     var longitude by remember(selectedCampsiteDetails) {
-                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble()
+                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble()
                             ?: 0.0) }
                     var latitude by remember(selectedCampsiteDetails) {
-                        mutableDoubleStateOf(selectedCampsiteDetails?.longitude?.toDouble() ?:0.0) }
+                        mutableDoubleStateOf(selectedCampsiteDetails?.latitude?.toDouble() ?:0.0) }
 
 
                     if (showMap) {
@@ -862,14 +906,20 @@ class OwnerCampsiteController (
                             )
                         )
 
+
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
+
                         Button(
                             onClick = {
                                 showMap = true
                             }
                         ) { Text("Choose Location") }
-                    }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    }
 
                     TextField(
                         value = description,
