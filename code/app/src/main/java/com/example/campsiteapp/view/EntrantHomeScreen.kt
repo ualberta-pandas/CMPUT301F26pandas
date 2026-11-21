@@ -105,6 +105,7 @@ fun EntrantHomeScreenView(
 ) {
     var entrantSearch by remember { mutableStateOf("") }
     var menuOpen by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -284,7 +285,7 @@ fun EntrantHomeScreenView(
                 text = "See past reservations",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
-                    .clickable { }
+                    .clickable { context.startActivity(Intent(context, PastReservationsScreen::class.java)) }
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
 
