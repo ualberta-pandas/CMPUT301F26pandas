@@ -57,6 +57,7 @@ import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
+import java.time.LocalDate
 
 private val pill = RoundedCornerShape(50)
 
@@ -265,9 +266,11 @@ fun EntrantHomeScreenView(
             getTextAttributes = { lottery ->
                 if (lottery.winner == deviceId) {
                     Pair("Campsite won - respond before ${lottery.bookingEndDate}", Color(0xFFE6DDB0))
-                } else {
+                } else if (lottery.lotteryEndDate <= LocalDate.now().toString()) {
                     Pair("Entered in lottery", Color(0xFFD9D9D9))
-                }
+                } else {
+                Pair("Entered in lottery", Color(0xFFD9D9D9))
+                 }
             }
         )
 
