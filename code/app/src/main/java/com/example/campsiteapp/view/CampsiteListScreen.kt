@@ -52,6 +52,7 @@ import com.example.campsiteapp.controller.EntrantCampsiteController
 
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleCampsiteDetailsScreen
+import java.time.LocalDate
 
 private val pill = RoundedCornerShape(50)
 
@@ -217,17 +218,29 @@ fun CampsiteListView(
 
         Spacer(modifier = Modifier.height(15.dp))
 
+        val openIfOpen: (String) -> Unit = { id ->
+            val lottery = lotteries.find { it.id == id }
+            if (lottery != null && lottery.lotteryEndDate > LocalDate.now().toString()) {
+                onLotteryClick(id)
+            }
+        }
+
         displayCampsitesAsCards(
-            Modifier, lotteries = lotteries, onLotteryClick,
+            Modifier, lotteries = lotteries,
+            openIfOpen,
             getTextAttributes = { lottery ->
                 val currSize = lottery.waitlistMax - lottery.waitlist.size
-                if (currSize == 0) {
+
+                if (lottery.lotteryEndDate <= LocalDate.now().toString()) {
+                    Pair("Lottery is closed", Color(0xFFD9B8B8))
+                } else if (currSize == 0) {
                     Pair("Closed - No Space Left", Color(0xFFD9B8B8))
                 } else if (currSize < 2) {
                     Pair("Open - 2 Spaces remaining", Color(0xFFE6DDB0))
                 } else {
                     Pair("Open - Many Spots", Color(0xFFB5C7BE))
                 }
+
             })
 
         Spacer(modifier = Modifier.height(12.dp))
