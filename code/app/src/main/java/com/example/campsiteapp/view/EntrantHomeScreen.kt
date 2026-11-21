@@ -285,7 +285,7 @@ fun EntrantHomeScreenView(
                 text = "See past reservations",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
-                    .clickable { context.startActivity(Intent(context, PastReservationsScreen::class.java))}
+                    .clickable { context.startActivity(Intent(context, PastReservationsScreen::class.java)) }
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
 
