@@ -231,7 +231,8 @@ fun CampsiteListView(
             getTextAttributes = { lottery ->
                 val currSize = lottery.waitlistMax - lottery.waitlist.size
 
-                if (lottery.lotteryEndDate <= LocalDate.now().toString()) {
+                var localDate: String = LocalDate.now().toString()
+                if (lottery.lotteryEndDate < LocalDate.now().toString()) {
                     Pair("Lottery is closed", Color(0xFFD9B8B8))
                 } else if (currSize == 0) {
                     Pair("Closed - No Space Left", Color(0xFFD9B8B8))

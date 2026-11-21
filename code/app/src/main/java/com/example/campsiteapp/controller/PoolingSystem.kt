@@ -18,12 +18,12 @@ object PoolingSystem {
      **/
     fun getTerminatedLotteries(): ArrayList<Lottery>{
         val drawnLotteries: ArrayList<Lottery> = ArrayList()
-        val query: Query = db.whereLessThanOrEqualTo("lotteryEndDate", LocalDate.now().toString())
+        val query: Query = db.whereLessThan("lotteryEndDate", LocalDate.now().toString())
 
         query.get().addOnSuccessListener { result ->
             for (doc in result){
                 val lottery = doc.toObject(Lottery::class.java).copy(id = doc.id)
-                if (lottery.winner.isNotEmpty()) continue
+                if (lottery.winners.isNotEmpty() || lottery.waitlist.isNotEmpty()) continue
 
                 drawnLotteries.add(lottery) // Might help when it comes to debugging
                 drawLotteryWinner(lottery)
@@ -40,13 +40,20 @@ object PoolingSystem {
         when it returns a list of lotteries that are past their due date
     **/
     fun drawLotteryWinner(lottery: Lottery){
-        val lotteryWaitlist = lottery.waitlist.filter { it.isNotBlank() }
+        val lotteryWaitlist = lottery.waitlist.filter { it.isNotBlank() }.toMutableList()
 
         if (lotteryWaitlist.isNotEmpty()) {
-            val randomDeviceId = (0..lotteryWaitlist.size - 1).random()
-            lottery.winner = lotteryWaitlist[randomDeviceId]
+            for (i in 1..lottery.numWinners){
+
+                val randomDeviceId: String = lotteryWaitlist.random()
+                lottery.winners.add(randomDeviceId)
+                lotteryWaitlist.remove(randomDeviceId)
+            }
+
         } else {
-            lottery.winner = "NullPerson"
+            for (i in 1..lottery.numWinners){
+                lottery.winners.add("NullPerson")
+            }
         }
     }
 }

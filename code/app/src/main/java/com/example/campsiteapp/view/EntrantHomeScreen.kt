@@ -264,7 +264,7 @@ fun EntrantHomeScreenView(
             lotteries = lotteries,
             onClickEvent = {},
             getTextAttributes = { lottery ->
-                if (lottery.winner == deviceId) {
+                if (deviceId in lottery.winners) {
                     Pair("Campsite won - respond before ${lottery.bookingEndDate}", Color(0xFFE6DDB0))
                 } else if (lottery.lotteryEndDate <= LocalDate.now().toString()) {
                     Pair("Entered in lottery", Color(0xFFD9D9D9))
