@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -36,21 +38,17 @@ import com.example.campsiteapp.view.OwnerCampsiteListScreen
 @Composable
 
 fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit){
-
-
-
-
-
     val tabs = listOf("Manage", "Lottery", "Reservations")
     var selectedIndex by remember { mutableIntStateOf(0) }
 
-
-    Column {
-        Spacer(modifier = Modifier.height(50.dp))
-        Row(horizontalArrangement = Arrangement.Center) {
+    Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
             Button(
                 onClick = {
-                    onBack()
+
                 }
             ) { Text("<-") }
             Text(text = "My Campsites")

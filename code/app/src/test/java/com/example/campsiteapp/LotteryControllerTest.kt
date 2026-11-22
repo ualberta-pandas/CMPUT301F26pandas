@@ -62,10 +62,10 @@ class LotteryControllerTest {
         assertNotNull(LotteryController.validate(validLottery.copy(waitlistMax = 1)))
     }
 
-//    @Test
-//    fun validate_nullCapacity_meansNoLimitAndIsValid() {
-//        assertNull(LotteryController.validate(validLottery.copy(waitlistMax = null)))
-//    }
+    @Test
+    fun validate_zeroCapacity_meansNoLimitAndIsValid() {
+        assertNull(LotteryController.validate(validLottery.copy(waitlistMax = 0)))
+    }
 
     @Test
     fun createLottery_validLottery_savesItAndReturnsNull() {
@@ -125,6 +125,11 @@ class LotteryControllerTest {
         assertNotNull(
             LotteryController.validate(validLottery.copy(bookingStartDate = "", bookingEndDate = ""))
         )
+    }
+
+    @Test
+    fun validate_emptyCampsiteList_returnsError() {
+        assertNotNull(LotteryController.validate(validLottery.copy(campsiteIds = emptyList())))
     }
 }
 
