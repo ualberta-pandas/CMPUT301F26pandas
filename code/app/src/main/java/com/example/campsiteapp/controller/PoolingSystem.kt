@@ -23,7 +23,7 @@ object PoolingSystem {
         query.get().addOnSuccessListener { result ->
             for (doc in result){
                 val lottery = doc.toObject(Lottery::class.java).copy(id = doc.id)
-                if (lottery.winners.isNotEmpty() || lottery.waitlist.isNotEmpty()) continue
+                if (lottery.winners.isNotEmpty() || lottery.waitlist.isEmpty()) continue
 
                 drawnLotteries.add(lottery) // Might help when it comes to debugging
                 drawLotteryWinner(lottery)
@@ -43,11 +43,15 @@ object PoolingSystem {
         val lotteryWaitlist = lottery.waitlist.filter { it.isNotBlank() }.toMutableList()
 
         if (lotteryWaitlist.isNotEmpty()) {
-            for (i in 1..lottery.numWinners){
+            var winnersIncr: Int = 0;
+            for (i in 1..lotteryWaitlist.size){
+                if (winnersIncr == lottery.numWinners) break;
 
                 val randomDeviceId: String = lotteryWaitlist.random()
                 lottery.winners.add(randomDeviceId)
                 lotteryWaitlist.remove(randomDeviceId)
+
+                winnersIncr++
             }
 
         } else {
