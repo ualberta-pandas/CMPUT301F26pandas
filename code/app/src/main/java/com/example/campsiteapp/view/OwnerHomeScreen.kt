@@ -50,7 +50,7 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit){
         Row(horizontalArrangement = Arrangement.Center) {
             Button(
                 onClick = {
-
+                    onBack()
                 }
             ) { Text("<-") }
             Text(text = "My Campsites")

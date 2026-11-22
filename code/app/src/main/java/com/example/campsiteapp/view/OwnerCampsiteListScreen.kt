@@ -82,7 +82,7 @@ class OwnerCampsiteListScreen {
                     .weight(0.8f)
                     .testTag("campsiteList")
             ) {
-                itemsIndexed(myCampsites) { index, campsite ->
+                itemsIndexed(campsites) { index, campsite ->
                     Spacer(modifier = Modifier.height(30.dp))
                     Row(
                         modifier = Modifier
