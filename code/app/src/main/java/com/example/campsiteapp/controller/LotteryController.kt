@@ -59,7 +59,7 @@ class LotteryController(private val storage: LotteryStorage) {
          * close before booking period begins,
          */
         fun validate(lottery: Lottery): String? = when {
-            lottery.campsiteIds.isEmpty() ->
+            lottery.campsiteIds.none { it.isNotBlank() } ->
                 "Select at least one campsite"
             lottery.bookingStartDate.isBlank()|| lottery.bookingEndDate.isBlank() ->
                 "Choose the booking period"
@@ -73,7 +73,7 @@ class LotteryController(private val storage: LotteryStorage) {
                 "Lottery must close before booking can begin"
             lottery.numWinners < 1 ->
                 "There must be at least one winnter"
-            lottery.waitlistMax < lottery.numWinners ->
+            lottery.waitlistMax != 0 && lottery.waitlistMax < lottery.numWinners ->
                 "Waitlist capacity can't be smaller than the number of winners"
             else -> null
         }

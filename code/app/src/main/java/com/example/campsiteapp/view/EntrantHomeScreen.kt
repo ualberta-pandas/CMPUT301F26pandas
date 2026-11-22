@@ -1,10 +1,12 @@
 package com.example.campsiteapp.view
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -62,6 +64,7 @@ import java.time.LocalDate
 private val pill = RoundedCornerShape(50)
 
 class EntrantHomeScreen : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -103,6 +106,7 @@ fun EntrantHomeScreenView(
 ) {
     var entrantSearch by remember { mutableStateOf("") }
     var menuOpen by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -132,8 +136,7 @@ fun EntrantHomeScreenView(
                     DropdownMenuItem(
                         text = { Text("Owner") },
                         onClick = { menuOpen = false
-                            openOwnerScreen()
-                        }
+                        openOwnerScreen()}
                     )
                 }
             }
@@ -285,7 +288,7 @@ fun EntrantHomeScreenView(
                 text = "See past reservations",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
-                    .clickable { }
+                    .clickable { context.startActivity(Intent(context, PastReservationsScreen::class.java)) }
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
 

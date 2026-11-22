@@ -24,17 +24,20 @@ data class Lottery(
     var lotteryStartDate: String = "",
     var lotteryEndDate: String = "",
     var numWinners: Int = 0,
-    var waitlistMax: Int = 0, //null means unlimited
+    var waitlistMax: Int = 0, //0 means unlimited
     var waitlist: ArrayList<String> = ArrayList(),
     var status: String = "",
     var winners: ArrayList<String> = ArrayList()
 ) : java.io.Serializable {
 
     fun isFull(): Boolean {
-        return waitlist.size == waitlistMax
+        return waitlistMax > 0 && waitlist.size >= waitlistMax
     }
 
     fun getCapacityLeft(): Int {
+        //On Entrant Side, if negative number
+        //display message saying "Unlimited" for
+        //capacity left
         return waitlistMax - waitlist.size
     }
 }
