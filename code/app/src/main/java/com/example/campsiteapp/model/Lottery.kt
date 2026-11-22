@@ -27,7 +27,7 @@ data class Lottery(
     var waitlistMax: Int = 0, //0 means unlimited
     var waitlist: ArrayList<String> = ArrayList(),
     var status: String = "",
-    var winner: String = ""
+    var winners: ArrayList<String> = ArrayList()
 ) : java.io.Serializable {
 
     fun isFull(): Boolean {
