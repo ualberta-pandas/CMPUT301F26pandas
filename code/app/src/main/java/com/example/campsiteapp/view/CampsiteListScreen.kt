@@ -218,10 +218,9 @@ fun CampsiteListView(
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        val openIfOpen: (String) -> Unit = { id ->
-            val lottery = lotteries.find { it.id == id }
-            if (lottery != null && lottery.lotteryEndDate >= LocalDate.now().toString()) {
-                onLotteryClick(id)
+        val openIfOpen: (Lottery) -> Unit = { lottery ->
+            if (lottery.lotteryEndDate >= LocalDate.now().toString()) {
+                onLotteryClick(lottery.id)
             }
         }
 
