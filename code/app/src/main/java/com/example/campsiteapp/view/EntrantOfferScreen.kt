@@ -81,7 +81,7 @@ class EntrantOfferScreen : ComponentActivity() {
 
             CampsiteAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    if (deviceId.isNotEmpty()) CampsiteView(
+                    if (deviceId.isNotEmpty()) EntrantOfferView(
                         campsiteSelection = campsite,
                         lottery = lottery,
                         hasOffer = hasOffer,
@@ -99,7 +99,7 @@ class EntrantOfferScreen : ComponentActivity() {
 }
 
 @Composable
-fun CampsiteView(
+fun EntrantOfferView(
     campsiteSelection: Campsite,
     lottery: Lottery,
     hasOffer: Boolean,
@@ -418,7 +418,7 @@ fun CampsiteViewPreview() {
         winners = arrayListOf("abc123")
     )
     CampsiteAppTheme {
-        CampsiteView(
+        EntrantOfferView(
             campsiteSelection = campsite,
             lottery = lottery,
             hasOffer = true,
