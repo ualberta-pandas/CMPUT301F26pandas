@@ -55,7 +55,7 @@
             android:exported="false" />
 
         <activity android:name=".view.ProfileActivity" android:exported="false" />
-        <activity android:name=".view.OwnerHomeScreen" android:exported="false" />
+        <activity android:name=".view.EntrantOfferScreen" android:exported="false" />
 
     </application>
 
