@@ -11,6 +11,8 @@
     <string name="browse_campsites">Browse Campsites</string>
     <string name="browse_profiles">Browse Profiles</string>
     <string name="browse_images">Browse Images</string>
+    <string name="use_as_entrant">Use as Entrant</string>
+    <string name="use_as_owner">Use as Owner</string>
 
     <!-- Campsites -->
     <string name="campsites_title">Campsites</string>

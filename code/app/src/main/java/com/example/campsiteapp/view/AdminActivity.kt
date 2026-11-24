@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,7 +18,12 @@ class AdminActivity : ComponentActivity() {
         val campsitesDatabase = CampsitesDatabase()
         setContent {
             CampsiteAppTheme {
-                AdminApp(campsitesDatabase)
+                AdminApp(
+                    campsitesDatabase,
+                    onUseAsEntrant = { startActivity(Intent(this, EntrantHomeScreen::class.java)) },
+                    onUseAsOwner = { startActivity(Intent(this, OwnerActivity::class.java)) },
+                    onBack = ::finish,
+                )
             }
         }
     }

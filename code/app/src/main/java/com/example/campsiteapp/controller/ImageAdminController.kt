@@ -6,7 +6,6 @@
  * - Reads the "imageLog" collection directly since ImageLog does not expose its
  *   entries or their document ids.
  * - Removed images stay on Cloudinary, since deleting them needs the API secret.
- * - Copies of a campsite stored in lotteries keep the removed image.
  * - Images uploaded before the image log existed are not listed.
  */
 package com.example.campsiteapp.controller
@@ -55,19 +54,21 @@ class ImageAdminController {
     }
 
     /**
-     * Removes [image] from the image log and from every campsite and profile
-     * showing it. Either everything is removed or nothing is.
+     * Removes [image] from the image log and from every campsite, lottery and
+     * profile showing it. Either everything is removed or nothing is.
      *
      * @param onFailure called if the removal fails.
      */
     fun removeImage(image: LoggedImage, onFailure: (Exception) -> Unit) {
         val campsites = db.collection("campsites").whereEqualTo("image", image.url).get()
+        val lotteries = db.collection("lotteries").whereEqualTo("campsite.image", image.url).get()
         val profiles = db.collection("profiles").whereEqualTo("profileImage", image.url).get()
-        Tasks.whenAllSuccess<QuerySnapshot>(campsites, profiles)
-            .onSuccessTask { (campsiteDocuments, profileDocuments) ->
+        Tasks.whenAllSuccess<QuerySnapshot>(campsites, lotteries, profiles)
+            .onSuccessTask { (campsiteDocuments, lotteryDocuments, profileDocuments) ->
                 db.runBatch { batch ->
                     batch.delete(imageLogRef.document(image.id))
                     campsiteDocuments.forEach { batch.update(it.reference, "image", "") }
+                    lotteryDocuments.forEach { batch.update(it.reference, "campsite.image", "") }
                     profileDocuments.forEach { batch.update(it.reference, "profileImage", "") }
                 }
             }
