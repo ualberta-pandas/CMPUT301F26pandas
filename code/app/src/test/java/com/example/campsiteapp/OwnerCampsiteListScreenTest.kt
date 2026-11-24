@@ -55,7 +55,8 @@ class OwnerCampsiteListScreenTest {
             OwnerCampsiteListScreen().CampsitesList(
                 campsites = campsites,
                 onAddCampsite = {},
-                onEditCampsite = { _, _ -> }
+                onEditCampsite = { _, _ -> },
+                deviceId = ""
             )
         }
     }

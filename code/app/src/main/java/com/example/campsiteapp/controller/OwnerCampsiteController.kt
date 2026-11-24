@@ -60,18 +60,12 @@ import androidx.compose.runtime.getValue
 class OwnerCampsiteController (
 
 ) {
-
-
-
     @Composable
     fun RegisterCampsite(
         onAddCampsite: (Campsite) -> Unit,
         onDismissRequest: () -> Unit
 
     ) {
-
-
-
         val scope = rememberCoroutineScope()
         var isUploading by remember { mutableStateOf(false) }
         val imageUploadService = remember {
