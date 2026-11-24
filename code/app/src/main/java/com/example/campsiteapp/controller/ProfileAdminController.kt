@@ -5,8 +5,8 @@
  * Outstanding issues:
  * - Reads the "profiles" collection directly since ProfileDatabase does not
  *   expose its profiles.
- * - Campsites are matched to owners by device ID, but the current campsite form
- *   stores a typed owner name.
+ * - Campsites are matched to owners by device ID, but new campsites do not
+ *   save their ownerId yet and the form stores a typed owner name.
  * - Lotteries and waitlist entries of a removed user are not removed.
  */
 package com.example.campsiteapp.controller
@@ -55,7 +55,7 @@ class ProfileAdminController(private val campsitesDatabase: CampsitesDatabase) {
      * Returns the campsites owned by the user with [deviceId].
      */
     fun campsitesOwnedBy(deviceId: String): List<Campsite> =
-        campsitesDatabase.campsites.filter { it.owner == deviceId }
+        campsitesDatabase.campsites.filter { it.ownerId == deviceId || it.owner == deviceId }
 
     /**
      * Removes the profile with [deviceId] and every campsite they own. Either

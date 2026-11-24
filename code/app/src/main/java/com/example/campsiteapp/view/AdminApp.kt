@@ -2,7 +2,6 @@
  * Root of the admin screens: the admin menu and navigation between screens.
  *
  * Outstanding issues:
- * - Still need the way to navigate between entrant/owner/admin for testing.
  * - The notification and message logs are not implemented yet.
  */
 package com.example.campsiteapp.view
@@ -45,9 +44,17 @@ private sealed interface Destination {
  * The admin UI, starting at the admin menu.
  *
  * @param campsitesDatabase where campsites are stored.
+ * @param onUseAsEntrant called when the admin chooses to use the app as an entrant.
+ * @param onUseAsOwner called when the admin chooses to use the app as an owner.
+ * @param onBack called when Back is pressed on the admin menu.
  */
 @Composable
-fun AdminApp(campsitesDatabase: CampsitesDatabase) {
+fun AdminApp(
+    campsitesDatabase: CampsitesDatabase,
+    onUseAsEntrant: () -> Unit,
+    onUseAsOwner: () -> Unit,
+    onBack: () -> Unit,
+) {
     val campsiteAdminController = remember { CampsiteAdminController(campsitesDatabase) }
     val profileAdminController = remember { ProfileAdminController(campsitesDatabase) }
     val imageAdminController = remember { ImageAdminController() }
@@ -66,6 +73,9 @@ fun AdminApp(campsitesDatabase: CampsitesDatabase) {
             onBrowseCampsites = { navigate(Destination.Campsites) },
             onBrowseProfiles = { navigate(Destination.Profiles) },
             onBrowseImages = { navigate(Destination.Images) },
+            onUseAsEntrant = onUseAsEntrant,
+            onUseAsOwner = onUseAsOwner,
+            onBack = onBack,
         )
 
         Destination.Campsites -> AdminCampsiteListScreen(
@@ -109,15 +119,24 @@ fun AdminApp(campsitesDatabase: CampsitesDatabase) {
 }
 
 /**
- * Admin menu linking to the browse screens.
+ * Admin menu linking to the browse screens and to the entrant and owner sides of the app.
  */
 @Composable
-private fun AdminMenu(onBrowseCampsites: () -> Unit, onBrowseProfiles: () -> Unit, onBrowseImages: () -> Unit) {
-    ScreenScaffold(title = stringResource(R.string.admin_title), onBack = null) { padding ->
+private fun AdminMenu(
+    onBrowseCampsites: () -> Unit,
+    onBrowseProfiles: () -> Unit,
+    onBrowseImages: () -> Unit,
+    onUseAsEntrant: () -> Unit,
+    onUseAsOwner: () -> Unit,
+    onBack: () -> Unit,
+) {
+    ScreenScaffold(title = stringResource(R.string.admin_title), onBack = onBack) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             MenuItem(stringResource(R.string.browse_campsites), "browseCampsites", onBrowseCampsites)
             MenuItem(stringResource(R.string.browse_profiles), "browseProfiles", onBrowseProfiles)
             MenuItem(stringResource(R.string.browse_images), "browseImages", onBrowseImages)
+            MenuItem(stringResource(R.string.use_as_entrant), "useAsEntrant", onUseAsEntrant)
+            MenuItem(stringResource(R.string.use_as_owner), "useAsOwner", onUseAsOwner)
         }
     }
 }
