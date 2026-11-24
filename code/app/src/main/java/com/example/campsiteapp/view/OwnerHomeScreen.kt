@@ -29,17 +29,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.campsiteapp.controller.LotteryController
 import com.example.campsiteapp.data.CampsitesDatabase
+import com.example.campsiteapp.data.LotteryDatabase
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
+import com.example.campsiteapp.view.LotteryOwnerScreen
+import com.example.campsiteapp.model.Lottery
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 
-fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit){
+fun OwnerHomeScreen(
+    campsitesDatabase: CampsitesDatabase,
+    lotteryDatabase: LotteryDatabase,
+    onBack: () -> Unit
+) {
     val tabs = listOf("Manage", "Lottery", "Reservations")
+    val lotteryController = remember { LotteryController(lotteryDatabase) }
+    val lotteryScreen = remember { LotteryOwnerScreen() }
     var selectedIndex by remember { mutableIntStateOf(0) }
+
 
     Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
         Row(
@@ -90,7 +101,13 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit){
                     campsitesDatabase.updateCampsite(old, new)
 
                 })
-            // 1 -> LotteryContent()
+            1 -> LotteryOwnerScreen().LotteryList(
+                lotteries = lotteryDatabase.lotteries,
+                campsites = campsitesDatabase.campsites,
+                onCreateLottery = lotteryController::createLottery,
+                onUpdateLottery = lotteryController::updateLottery
+            )
+
             // 2 -> ReservationsContent()
         }
     }
