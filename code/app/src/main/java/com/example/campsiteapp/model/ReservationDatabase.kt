@@ -50,4 +50,5 @@ class ReservationDatabase {
     fun deleteReservation(id: String) {
         reservationsRef.document(id).delete()
     }
+
 }

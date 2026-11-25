@@ -226,12 +226,12 @@ fun EntrantHomeScreenView(
         android.util.Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
 
         Text("Your Confirmed Bookings", modifier = Modifier.padding(start = 16.dp))
-        LazyColumn(
+        Column(
             modifier = Modifier.height(300.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(reservations) { reservation ->
+            reservations.forEach{ reservation ->
                 val campsite: Campsite = reservation.campsite
 
                 Box(modifier = Modifier
@@ -271,7 +271,7 @@ fun EntrantHomeScreenView(
         Text("Your Pending Bookings", modifier = Modifier.padding(start = 16.dp))
 
         displayCampsitesAsCards(
-            modifier = Modifier.height(300.dp),
+            modifier = Modifier.fillMaxWidth(),
             lotteries = lotteries,
             onClickEvent = {lottery ->
                 val hasOffer: Boolean = deviceId in lottery.winners
@@ -344,11 +344,12 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
                             lotteries: List<Lottery>, onClickEvent: (Lottery) -> Unit,
                             getTextAttributes: (Lottery) -> Pair<String, Color>,
 ){
-    LazyColumn( modifier = modifier.fillMaxSize(),
+    Column(
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        items(lotteries) { lottery ->
+        lotteries.forEach { lottery ->
             val campsite: Campsite = lottery.campsite
             val status: Pair<String, Color> = getTextAttributes(lottery)
 
