@@ -127,7 +127,7 @@ fun CampsiteView(
     waitlistSelectionClick: (userOnWaitlist: Boolean) -> Unit,
     onBack: () -> Unit,
 
-    updateByUserSearch: (search: String) -> Unit,
+    updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
 
     openProfileScreen: () -> Unit,
     openOwnerScreen: () -> Unit,
@@ -137,6 +137,10 @@ fun CampsiteView(
     modifier: Modifier = Modifier
 ) {
     var entrantSearch by remember { mutableStateOf("") }
+    var availableDates by remember { mutableStateOf("Select Dates") }
+    var guestCount by remember { mutableStateOf("Guest Count") }
+    val filters = Triple(entrantSearch,availableDates,guestCount)
+
     var menuOpen by remember { mutableStateOf(false) }
     var onWaitlist by remember { mutableStateOf(userOnWaitlist()) }
 
@@ -202,7 +206,7 @@ fun CampsiteView(
             onValueChange = { entrantSearch = it },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
+            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
             textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
             modifier = Modifier
                 .fillMaxWidth()
