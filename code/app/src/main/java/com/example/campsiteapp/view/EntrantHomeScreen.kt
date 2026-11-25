@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -33,12 +34,17 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +65,12 @@ import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.util.Date
+import java.util.Locale
 
 private val pill = RoundedCornerShape(50)
 
@@ -96,7 +108,7 @@ class EntrantHomeScreen : ComponentActivity() {
 @Composable
 fun EntrantHomeScreenView(
     modifier: Modifier = Modifier,
-    updateByUserSearch: (String) -> Unit,
+    updateByUserSearch: (Triple<String, String, String>) -> Unit,
     deviceId: String,
 
     openProfileScreen: () -> Unit,
@@ -104,7 +116,12 @@ fun EntrantHomeScreenView(
     openAdminScreen: () -> Unit
 ) {
     var entrantSearch by remember { mutableStateOf("") }
+    var availableDates by remember { mutableStateOf("Select Dates") }
+    var guestCount by remember { mutableStateOf("Guest Count") }
+    val filters = Triple(entrantSearch,availableDates,guestCount)
     var menuOpen by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showGuests by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -159,7 +176,7 @@ fun EntrantHomeScreenView(
             onValueChange = { entrantSearch = it },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
+            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
             textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
             modifier = Modifier
                 .fillMaxWidth()
@@ -178,12 +195,16 @@ fun EntrantHomeScreenView(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
                         modifier = Modifier.size(20.dp)
+                            .clickable(
+                                onClick = {updateByUserSearch(filters)}
+                            )
                     )
                 }
             }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+
 
         Row(
             modifier = Modifier
@@ -193,11 +214,70 @@ fun EntrantHomeScreenView(
         ) {
 
             Text(
-                text = "Select Dates",
+                text = availableDates,
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .clickable(
+                        onClick = {showDatePicker = true}
+                    )
             )
+
+
+        }
+
+        val dateRangePickerState = rememberDateRangePickerState()
+        var startDate by remember { mutableStateOf("") }
+        var endDate by remember { mutableStateOf("") }
+
+        if (showDatePicker) {
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+
+                confirmButton = {
+                    Button(
+                        onClick = {
+
+                            val start = dateRangePickerState.selectedStartDateMillis
+                            val end = dateRangePickerState.selectedEndDateMillis
+
+                            if (start != null && end != null) {
+                                val formatter = SimpleDateFormat(
+                                    "dd/MM/yyyy",
+                                    Locale.getDefault()
+                                )
+
+                                availableDates =
+                                    "${formatter.format(Date(start))} - " +
+                                            formatter.format(Date(end))
+
+                                startDate = "${formatter.format(Date(start))}"
+                                endDate = "${formatter.format(Date(end))}"
+
+
+
+                            }
+
+
+                            showDatePicker = false
+                        }
+                    ) { Text("Ok") }
+                },
+
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            showDatePicker = false
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            ) {
+
+                DateRangePicker(state = dateRangePickerState)
+            }
+        }
 
             Spacer(modifier = Modifier.width(6.dp))
 
@@ -296,7 +376,7 @@ fun EntrantHomeScreenView(
             }
         }
     }
-}
+
 
 
 @Composable

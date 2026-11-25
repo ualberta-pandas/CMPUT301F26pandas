@@ -31,13 +31,15 @@ object EntrantCampsiteController {
      Returns a list of the lotteries that have their campsites matching
      the user result. Probably going to be done by some regex
      **/
-    fun getResultsBySearch(searchResult: String): List<Lottery>{
-        val regex = Regex(Regex.escape(searchResult), RegexOption.IGNORE_CASE)
+    fun getResultsBySearch(searchResult: Triple<String, String, String>): List<Lottery>{
+        val campName = Regex(Regex.escape(searchResult.first), RegexOption.IGNORE_CASE)
+
 
         val newLotteries = mutableListOf<Lottery>()
 
         for (lottery in lotteries) {
-            if (regex.containsMatchIn(lottery.campsite.name)) {
+            if (campName.containsMatchIn(lottery.campsite.name) && searchResult.second == lottery.campsite.startDate+'-'+lottery.campsite.endDate &&
+                lottery.campsite.occupancy >=searchResult.third.toInt())  {
                 newLotteries.add(lottery)
             }
         }
@@ -71,7 +73,7 @@ object EntrantCampsiteController {
         return newReservations
     }
 
-    fun toggleSearchResultsScreen(context: Context, userSearch: String){
+    fun toggleSearchResultsScreen(context: Context, userSearch: Triple<String,String,String>){
         val intent = Intent(context, CampsiteListScreen::class.java)
         intent.putExtra("search", userSearch)
         context.startActivity(intent)
