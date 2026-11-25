@@ -22,15 +22,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.controller.LotteryController
 import com.example.campsiteapp.data.CampsitesDatabase
+import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.data.LotteryDatabase
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
@@ -44,12 +47,32 @@ import com.example.campsiteapp.model.Lottery
 fun OwnerHomeScreen(
     campsitesDatabase: CampsitesDatabase,
     lotteryDatabase: LotteryDatabase,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    deviceId: String? = null
 ) {
     val tabs = listOf("Manage", "Lottery", "Reservations")
     val lotteryController = remember { LotteryController(lotteryDatabase) }
-    val lotteryScreen = remember { LotteryOwnerScreen() }
     var selectedIndex by remember { mutableIntStateOf(0) }
+
+    val context = LocalContext.current
+    var lookupCount by remember { mutableIntStateOf(0) }
+    val lookedUpId by produceState<String?>(initialValue = null, deviceId, lookupCount) {
+        value = deviceId ?: (DeviceIDs(context).fetchDeviceId() ?: "")
+    }
+    val ownerId = deviceId ?: lookedUpId
+
+    val myCampsites = if(ownerId.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        campsitesDatabase.campsites.filter { it.ownerId == ownerId }
+    }
+
+    val myLotteries = if(ownerId.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        lotteryDatabase.lotteries.filter { it.ownerId == ownerId }
+    }
+
 
 
     Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
@@ -58,9 +81,7 @@ fun OwnerHomeScreen(
             horizontalArrangement = Arrangement.Center
         ) {
             Button(
-                onClick = {
-
-                }
+                onClick = onBack
             ) { Text("<-") }
             Text(text = "My Campsites")
         }
@@ -94,17 +115,20 @@ fun OwnerHomeScreen(
 
         when (selectedIndex) {
             0 -> OwnerCampsiteListScreen().CampsitesList(
-                campsites = campsitesDatabase.campsites,
-                onAddCampsite = { campsitesDatabase.addCampsite(it) },
+                campsites = myCampsites,
+                onAddCampsite = {
+                    campsitesDatabase.addCampsite(it)
+                    lookupCount++
+                },
                 onEditCampsite = { old, new ->
-
                     campsitesDatabase.updateCampsite(old, new)
-
-                })
+                },
+                deviceId = ownerId ?: ""
+                )
             1 -> LotteryOwnerScreen().LotteryList(
-                lotteries = lotteryDatabase.lotteries,
-                campsites = campsitesDatabase.campsites,
-                onCreateLottery = lotteryController::createLottery,
+                lotteries = myLotteries,
+                campsites = myCampsites,
+                onCreateLottery = { lotteryController.createLottery(it.copy(ownerId = ownerId ?: "")) },
                 onUpdateLottery = lotteryController::updateLottery
             )
 

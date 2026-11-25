@@ -140,7 +140,7 @@ fun LotteryForm(
                     onClick = {
                         val lottery = Lottery(
                             id = initial?.id ?: "",
-                            ownerId = initial?.ownerId ?: campsites.firstOrNull { it.id in selectedIds }?.owner ?: "",
+                            ownerId = initial?.ownerId ?: "",
                             campsiteIds = selectedIds.toList(),
                             lotteryStartDate = lotteryStart,
                             lotteryEndDate = lotteryEnd,

@@ -65,7 +65,7 @@ class OwnerCampsiteListScreen {
         val currentId = deviceId ?: lookedUpId
 
         for (campsite in campsites){
-            if (campsite.ownerId == deviceId){
+            if (campsite.ownerId == currentId){
                 myCampsites.add(campsite)
             }
 
