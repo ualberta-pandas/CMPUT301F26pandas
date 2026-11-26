@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -83,6 +84,7 @@ class OwnerCampsiteController (
 
         Column(
             modifier = Modifier.fillMaxWidth()
+                .verticalScroll(rememberScrollState(), enabled = true)
 
         ) {
             Card(
@@ -170,6 +172,7 @@ class OwnerCampsiteController (
 
                     Spacer(modifier = Modifier.height(10.dp))
 
+
                     Row() {
                         TextField(
                             value = location,
@@ -183,8 +186,13 @@ class OwnerCampsiteController (
 
                         )
 
-                        Spacer(modifier = Modifier.height(10.dp))
 
+                    }
+
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         TextField(
                             value = occupancy,
                             onValueChange = { occupancy = it },
@@ -195,11 +203,10 @@ class OwnerCampsiteController (
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
-
                     }
 
-
                     Spacer(modifier = Modifier.height(10.dp))
+
                     Row() {
                         TextField(
                             value = owner,
@@ -246,10 +253,11 @@ class OwnerCampsiteController (
 
 
 
+                    }
 
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                        Spacer(modifier = Modifier.height(10.dp))
-
+                    Row(){
                         Button(
                             onClick = {
 
@@ -309,9 +317,7 @@ class OwnerCampsiteController (
                             }
                         }
 
-
                     }
-
 
                     var showMap by remember { mutableStateOf(false) }
 
@@ -376,8 +382,11 @@ class OwnerCampsiteController (
                         )
 
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                    }
 
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(){
                         Button(
                             onClick = {
                                 showMap = true
