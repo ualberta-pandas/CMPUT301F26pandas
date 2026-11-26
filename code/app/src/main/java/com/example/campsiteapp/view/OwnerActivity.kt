@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import com.example.campsiteapp.data.CampsitesDatabase
+import com.example.campsiteapp.model.ReservationDatabase
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
 class OwnerActivity: ComponentActivity() {
@@ -17,9 +18,12 @@ class OwnerActivity: ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val campsitesDatabase = CampsitesDatabase()
+        val reservationDatabase = ReservationDatabase()
         setContent {
             CampsiteAppTheme {
-                OwnerHomeScreen(campsitesDatabase, onBack = {finish()})
+                OwnerHomeScreen(campsitesDatabase, onBack = {finish()},
+                    reservationDatabase = reservationDatabase
+                    )
             }
         }
     }

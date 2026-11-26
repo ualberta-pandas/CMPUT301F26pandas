@@ -106,7 +106,7 @@ class EntrantHomeScreen : ComponentActivity() {
 
                         openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@EntrantHomeScreen) },
                         openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@EntrantHomeScreen) },
-                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@EntrantHomeScreen) },
+                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@EntrantHomeScreen)  },
                         openEntrantOfferScreen = {lottery, hasOffer ->
                             EntrantOfferController.toggleOfferScreen(this@EntrantHomeScreen, lottery, hasOffer)
                         }

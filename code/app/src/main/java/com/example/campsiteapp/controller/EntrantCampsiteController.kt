@@ -6,7 +6,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.campsiteapp.model.Lottery
-import com.example.campsiteapp.data.Reservation
+import com.example.campsiteapp.model.Reservation
 import com.example.campsiteapp.data.LotteryDatabase
 import com.example.campsiteapp.model.ReservationDatabase
 import com.example.campsiteapp.view.AdminActivity

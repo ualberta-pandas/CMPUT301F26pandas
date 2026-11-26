@@ -54,6 +54,8 @@ import java.time.Instant
 import java.time.ZoneOffset
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
+import com.example.campsiteapp.model.Reservation
+import com.example.campsiteapp.model.ReservationDatabase
 
 @RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
@@ -1058,6 +1060,38 @@ class OwnerCampsiteController (
                 }
 
             }}
+    }
+
+    private val reservationDB by lazy { ReservationDatabase() }
+    private val reservations: List<Reservation> get() = reservationDB.reservations
+
+    fun getReservationsById(deviceId: String): List<Reservation> {
+        val newReservations = mutableListOf<Reservation>()
+
+        for (reservation in reservations) {
+            if (reservation.campsite.ownerId == deviceId) {
+
+                newReservations.add(reservation)
+            }
+        }
+        return newReservations
+    }
+
+    fun getPastReservationsById(deviceId: String): List<Reservation> {
+        val newReservations = mutableListOf<Reservation>()
+
+        for (reservation in reservations) {
+            if (reservation.campsite.ownerId == deviceId && reservation.endDate.isNotEmpty()) {
+
+                val end = LocalDate.parse(reservation.endDate, DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+
+                if(end.isBefore(LocalDate.now())){
+                    newReservations.add(reservation)
+                }
+
+            }
+        }
+        return newReservations
     }
 
 }
