@@ -181,7 +181,7 @@ fun ProfilePicture(
     Box(
         modifier
             .size(size)
-            .padding(5.dp)
+            .padding(size*(1f/24f))
     ) {
         if((image=="null")or(image=="")){
             Box(
@@ -196,7 +196,7 @@ fun ProfilePicture(
                     imageVector = Icons.Default.AccountCircle,
                     "Default profile image",
                     modifier = Modifier
-                        .size(size+(size*0.5f))
+                        .size(size*1.5f)
                         .align(Alignment.Center),
                     tint = Color.Gray
                 )
