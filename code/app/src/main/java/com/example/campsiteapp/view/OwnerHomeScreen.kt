@@ -78,9 +78,9 @@ fun OwnerHomeScreen(
     }
 
     val myReservations = if(ownerId.isNullOrEmpty()) {
-        emptyList()
+//        emptyList()
     } else {
-        reservationDatabase.reservations.filter { it.ownerId == ownerId }
+//        reservationDatabase.reservations.filter { it.ownerId == ownerId }
     }
 
 
@@ -147,11 +147,11 @@ fun OwnerHomeScreen(
                 onUpdateLottery = lotteryController::updateLottery
             )
 
-            2 -> OwnerReservationsList().ReservationsList(
-                activeReservations = ownerReservationsController.getReservationsById(ownerId),
-                pasReservations = ownerReservationsController.getPastReservationsById(ownerId),
-                cancelledReservations = ownerReservationsController.getCancelledReservationsById(ownerId)
-            )
+//            2 -> OwnerReservationsList().ReservationsList(
+//                activeReservations = ownerReservationsController.getReservationsById(ownerId),
+//                pasReservations = ownerReservationsController.getPastReservationsById(ownerId),
+//                cancelledReservations = ownerReservationsController.getCancelledReservationsById(ownerId)
+//            )
         }
     }
 }
