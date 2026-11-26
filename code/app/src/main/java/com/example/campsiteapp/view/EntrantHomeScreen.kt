@@ -85,6 +85,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.ui.unit.Dp
+import com.example.campsiteapp.model.Quad
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.SetOptions
@@ -129,7 +130,7 @@ class EntrantHomeScreen : ComponentActivity() {
 @Composable
 fun EntrantHomeScreenView(
     modifier: Modifier = Modifier,
-    updateByUserSearch: (Triple<String, String, String>) -> Unit,
+    updateByUserSearch: (Quad<String, String, String, String>) -> Unit,
     deviceId: String,
 
     openProfileScreen: () -> Unit,
@@ -138,16 +139,18 @@ fun EntrantHomeScreenView(
     openEntrantOfferScreen: (lottery: Lottery, hasOffer: Boolean) -> Unit
 ) {
     var entrantSearch by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
     var availableDates by remember { mutableStateOf("Select Dates") }
     var guestCount by remember { mutableIntStateOf(0) }
-    val filters = Triple(entrantSearch, availableDates, guestCount.toString())
+    val filters = Quad(entrantSearch,location,availableDates,guestCount.toString())
     var menuOpen by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showGuests by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .padding(top = 5.dp),
         verticalArrangement = Arrangement.Top
     ) {
@@ -217,7 +220,8 @@ fun EntrantHomeScreenView(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier
+                            .size(20.dp)
                             .clickable(
                                 onClick = { updateByUserSearch(filters) }
                             )
@@ -333,6 +337,12 @@ fun EntrantHomeScreenView(
                     }
                 }
             }
+
+            TextField(
+                value = location,
+                onValueChange = {location = it},
+                label = { Text("Location") }
+            )
         }
 
 
@@ -518,7 +528,7 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
 
             Box(modifier = Modifier
                 .width(350.dp)
-                .heightIn(min=170.dp)
+                .heightIn(min = 170.dp)
                 .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
                 .clickable {
                     onClickEvent(lottery)
