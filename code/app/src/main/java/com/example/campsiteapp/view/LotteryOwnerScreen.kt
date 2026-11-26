@@ -131,7 +131,10 @@ private fun LotteryCard(
             Text("Registration: ${lottery.lotteryStartDate} - ${lottery.lotteryEndDate}")
             Text("Booking: ${lottery.bookingStartDate} - ${lottery.bookingEndDate}")
             Text("Winners: ${lottery.numWinners}")
-            Text("Waitlist: ${lottery.waitlistMax?.toString() ?: "No limit"}")
+            Text(
+                "Waitlist: ${if (lottery.waitlistMax == 0) "No limit" else lottery.waitlistMax}",
+                modifier = Modifier.testTag("lotteryWaitlist")
+            )
             if(lottery.status.isNotBlank()) {
                 Text("Status: ${lottery.status}")
             }

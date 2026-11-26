@@ -9,5 +9,5 @@ data class Reservation(
     val startDate: String = "",
     val endDate: String = "",
     val status: String = "pending",
-    val campsite: Campsite
+    val campsite: Campsite = Campsite()
 ): java.io.Serializable
