@@ -75,7 +75,9 @@ object EntrantCampsiteController {
 
     fun toggleSearchResultsScreen(context: Context, userSearch: Triple<String,String,String>){
         val intent = Intent(context, CampsiteListScreen::class.java)
-        intent.putExtra("search", userSearch)
+        intent.putExtra("search", userSearch.first)
+        intent.putExtra("dates", userSearch.second)
+        intent.putExtra("guests", userSearch.third)
         context.startActivity(intent)
     }
 

@@ -63,9 +63,11 @@ class CampsiteListScreen : ComponentActivity() {
 
         // TODO: get these from your controllers /
 
-        val searchResult = intent.getStringExtra("search") ?: ""
-
-        // declare intent here
+        val searchResult = Triple(
+            intent.getStringExtra("search") ?: "",
+            intent.getStringExtra("dates") ?: "",
+            intent.getStringExtra("guests") ?: ""
+        )
 
         setContent {
             CampsiteAppTheme {
@@ -240,14 +242,3 @@ fun CampsiteListView(
         Spacer(modifier = Modifier.height(12.dp))
     }
 }
-
-/*
-Prompts to
-okay, I know that if you change something in a list, when there's a lazy_column that's relying on it, its going to recompose because of
-the update to the list. give me some sample code and things to get started
-
-generate me some campsite test-cases
-
-
-working with boxes (for visual effects)
-*/

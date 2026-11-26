@@ -45,12 +45,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
+import coil.compose.AsyncImage
 import com.example.campsiteapp.controller.EntrantCampsiteController
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.model.Campsite
@@ -305,16 +308,15 @@ fun CampsiteView(
         ) {
             Text(text = campsiteSelection.name, fontSize = 22.sp)
 
-            Text(
-                text = """
-                
-                
-                IMAGE GOES HERE 
-                
-                
-    
-            """.trimIndent()
-            ) // TODO: promo image
+            AsyncImage(
+                model = campsiteSelection.image,
+                contentDescription = "Campsite image",
+                modifier = Modifier
+                    .testTag("campsiteImage")
+                    .width(200.dp)
+                    .height(200.dp),
+                contentScale = ContentScale.Crop
+            )
 
             Spacer(Modifier.height(10.dp))
 
