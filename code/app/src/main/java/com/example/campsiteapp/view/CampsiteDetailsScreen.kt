@@ -45,12 +45,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
+import coil.compose.AsyncImage
 import com.example.campsiteapp.controller.EntrantCampsiteController
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.model.Campsite
@@ -127,7 +130,7 @@ fun CampsiteView(
     waitlistSelectionClick: (userOnWaitlist: Boolean) -> Unit,
     onBack: () -> Unit,
 
-    updateByUserSearch: (search: String) -> Unit,
+    updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
 
     openProfileScreen: () -> Unit,
     openOwnerScreen: () -> Unit,
@@ -137,6 +140,10 @@ fun CampsiteView(
     modifier: Modifier = Modifier
 ) {
     var entrantSearch by remember { mutableStateOf("") }
+    var availableDates by remember { mutableStateOf("Select Dates") }
+    var guestCount by remember { mutableStateOf("Guest Count") }
+    val filters = Triple(entrantSearch,availableDates,guestCount)
+
     var menuOpen by remember { mutableStateOf(false) }
     var onWaitlist by remember { mutableStateOf(userOnWaitlist()) }
 
@@ -202,7 +209,7 @@ fun CampsiteView(
             onValueChange = { entrantSearch = it },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
+            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
             textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
             modifier = Modifier
                 .fillMaxWidth()
@@ -301,16 +308,15 @@ fun CampsiteView(
         ) {
             Text(text = campsiteSelection.name, fontSize = 22.sp)
 
-            Text(
-                text = """
-                
-                
-                IMAGE GOES HERE 
-                
-                
-    
-            """.trimIndent()
-            ) // TODO: promo image
+            AsyncImage(
+                model = campsiteSelection.image,
+                contentDescription = "Campsite image",
+                modifier = Modifier
+                    .testTag("campsiteImage")
+                    .width(200.dp)
+                    .height(200.dp),
+                contentScale = ContentScale.Crop
+            )
 
             Spacer(Modifier.height(10.dp))
 
