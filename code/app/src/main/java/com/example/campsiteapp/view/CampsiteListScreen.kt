@@ -222,7 +222,7 @@ fun CampsiteListView(
             Spacer(modifier = Modifier.width(6.dp))
 
             Text(
-                text = "Guest Count: $guestCount.toString()",
+                text = "Guest Count: $guestCount",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
                     .padding(horizontal = 12.dp, vertical = 4.dp)

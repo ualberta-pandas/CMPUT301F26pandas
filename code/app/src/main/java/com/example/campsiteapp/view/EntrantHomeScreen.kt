@@ -584,7 +584,9 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
                         )
 
 
-                        Button(onClick = { saveRating(campsite.id, deviceId = deviceId, rating) }) {
+                        Button(onClick = {
+                        saveRating(campsite.id, deviceId = deviceId, rating)
+                        showRating = false}) {
                             Text("Submit")
                         }
 
