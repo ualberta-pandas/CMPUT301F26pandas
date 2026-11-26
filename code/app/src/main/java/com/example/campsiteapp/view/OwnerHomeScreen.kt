@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.controller.OwnerCampsiteController
+import com.example.campsiteapp.controller.OwnerReservationsController
 import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.ReservationDatabase
@@ -88,6 +89,7 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit, de
 
 
         val ownerCampsiteController = remember {  OwnerCampsiteController() }
+        val ownerReservationsController = remember { OwnerReservationsController() }
 
         when (selectedIndex) {
             0 -> OwnerCampsiteListScreen().CampsitesList(
@@ -101,8 +103,9 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit, de
                 )
             // 1 -> LotteryContent()
             2 -> OwnerReservationsList().ReservationsList(
-                activeReservations = ownerCampsiteController.getReservationsById(deviceId),
-                pasReservations = ownerCampsiteController.getPastReservationsById(deviceId)
+                activeReservations = ownerReservationsController.getReservationsById(deviceId),
+                pasReservations = ownerReservationsController.getPastReservationsById(deviceId),
+                cancelledReservations = ownerReservationsController.getCancelledReservationsById(deviceId)
             )
         }
     }

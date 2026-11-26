@@ -44,7 +44,8 @@ class OwnerReservationsList {
    @Composable
    fun ReservationsList(
        activeReservations: List<Reservation>,
-       pasReservations: List<Reservation>
+       pasReservations: List<Reservation>,
+       cancelledReservations: List<Reservation>
    ){
        
            var selectedReservation by remember { mutableStateOf<Reservation?>(null) }
