@@ -102,6 +102,11 @@ class EntrantHomeScreen : ComponentActivity() {
                         openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@EntrantHomeScreen) },
                         openEntrantOfferScreen = {lottery, hasOffer ->
                             EntrantOfferController.toggleOfferScreen(this@EntrantHomeScreen, lottery, hasOffer)
+                        },
+
+                        openReservationScreen = {
+                            // TO-DO
+                            // toggle reservation screen
                         }
                     )
                 }
@@ -119,7 +124,8 @@ fun EntrantHomeScreenView(
     openProfileScreen: () -> Unit,
     openOwnerScreen: () -> Unit,
     openAdminScreen: () -> Unit,
-    openEntrantOfferScreen: (lottery: Lottery, hasOffer: Boolean) -> Unit
+    openEntrantOfferScreen: (lottery: Lottery, hasOffer: Boolean) -> Unit,
+    openReservationScreen: () -> Unit
 ) {
     var entrantSearch by remember { mutableStateOf("") }
     var availableDates by remember { mutableStateOf("Select Dates") }
@@ -334,7 +340,8 @@ fun EntrantHomeScreenView(
         Text("Your Confirmed Bookings", modifier = Modifier.padding(start = 16.dp))
         DisplayBookingsAsCards(
             modifier = Modifier.fillMaxWidth(),
-            reservations = reservations
+            reservations = reservations,
+            onReservationEvent = openReservationScreen
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -442,6 +449,7 @@ fun CounterView(
 fun DisplayBookingsAsCards(
     modifier: Modifier = Modifier,
     reservations: List<Reservation>,
+    onReservationEvent: () -> Unit,
 ){
     /*
         the firestore document doesn't keep the serialized object, so
@@ -451,7 +459,8 @@ fun DisplayBookingsAsCards(
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+
     ){
         reservations.forEach { reservation ->
             val campsite: Campsite = reservation.campsite // Reservation needs to fetch the campsite, and then I need to call
@@ -460,6 +469,10 @@ fun DisplayBookingsAsCards(
                 modifier = Modifier
                     .size(width = 350.dp, height = 170.dp)
                     .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
+                    .clickable {
+                        // TODO
+                        onReservationEvent()
+                    }
             ) {
                 Column(
                     modifier = Modifier
