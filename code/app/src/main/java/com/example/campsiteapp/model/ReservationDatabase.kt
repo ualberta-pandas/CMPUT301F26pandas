@@ -1,7 +1,8 @@
 package com.example.campsiteapp.model
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
-import com.example.campsiteapp.data.Reservation
+import com.example.campsiteapp.model.Reservation
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
@@ -17,14 +18,22 @@ class ReservationDatabase {
                 return@addSnapshotListener
             }
 
-            _reservations.clear()
-
-            snapshots?.documents?.forEach { document ->
-                val reservation = document.toObject(Reservation::class.java)
-                if (reservation != null) {
-                    _reservations.add(reservation.copy(id = document.id))
+            val newList = snapshots?.documents?.mapNotNull { document ->
+                try {
+                    document.toObject(Reservation::class.java)
+                        ?.copy(id = document.id)
+                } catch (e: Exception) {
+                    Log.e(
+                        "ReservationDatabase",
+                        "Skipping bad reservation ${document.id}: ${e.message}"
+                    )
+                    null
                 }
-            }
+            } ?: emptyList()
+
+            _reservations.clear()
+            _reservations.addAll(newList)
+
         }
     }
 
@@ -34,7 +43,7 @@ class ReservationDatabase {
     fun addReservation(reservation: Reservation) {
         reservationsRef.add(
             mapOf(
-                "campsiteId" to reservation.campsiteId,
+                "id" to reservation.id,
                 "entrantId" to reservation.entrantId,
                 "startDate" to reservation.startDate,
                 "endDate" to reservation.endDate,

@@ -22,11 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.produceState
@@ -37,6 +39,10 @@ import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.data.LotteryDatabase
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
+import com.example.campsiteapp.controller.OwnerCampsiteController
+import com.example.campsiteapp.controller.OwnerReservationsController
+import com.example.campsiteapp.model.ReservationDatabase
+
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -45,9 +51,11 @@ import com.example.campsiteapp.view.OwnerCampsiteListScreen
 fun OwnerHomeScreen(
     campsitesDatabase: CampsitesDatabase,
     lotteryDatabase: LotteryDatabase,
-    onBack: () -> Unit
+    reservationDatabase: ReservationDatabase,
+    onBack: () -> Unit,
+    deviceId: String ?: ""
 ){
-    val tabs = listOf("Manage", "Lottery", "Reservations")
+    val tabs = listOf("Campsites", "Lottery", "Reservations")
     var selectedIndex by remember { mutableIntStateOf(0) }
     val lotteryController = remember(lotteryDatabase) { LotteryController(lotteryDatabase) }
 
@@ -63,7 +71,7 @@ fun OwnerHomeScreen(
         ) {
             Button(
                 onClick = {
-
+                    onBack()
                 }
             ) { Text("<-") }
             Text(text = "My Campsites")
@@ -96,23 +104,36 @@ fun OwnerHomeScreen(
             }
         }
 
+
+
+        val ownerCampsiteController = remember {  OwnerCampsiteController() }
+        val ownerReservationsController = remember { OwnerReservationsController() }
+
         when (selectedIndex) {
             0 -> OwnerCampsiteListScreen().CampsitesList(
-                campsites = campsitesDatabase.campsites,
+                campsites = ownerCampsiteController.getCampsiteListById(deviceId),
                 onAddCampsite = { campsitesDatabase.addCampsite(it) },
                 onEditCampsite = { old, new ->
 
                     campsitesDatabase.updateCampsite(old, new)
 
                 })
+            
             // Owners only see and run lotteries for their own campsites.
-            1 -> if (deviceId.isNotEmpty()) LotteryOwnerScreen().LotteryList(
-                lotteries = lotteryDatabase.lotteries.filter { it.ownerId == deviceId },
-                campsites = campsitesDatabase.campsites.filter { it.ownerId == deviceId },
-                onCreateLottery = { lotteryController.createLottery(it) },
-                onUpdateLottery = { lotteryController.updateLottery(it) }
+            1 -> if (deviceId.isNotEmpty()) { 
+                    LotteryOwnerScreen().LotteryList(
+                      lotteries = lotteryDatabase.lotteries.filter { it.ownerId == deviceId },
+                      campsites = campsitesDatabase.campsites.filter { it.ownerId == deviceId },
+                      onCreateLottery = { lotteryController.createLottery(it) },
+                      onUpdateLottery = { lotteryController.updateLottery(it) }
+                    )
+                }
+            
+            2 -> OwnerReservationsList().ReservationsList(
+                activeReservations = ownerReservationsController.getReservationsById(deviceId),
+                pasReservations = ownerReservationsController.getPastReservationsById(deviceId),
+                cancelledReservations = ownerReservationsController.getCancelledReservationsById(deviceId)
             )
-            // 2 -> ReservationsContent()
         }
     }
 }
