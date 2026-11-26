@@ -392,13 +392,15 @@ fun EntrantHomeScreenView(
             displayCampsitesAsCards(
                 modifier = Modifier.weight(1f),
                 lotteries = lotteries,
-                onClickEvent = {},
+                onClickEvent = {lottery ->
+                    val hasOffer: Boolean = deviceId in lottery.winners
+                    openEntrantOfferScreen(lottery, hasOffer)
+                },
                 getTextAttributes = { lottery ->
-                    if (lottery.winner == deviceId) {
-                        Pair(
-                            "Campsite won - respond before ${lottery.bookingEndDate}",
-                            Color(0xFFE6DDB0)
-                        )
+                    if (deviceId in lottery.winners) {
+                        Pair("Campsite won - respond before ${lottery.bookingEndDate}", Color(0xFFE6DDB0))
+                    } else if (lottery.lotteryEndDate <= LocalDate.now().toString()) {
+                        Pair("Entered in lottery", Color(0xFFD9D9D9))
                     } else {
                         Pair("Entered in lottery", Color(0xFFD9D9D9))
                     }
