@@ -7,9 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
-import androidx.compose.ui.platform.LocalContext
 import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.data.LotteryDatabase
 import com.example.campsiteapp.data.DeviceIDs
@@ -27,11 +24,6 @@ class OwnerActivity: ComponentActivity() {
         val reservationDatabase = ReservationDatabase()
         
         setContent {
-
-            val deviceId by produceState(initialValue = "") {
-                value = DeviceIDs(this@OwnerActivity).fetchDeviceId()?:""
-            }
-
             CampsiteAppTheme {
                 OwnerHomeScreen(campsitesDatabase, lotteryDatabase, reservationDatabase,onBack = {finish()}, deviceId = deviceId)
             }

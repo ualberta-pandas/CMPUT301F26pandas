@@ -33,10 +33,8 @@ import androidx.compose.material3.IconButton
 
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,7 +53,6 @@ import com.example.campsiteapp.controller.EntrantCampsiteController
 
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleCampsiteDetailsScreen
-import com.example.campsiteapp.model.Quad
 import java.time.LocalDate
 
 private val pill = RoundedCornerShape(50)
@@ -67,13 +64,11 @@ class CampsiteListScreen : ComponentActivity() {
 
         // TODO: get these from your controllers /
 
-        val searchResult = Quad(
+        val searchResult = Triple(
             intent.getStringExtra("search") ?: "",
-            intent.getStringExtra("location") ?: "",
             intent.getStringExtra("dates") ?: "",
-            intent.getStringExtra("guests")?:""
-
-            )
+            intent.getStringExtra("guests") ?: ""
+        )
 
         setContent {
             CampsiteAppTheme {
@@ -108,7 +103,7 @@ class CampsiteListScreen : ComponentActivity() {
 @Composable
 fun CampsiteListView(
     modifier: Modifier = Modifier,
-    updateByUserSearch: (search: Quad<String, String, String, String>) -> Unit,
+    updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
     onLotteryClick: (String) -> Unit,
 
     openProfileScreen: () -> Unit, // confirm if the user should be able to open their profile screen from here
@@ -119,10 +114,9 @@ fun CampsiteListView(
     lotteries: List<Lottery>,
 ) {
     var entrantSearch by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
     var availableDates by remember { mutableStateOf("Select Dates") }
-    var guestCount by remember { mutableIntStateOf(0) }
-    val filters = Quad(entrantSearch,location,availableDates,guestCount.toString())
+    var guestCount by remember { mutableStateOf("Guest Count") }
+    val filters = Triple(entrantSearch,availableDates,guestCount)
     var menuOpen by remember { mutableStateOf(false) }
 
     Column(
@@ -222,18 +216,10 @@ fun CampsiteListView(
             Spacer(modifier = Modifier.width(6.dp))
 
             Text(
-                text = "Guest Count: $guestCount",
+                text = guestCount,
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
-            )
-
-            Spacer(modifier= Modifier.width(6.dp))
-
-            TextField(
-                value = location,
-                onValueChange = {location = it},
-                label = {Text("Location")}
             )
 
 
@@ -253,6 +239,7 @@ fun CampsiteListView(
             getTextAttributes = { lottery ->
                 val currSize = lottery.waitlistMax - lottery.waitlist.size
 
+                var localDate: String = LocalDate.now().toString()
                 if (lottery.lotteryEndDate < LocalDate.now().toString()) {
                     Pair("Lottery is closed", Color(0xFFD9B8B8))
                 } else if (currSize == 0) {

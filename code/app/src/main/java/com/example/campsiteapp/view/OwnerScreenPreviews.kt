@@ -31,7 +31,8 @@ private fun OwnerCampsiteListPreview() {
     OwnerCampsiteListScreen().CampsitesList(
         campsites = previewCampsites,
         onAddCampsite = {},
-        onEditCampsite = { _, _ -> }
+        onEditCampsite = { _, _ -> },
+        deviceId = ""
     )
 }
 
@@ -42,7 +43,8 @@ private fun OwnerCampsiteListEmptyPreview() {
     OwnerCampsiteListScreen().CampsitesList(
         campsites = emptyList(),
         onAddCampsite = {},
-        onEditCampsite = { _, _ -> }
+        onEditCampsite = { _, _ -> },
+        deviceId = ""
     )
 }
 

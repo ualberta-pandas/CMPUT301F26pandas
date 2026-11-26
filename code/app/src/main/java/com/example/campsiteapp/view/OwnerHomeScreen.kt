@@ -22,13 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.produceState
@@ -71,7 +69,7 @@ fun OwnerHomeScreen(
         ) {
             Button(
                 onClick = {
-                    onBack()
+
                 }
             ) { Text("<-") }
             Text(text = "My Campsites")
@@ -104,14 +102,9 @@ fun OwnerHomeScreen(
             }
         }
 
-
-
-        val ownerCampsiteController = remember {  OwnerCampsiteController() }
-        val ownerReservationsController = remember { OwnerReservationsController() }
-
         when (selectedIndex) {
             0 -> OwnerCampsiteListScreen().CampsitesList(
-                campsites = ownerCampsiteController.getCampsiteListById(deviceId),
+                campsites = campsitesDatabase.campsites,
                 onAddCampsite = { campsitesDatabase.addCampsite(it) },
                 onEditCampsite = { old, new ->
 
@@ -129,11 +122,11 @@ fun OwnerHomeScreen(
                     )
                 }
             
-            2 -> OwnerReservationsList().ReservationsList(
-                activeReservations = ownerReservationsController.getReservationsById(deviceId),
-                pasReservations = ownerReservationsController.getPastReservationsById(deviceId),
-                cancelledReservations = ownerReservationsController.getCancelledReservationsById(deviceId)
-            )
+//             2 -> OwnerReservationsList().ReservationsList(
+//                 activeReservations = ownerReservationsController.getReservationsById(deviceId),
+//                 pasReservations = ownerReservationsController.getPastReservationsById(deviceId),
+//                 cancelledReservations = ownerReservationsController.getCancelledReservationsById(deviceId)
+//             )
         }
     }
 }

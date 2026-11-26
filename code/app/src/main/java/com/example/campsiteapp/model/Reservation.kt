@@ -30,7 +30,6 @@ data class Reservation(
  */
 enum class ReservationStatus(val displayText: String) {
     COMPLETED("Completed"),
-    ACCEPTED("Accepted"),
     CANCELLED("Cancelled"),
     REJECTED("Rejected by host"),
     EXPIRED("Offer expired"),
