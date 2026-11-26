@@ -20,7 +20,5 @@ data class Campsite(
     val status: String = "",
     var rating: Double = 0.0,
     var address: String = "",
-    var ownerId: String = "",
-    var ratingCount: Int = 0,
-    var ratingSum: Int = 0
+    var ownerId: String = ""
 ) : java.io.Serializable

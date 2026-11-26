@@ -22,13 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.controller.LotteryController
@@ -54,9 +52,15 @@ fun OwnerHomeScreen(
     onBack: () -> Unit,
     deviceId: String? = null
 ) {
-    val tabs = listOf("Manage", "Lottery", "Reservations")
+    val tabs = listOf("Campsites", "Lottery", "Reservations")
     val lotteryController = remember { LotteryController(lotteryDatabase) }
     var selectedIndex by remember { mutableIntStateOf(0) }
+    val lotteryController = remember(lotteryDatabase) { LotteryController(lotteryDatabase) }
+
+    val context = LocalContext.current
+    val deviceId by produceState(initialValue = "") {
+        value = DeviceIDs(context).fetchDeviceId() ?: ""
+    }
 
     val context = LocalContext.current
     var lookupCount by remember { mutableIntStateOf(0) }
@@ -137,14 +141,14 @@ fun OwnerHomeScreen(
                 },
                 onEditCampsite = { old, new ->
                     campsitesDatabase.updateCampsite(old, new)
-                },
-                deviceId = ownerId ?: ""
-                )
-            1 -> LotteryOwnerScreen().LotteryList(
-                lotteries = myLotteries,
-                campsites = myCampsites,
-                onCreateLottery = { lotteryController.createLottery(it.copy(ownerId = ownerId ?: "")) },
-                onUpdateLottery = lotteryController::updateLottery
+
+                })
+            // Owners only see and run lotteries for their own campsites.
+            1 -> if (deviceId.isNotEmpty()) LotteryOwnerScreen().LotteryList(
+                lotteries = lotteryDatabase.lotteries.filter { it.ownerId == deviceId },
+                campsites = campsitesDatabase.campsites.filter { it.ownerId == deviceId },
+                onCreateLottery = { lotteryController.createLottery(it) },
+                onUpdateLottery = { lotteryController.updateLottery(it) }
             )
 
 //            2 -> OwnerReservationsList().ReservationsList(

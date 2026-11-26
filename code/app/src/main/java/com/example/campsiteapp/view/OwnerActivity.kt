@@ -25,11 +25,6 @@ class OwnerActivity: ComponentActivity() {
         val lotteryDatabase = LotteryDatabase()
         val reservationDatabase = ReservationDatabase()
         setContent {
-
-            val deviceId by produceState(initialValue = "") {
-                value = DeviceIDs(this@OwnerActivity).fetchDeviceId()?:""
-            }
-
             CampsiteAppTheme {
                 OwnerHomeScreen(campsitesDatabase, lotteryDatabase, reservationDatabase,onBack = {finish()}, deviceId = deviceId)
             }

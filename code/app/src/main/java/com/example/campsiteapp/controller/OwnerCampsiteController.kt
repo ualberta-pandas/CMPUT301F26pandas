@@ -184,13 +184,8 @@ class OwnerCampsiteController (
 
                         )
 
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                    }
-
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(){
                         TextField(
                             value = occupancy,
                             onValueChange = { occupancy = it },
@@ -201,10 +196,11 @@ class OwnerCampsiteController (
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
+
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
 
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row() {
                         TextField(
                             value = owner,
@@ -251,11 +247,10 @@ class OwnerCampsiteController (
 
 
 
-                    }
 
-                    Spacer(modifier = Modifier.height(10.dp))
 
-                    Row(){
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         Button(
                             onClick = {
 
@@ -315,7 +310,9 @@ class OwnerCampsiteController (
                             }
                         }
 
+
                     }
+
 
                     var showMap by remember { mutableStateOf(false) }
 
@@ -380,33 +377,14 @@ class OwnerCampsiteController (
                         )
 
 
-                    }
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(){
                         Button(
                             onClick = {
                                 showMap = true
                             }
                         ) { Text("Choose Location") }
                     }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    TextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        label = { Text("Description") },
-                        maxLines = 4,
-                        modifier = Modifier
-                            .border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            )
-                            .fillMaxWidth()
-                    )
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -458,6 +436,10 @@ class OwnerCampsiteController (
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val context = LocalContext.current
+//                    val ownerId by produceState(initialValue = "") {
+//                        val deviceIDs = DeviceIDs(context)
+//                        value = deviceIDs.fetchDeviceId() ?: deviceIDs.registerDeviceId()
+//                    }
 
                     Row(
                         horizontalArrangement = Arrangement.End,
@@ -529,6 +511,7 @@ class OwnerCampsiteController (
                                                 rules = rules,
                                                 image = imageUrl,
                                                 status = status,
+//                                                ownerId = ownerId
                                                 ownerId = deviceId
                                             )
                                         )

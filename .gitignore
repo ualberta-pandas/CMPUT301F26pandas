@@ -9,3 +9,6 @@ local.properties
 
 
 .kotlin/
+
+# Local Claude Code context
+CLAUDE.md

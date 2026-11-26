@@ -6,9 +6,6 @@ import androidx.core.graphics.createBitmap
 import androidx.core.graphics.set
 
 class QrCodeService {
-
-
-
     fun generateQRCode(text: String): Bitmap {
 
         val writer = QRCodeWriter()
@@ -31,5 +28,4 @@ class QrCodeService {
 
         return bitmap
     }
-
 }
