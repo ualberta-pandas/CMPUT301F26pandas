@@ -138,10 +138,13 @@ fun LotteryForm(
                 Button(
                     modifier = Modifier.testTag("saveLotteryButton"),
                     onClick = {
+                        // Start from the existing lottery so an edit keeps its
+                        // waitlist, winners and status.
                         val firstSelected = campsites.firstOrNull { it.id in selectedIds }
                         val lottery = (initial ?: Lottery()).copy(
                             ownerId = initial?.ownerId ?: firstSelected?.ownerId ?: "",
                             campsiteIds = selectedIds.toList(),
+                            // The entrant screens still read the single embedded campsite.
                             campsite = firstSelected ?: initial?.campsite ?: Campsite(),
                             lotteryStartDate = lotteryStart,
                             lotteryEndDate = lotteryEnd,
