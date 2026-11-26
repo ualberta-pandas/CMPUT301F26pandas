@@ -24,11 +24,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
@@ -65,6 +67,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campsiteapp.controller.EntrantCampsiteController
+import com.example.campsiteapp.controller.EntrantOfferController
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.Lottery
@@ -104,6 +107,9 @@ class EntrantHomeScreen : ComponentActivity() {
                         openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@EntrantHomeScreen) },
                         openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@EntrantHomeScreen) },
                         openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@EntrantHomeScreen) },
+                        openEntrantOfferScreen = {lottery, hasOffer ->
+                            EntrantOfferController.toggleOfferScreen(this@EntrantHomeScreen, lottery, hasOffer)
+                        }
                     )
                 }
             }
@@ -119,7 +125,8 @@ fun EntrantHomeScreenView(
 
     openProfileScreen: () -> Unit,
     openOwnerScreen: () -> Unit,
-    openAdminScreen: () -> Unit
+    openAdminScreen: () -> Unit,
+    openEntrantOfferScreen: (lottery: Lottery, hasOffer: Boolean) -> Unit
 ) {
     var entrantSearch by remember { mutableStateOf("") }
     var availableDates by remember { mutableStateOf("Select Dates") }
@@ -421,6 +428,25 @@ fun EntrantHomeScreenView(
                 )
             }
         }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            Text(
+                text = "privacy policy",
+                color = Color(0xFF909090),
+                modifier = Modifier.clickable {}
+            )
+
+            Text(
+                text = "terms & conditions",
+                color = Color(0xFF909090),
+                modifier = Modifier.clickable {}
+            )
+        }
     }
 
 }
@@ -461,7 +487,7 @@ fun CounterView(
 
 @Composable
 fun displayCampsitesAsCards(modifier: Modifier = Modifier,
-                            lotteries: List<Lottery>, onClickEvent: (String) -> Unit,
+                            lotteries: List<Lottery>, onClickEvent: (Lottery) -> Unit,
                             getTextAttributes: (Lottery) -> Pair<String, Color>,
 ){
     LazyColumn( modifier = modifier.fillMaxSize(),
@@ -470,11 +496,14 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
     ) {
         items(lotteries) { lottery ->
             val campsite: Campsite = lottery.campsite
+            val status: Pair<String, Color> = getTextAttributes(lottery)
 
-            Box(modifier = modifier
+            Box(modifier = Modifier
                 .size(width = 350.dp, height = 170.dp)
                 .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
-                .clickable { onClickEvent(lottery.id) }
+                .clickable {
+                    onClickEvent(lottery)
+                }
             ){
                 Column(
                     modifier = Modifier
@@ -485,8 +514,6 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
                     Text(text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
                         fontSize = 12.sp)
                     Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
-
-                    val status = getTextAttributes(lottery)
 
                     Text(
                         text = status.first,
