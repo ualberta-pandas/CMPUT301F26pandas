@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.controller.LotteryController
+import com.example.campsiteapp.controller.OwnerCampsiteController
 import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.data.LotteryDatabase
@@ -49,6 +50,7 @@ import com.example.campsiteapp.controller.OwnerReservationsController
 fun OwnerHomeScreen(
     campsitesDatabase: CampsitesDatabase,
     lotteryDatabase: LotteryDatabase,
+    reservationDatabase: ReservationDatabase,
     onBack: () -> Unit,
     deviceId: String? = null
 ) {
@@ -73,6 +75,12 @@ fun OwnerHomeScreen(
         emptyList()
     } else {
         lotteryDatabase.lotteries.filter { it.ownerId == ownerId }
+    }
+
+    val myReservations = if(ownerId.isNullOrEmpty()) {
+        emptyList()
+    } else {
+        reservationDatabase.reservations.filter { it.ownerId == ownerId }
     }
 
 
@@ -117,7 +125,7 @@ fun OwnerHomeScreen(
 
 
 
-        val ownerCampsiteController = remember {  OwnerCampsiteController() }
+        val ownerCampsiteController = remember { OwnerCampsiteController() }
         val ownerReservationsController = remember { OwnerReservationsController() }
 
         when (selectedIndex) {
@@ -139,13 +147,10 @@ fun OwnerHomeScreen(
                 onUpdateLottery = lotteryController::updateLottery
             )
 
-                }
-                )
-            // 1 -> LotteryContent()
             2 -> OwnerReservationsList().ReservationsList(
-                activeReservations = ownerReservationsController.getReservationsById(deviceId),
-                pasReservations = ownerReservationsController.getPastReservationsById(deviceId),
-                cancelledReservations = ownerReservationsController.getCancelledReservationsById(deviceId)
+                activeReservations = ownerReservationsController.getReservationsById(ownerId),
+                pasReservations = ownerReservationsController.getPastReservationsById(ownerId),
+                cancelledReservations = ownerReservationsController.getCancelledReservationsById(ownerId)
             )
         }
     }
