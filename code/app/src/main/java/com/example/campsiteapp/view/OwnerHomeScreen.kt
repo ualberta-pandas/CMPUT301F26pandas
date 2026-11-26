@@ -22,28 +22,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.campsiteapp.controller.OwnerCampsiteController
-import com.example.campsiteapp.controller.OwnerReservationsController
 import com.example.campsiteapp.data.CampsitesDatabase
-import com.example.campsiteapp.data.DeviceIDs
-import com.example.campsiteapp.model.ReservationDatabase
-
+import com.example.campsiteapp.model.Campsite
+import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 
-fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit, deviceId: String){
-    val tabs = listOf("Campsites", "Lottery", "Reservations")
+fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit){
+    val tabs = listOf("Manage", "Lottery", "Reservations")
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
@@ -53,7 +48,7 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit, de
         ) {
             Button(
                 onClick = {
-                    onBack()
+
                 }
             ) { Text("<-") }
             Text(text = "My Campsites")
@@ -86,27 +81,17 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit, de
             }
         }
 
-
-
-        val ownerCampsiteController = remember {  OwnerCampsiteController() }
-        val ownerReservationsController = remember { OwnerReservationsController() }
-
         when (selectedIndex) {
             0 -> OwnerCampsiteListScreen().CampsitesList(
-                campsites = ownerCampsiteController.getCampsiteListById(deviceId),
+                campsites = campsitesDatabase.campsites,
                 onAddCampsite = { campsitesDatabase.addCampsite(it) },
                 onEditCampsite = { old, new ->
 
                     campsitesDatabase.updateCampsite(old, new)
 
-                }
-                )
+                })
             // 1 -> LotteryContent()
-            2 -> OwnerReservationsList().ReservationsList(
-                activeReservations = ownerReservationsController.getReservationsById(deviceId),
-                pasReservations = ownerReservationsController.getPastReservationsById(deviceId),
-                cancelledReservations = ownerReservationsController.getCancelledReservationsById(deviceId)
-            )
+            // 2 -> ReservationsContent()
         }
     }
 }

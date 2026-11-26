@@ -81,8 +81,7 @@ class CampsitesDatabase {
                 "rules" to campsite.rules,
                 "image" to campsite.image,
                 "price" to campsite.price,
-                "status" to campsite.status,
-                "ownerId" to campsite.ownerId
+                "status" to campsite.status
             )
 
         )
