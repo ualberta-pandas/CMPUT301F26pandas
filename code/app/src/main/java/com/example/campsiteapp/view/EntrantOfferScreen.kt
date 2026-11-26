@@ -29,9 +29,9 @@ import androidx.core.content.IntentCompat
 import com.example.campsiteapp.controller.EntrantCampsiteController
 import com.example.campsiteapp.controller.EntrantOfferController
 import com.example.campsiteapp.data.DeviceIDs
-import com.example.campsiteapp.data.Reservation
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.model.Lottery
+import com.example.campsiteapp.model.Reservation
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 private val pill = RoundedCornerShape(50)
 
@@ -418,13 +418,16 @@ fun DownloadOffer(
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
     ){
         Text(
-            text = if (offerRejected.value) "Offer Accepted" else "Offer Rejected",
+            text = if (!offerRejected.value) "Offer Accepted" else "Offer Rejected",
             fontSize = 16.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .weight(1f)
                 .padding(8.dp)
-                .background(Color(0xFFB5C7BE), pill)
+                .background(
+                    if (!offerRejected.value) Color(0xFFB5C7BE) else Color(0xFFE5A9A9),
+                    pill
+                )
                 .height(40.dp)
                 .wrapContentHeight(Alignment.CenterVertically)
         )

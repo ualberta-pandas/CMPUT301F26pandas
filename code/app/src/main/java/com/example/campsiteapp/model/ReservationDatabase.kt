@@ -1,7 +1,6 @@
 package com.example.campsiteapp.model
 
 import androidx.compose.runtime.mutableStateListOf
-import com.example.campsiteapp.data.Reservation
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
@@ -34,7 +33,6 @@ class ReservationDatabase {
     fun addReservation(reservation: Reservation) {
         reservationsRef.add(
             mapOf(
-                "campsiteId" to reservation.campsiteId,
                 "entrantId" to reservation.entrantId,
                 "startDate" to reservation.startDate,
                 "endDate" to reservation.endDate,

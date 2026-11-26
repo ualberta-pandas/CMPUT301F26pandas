@@ -8,9 +8,10 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import com.example.campsiteapp.data.LotteryDatabase
-import com.example.campsiteapp.data.Reservation
 import com.example.campsiteapp.model.Lottery
+import com.example.campsiteapp.model.Reservation
 import com.example.campsiteapp.model.ReservationDatabase
+import com.example.campsiteapp.model.ReservationStatus
 import com.example.campsiteapp.view.EntrantOfferScreen
 import java.io.File
 
@@ -33,11 +34,10 @@ object EntrantOfferController {
      **/
     fun entrantAcceptOfferHandler(deviceId: String, lottery: Lottery): Reservation {
         var reservation: Reservation = Reservation(
-            campsiteId = lottery.campsite.id,
             entrantId = deviceId,
             startDate = lottery.bookingStartDate,
             endDate = lottery.bookingEndDate,
-            status = "accepted",
+            status = ReservationStatus.COMPLETED,
             campsite = lottery.campsite
         )
 
@@ -52,6 +52,9 @@ object EntrantOfferController {
      */
     fun entrantRejectOfferHandler(deviceId: String, lottery: Lottery){
         lottery.waitlist.remove(deviceId)
+        lottery.winners.remove(deviceId)
+
+        PoolingSystem.drawLotteryWinner(lottery)
         lotteryDB.updateLottery(lottery)
     }
 
