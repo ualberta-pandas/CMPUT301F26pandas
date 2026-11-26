@@ -180,6 +180,8 @@ class OwnerCampsiteController (
 
                         )
 
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         TextField(
                             value = occupancy,
                             onValueChange = { occupancy = it },
@@ -238,6 +240,12 @@ class OwnerCampsiteController (
                             readOnly = true
 
                         )
+
+
+
+
+
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         Button(
                             onClick = {
@@ -364,28 +372,15 @@ class OwnerCampsiteController (
                             )
                         )
 
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         Button(
                             onClick = {
                                 showMap = true
                             }
                         ) { Text("Choose Location") }
                     }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    TextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        label = { Text("Description") },
-                        maxLines = 4,
-                        modifier = Modifier
-                            .border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            )
-                            .fillMaxWidth()
-                    )
 
                     Spacer(modifier = Modifier.height(10.dp))
 

@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -29,18 +30,27 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -59,6 +69,14 @@ import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.util.Date
+import java.util.Locale
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 private val pill = RoundedCornerShape(50)
 
@@ -96,7 +114,7 @@ class EntrantHomeScreen : ComponentActivity() {
 @Composable
 fun EntrantHomeScreenView(
     modifier: Modifier = Modifier,
-    updateByUserSearch: (String) -> Unit,
+    updateByUserSearch: (Triple<String, String, String>) -> Unit,
     deviceId: String,
 
     openProfileScreen: () -> Unit,
@@ -104,12 +122,17 @@ fun EntrantHomeScreenView(
     openAdminScreen: () -> Unit
 ) {
     var entrantSearch by remember { mutableStateOf("") }
+    var availableDates by remember { mutableStateOf("Select Dates") }
+    var guestCount by remember { mutableIntStateOf(0) }
+    val filters = Triple(entrantSearch, availableDates, guestCount.toString())
     var menuOpen by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showGuests by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     Column(
         modifier = modifier.fillMaxSize()
-        .padding(top = 5.dp),
+            .padding(top = 5.dp),
         verticalArrangement = Arrangement.Top
     ) {
         Spacer(modifier = Modifier.height(5.dp))
@@ -160,7 +183,7 @@ fun EntrantHomeScreenView(
             onValueChange = { entrantSearch = it },
             singleLine = true,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
+            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
             textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
             modifier = Modifier
                 .fillMaxWidth()
@@ -179,12 +202,16 @@ fun EntrantHomeScreenView(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
                         modifier = Modifier.size(20.dp)
+                            .clickable(
+                                onClick = { updateByUserSearch(filters) }
+                            )
                     )
                 }
             }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+
 
         Row(
             modifier = Modifier
@@ -194,22 +221,105 @@ fun EntrantHomeScreenView(
         ) {
 
             Text(
-                text = "Select Dates",
+                text = availableDates,
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .clickable(
+                        onClick = { showDatePicker = true }
+                    )
             )
+
+
+            val dateRangePickerState = rememberDateRangePickerState()
+            var startDate by remember { mutableStateOf("") }
+            var endDate by remember { mutableStateOf("") }
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+
+                    confirmButton = {
+                        Button(
+                            onClick = {
+
+                                val start = dateRangePickerState.selectedStartDateMillis
+                                val end = dateRangePickerState.selectedEndDateMillis
+
+                                if (start != null && end != null) {
+                                    val formatter = SimpleDateFormat(
+                                        "dd/MM/yyyy",
+                                        Locale.getDefault()
+                                    )
+
+                                    availableDates =
+                                        "${formatter.format(Date(start))} - " +
+                                                formatter.format(Date(end))
+
+                                    startDate = "${formatter.format(Date(start))}"
+                                    endDate = "${formatter.format(Date(end))}"
+
+
+                                }
+
+
+                                showDatePicker = false
+                            }
+                        ) { Text("Ok") }
+                    },
+
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                showDatePicker = false
+                            }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                ) {
+
+                    DateRangePicker(state = dateRangePickerState)
+                }
+            }
 
             Spacer(modifier = Modifier.width(6.dp))
 
             Text(
-                text = "Select Guests",
+                text = "Guest Count: $guestCount",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .clickable(
+                        onClick = { showGuests = true }
+                    )
             )
+
+            if (showGuests) {
+                Dialog(
+
+                    onDismissRequest = { showGuests = false },
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    )
+                ) {
+                    Surface(shape = RoundedCornerShape(16.dp)) {
+                        Box(modifier = Modifier.padding(26.dp)) {
+
+                            CounterView(
+                                count = guestCount,
+                                onCountChange = { guestCount = it },
+                                min = 1,
+                                max = 100
+                            )
+                        }
+
+                    }
+                }
+            }
         }
- 
+
+
         Spacer(modifier = Modifier.height(64.dp))
 
         val reservations = EntrantCampsiteController.getReservationsById(deviceId)
@@ -217,43 +327,53 @@ fun EntrantHomeScreenView(
         android.util.Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
 
         Text("Your Confirmed Bookings", modifier = Modifier.padding(start = 16.dp))
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(reservations) { reservation ->
-                val campsite: Campsite = reservation.campsite
 
-                Box(modifier = Modifier
-                    .size(width = 350.dp, height = 140.dp)
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
-                ){
-                    Column(
+
+        Column() {
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(reservations) { reservation ->
+                    val campsite: Campsite = reservation.campsite
+
+                    Box(
                         modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-                    ){
-                        Text(text = campsite.name, fontSize = 18.sp)
-                        Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
-                        Text(text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
-                            fontSize = 12.sp)
-                        Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
-
-                        val status: Pair<String, Color> = Pair("Booked - Cancel Before ${campsite.startDate}", Color(0xFFB5C7BE))
-                        Text(
-                            text = status.first,
-                            color = Color.Black,
+                            .size(width = 350.dp, height = 140.dp)
+                            .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
+                    ) {
+                        Column(
                             modifier = Modifier
-                                .width(300.dp)
-                                .height(60.dp)
-                                .background(status.second, RoundedCornerShape(50))
-                                .padding(horizontal = 12.dp, vertical = 4.dp),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
+                                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
+                        ) {
+                            Text(text = campsite.name, fontSize = 18.sp)
+                            Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
+                            Text(
+                                text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
+                                fontSize = 12.sp
+                            )
+                            Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
 
-                Spacer(modifier = Modifier.height(12.dp))
+                            val status: Pair<String, Color> = Pair(
+                                "Booked - Cancel Before ${campsite.startDate}",
+                                Color(0xFFB5C7BE)
+                            )
+                            Text(
+                                text = status.first,
+                                color = Color.Black,
+                                modifier = Modifier
+                                    .width(300.dp)
+                                    .height(60.dp)
+                                    .background(status.second, RoundedCornerShape(50))
+                                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
             }
         }
 
@@ -261,18 +381,23 @@ fun EntrantHomeScreenView(
         Spacer(modifier = Modifier.height(32.dp))
         Text("Your Pending Bookings", modifier = Modifier.padding(start = 16.dp))
 
-        displayCampsitesAsCards(
-            modifier = Modifier.weight(1f),
-            lotteries = lotteries,
-            onClickEvent = {},
-            getTextAttributes = { lottery ->
-                if (lottery.winner == deviceId) {
-                    Pair("Campsite won - respond before ${lottery.bookingEndDate}", Color(0xFFE6DDB0))
-                } else {
-                    Pair("Entered in lottery", Color(0xFFD9D9D9))
+        Column() {
+            displayCampsitesAsCards(
+                modifier = Modifier.weight(1f),
+                lotteries = lotteries,
+                onClickEvent = {},
+                getTextAttributes = { lottery ->
+                    if (lottery.winner == deviceId) {
+                        Pair(
+                            "Campsite won - respond before ${lottery.bookingEndDate}",
+                            Color(0xFFE6DDB0)
+                        )
+                    } else {
+                        Pair("Entered in lottery", Color(0xFFD9D9D9))
+                    }
                 }
-            }
-        )
+            )
+        }
 
         Row(
             modifier = Modifier
@@ -285,7 +410,7 @@ fun EntrantHomeScreenView(
                 text = "See past reservations",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
-                    .clickable { context.startActivity(Intent(context, PastReservationsScreen::class.java)) }
+                    .clickable { }
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
 
@@ -297,8 +422,42 @@ fun EntrantHomeScreenView(
             }
         }
     }
+
 }
 
+
+
+@Composable
+fun CounterView(
+    count: Int,
+    onCountChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    min: Int = 0,
+    max: Int = 20
+) {
+    Row(
+        modifier = modifier
+            .border(1.dp, Color.Black, pill)
+            .padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = { if (count > min) onCountChange(count - 1) },
+            enabled = count > min
+        ) {
+            Icon(Icons.Default.Remove, contentDescription = "Less")
+        }
+
+        Text(text = "$count", fontSize = 16.sp)
+
+        IconButton(
+            onClick = { if (count < max) onCountChange(count + 1) },
+            enabled = count < max
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "More")
+        }
+    }
+}
 
 @Composable
 fun displayCampsitesAsCards(modifier: Modifier = Modifier,

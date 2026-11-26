@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,9 +63,11 @@ class CampsiteListScreen : ComponentActivity() {
 
         // TODO: get these from your controllers /
 
-        val searchResult = intent.getStringExtra("search") ?: ""
-
-        // declare intent here
+        val searchResult = Triple(
+            intent.getStringExtra("search") ?: "",
+            intent.getStringExtra("dates") ?: "",
+            intent.getStringExtra("guests") ?: ""
+        )
 
         setContent {
             CampsiteAppTheme {
@@ -99,7 +102,7 @@ class CampsiteListScreen : ComponentActivity() {
 @Composable
 fun CampsiteListView(
     modifier: Modifier = Modifier,
-    updateByUserSearch: (search: String) -> Unit,
+    updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
     onLotteryClick: (String) -> Unit,
 
     openProfileScreen: () -> Unit, // confirm if the user should be able to open their profile screen from here
@@ -110,6 +113,9 @@ fun CampsiteListView(
     lotteries: List<Lottery>,
 ) {
     var entrantSearch by remember { mutableStateOf("") }
+    var availableDates by remember { mutableStateOf("Select Dates") }
+    var guestCount by remember { mutableStateOf("Guest Count") }
+    val filters = Triple(entrantSearch,availableDates,guestCount)
     var menuOpen by remember { mutableStateOf(false) }
 
     Column(
@@ -162,7 +168,7 @@ fun CampsiteListView(
                 onValueChange = { entrantSearch = it },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(entrantSearch) }),
+                keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
                 textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
                 modifier = Modifier
                     .weight(1f)
@@ -181,6 +187,9 @@ fun CampsiteListView(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
                             modifier = Modifier.size(20.dp)
+                                .clickable(
+                                    onClick = {updateByUserSearch(filters)}
+                                )
                         )
                     }
                 }
@@ -197,7 +206,7 @@ fun CampsiteListView(
         ) {
 
             Text(
-                text = "No Dates Filter",
+                text = availableDates,
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -206,7 +215,7 @@ fun CampsiteListView(
             Spacer(modifier = Modifier.width(6.dp))
 
             Text(
-                text = "No Guest Filter",
+                text = guestCount,
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
@@ -233,14 +242,3 @@ fun CampsiteListView(
         Spacer(modifier = Modifier.height(12.dp))
     }
 }
-
-/*
-Prompts to
-okay, I know that if you change something in a list, when there's a lazy_column that's relying on it, its going to recompose because of
-the update to the list. give me some sample code and things to get started
-
-generate me some campsite test-cases
-
-
-working with boxes (for visual effects)
-*/
