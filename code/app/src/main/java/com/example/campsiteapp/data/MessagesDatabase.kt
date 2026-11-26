@@ -3,12 +3,10 @@
  *
  * Outstanding issues:
  * - Function deleteMessages in deleteUserChats will likely raise an exception if there are over 500 messages (according to documentation)
- * - Database communication redundancy will likely burden performance (temporary)
  */
 package com.example.campsiteapp.data
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
 import com.example.campsiteapp.model.Chat
 import com.example.campsiteapp.model.Message
 import com.google.firebase.Firebase
@@ -29,8 +27,6 @@ import kotlin.collections.List
  * Access, create, and modify chat documents and their nested message documents
  */
 class MessagesDatabase {
-    private val _chats = mutableStateListOf<Chat>()
-
     /**
      * Get updated chats for a user
      *
@@ -129,7 +125,7 @@ class MessagesDatabase {
      * Adds a chat to the database
      *
      * Adds data of chat to a new document in the database and returns new object
-     * or returns the chat if it already exists
+     * or updates and returns the chat if it already exists
      *
      * @param userIds the device ids of the users in the chat
      * @param profileImages the profile images of the users in the chat
@@ -165,11 +161,8 @@ class MessagesDatabase {
                 .await()
 
             val updatedChat = updateRef.get().await().toObject(Chat::class.java)
-            return if(updatedChat!=null){
-                (updatedChat)
-            } else {
-                (chat)
-            }
+            //If it is null, the chat the messaging system is working with can not update properly
+            return updatedChat ?: chat
         }
     }
 
@@ -306,23 +299,4 @@ class MessagesDatabase {
     }
 
     private val chatsRef = Firebase.firestore.collection("chats")
-
-    //TODO: Get rid of this listener...
-    init {
-        chatsRef.addSnapshotListener { snapshots, error ->
-            if (error != null){
-                return@addSnapshotListener
-            }
-
-            _chats.clear()
-
-            snapshots?.documents?.forEach { document ->
-
-                val chat = document.toObject(Chat::class.java)
-                if(chat != null){
-                    _chats.add(chat)
-                }
-            }
-        }
-    }
 }
