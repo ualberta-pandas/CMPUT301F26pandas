@@ -285,6 +285,7 @@ fun CampsiteView(
                 ${campsiteSelection.location}
                 ${campsiteSelection.occupancy} people maximum occupancy
                 ${campsiteSelection.rating}/5 ★
+                Your rating/5★
             """.trimIndent(),
             fontSize = 12.sp,
 

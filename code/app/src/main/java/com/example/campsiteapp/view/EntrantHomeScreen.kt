@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -49,6 +50,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -80,6 +82,13 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Icon
+import androidx.compose.ui.unit.Dp
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.firestore
 
 private val pill = RoundedCornerShape(50)
 
@@ -492,6 +501,11 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
                             lotteries: List<Lottery>, onClickEvent: (Lottery) -> Unit,
                             getTextAttributes: (Lottery) -> Pair<String, Color>,
 ){
+    val context = LocalContext.current
+    val deviceId by produceState(initialValue = "") {
+        value = DeviceIDs(context).fetchDeviceId()?:""
+    }
+
     LazyColumn( modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -500,8 +514,11 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
             val campsite: Campsite = lottery.campsite
             val status: Pair<String, Color> = getTextAttributes(lottery)
 
+
+
             Box(modifier = Modifier
-                .size(width = 350.dp, height = 170.dp)
+                .width(350.dp)
+                .heightIn(min=170.dp)
                 .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
                 .clickable {
                     onClickEvent(lottery)
@@ -513,8 +530,14 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
                 ){
                     Text(text = campsite.name, fontSize = 18.sp)
                     Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
-                    Text(text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
-                        fontSize = 12.sp)
+                    val average = if (campsite.ratingCount > 0) {
+                        campsite.ratingSum.toDouble() / campsite.ratingCount
+                    } else 0.0
+
+                    Text(
+                        text = if (campsite.ratingCount > 0) "%.1f stars/5".format(average) else "No ratings yet",
+                        fontSize = 12.sp
+                    )
                     Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
 
                     Text(
@@ -527,10 +550,92 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
                             .padding(horizontal = 12.dp, vertical = 4.dp),
                         fontSize = 12.sp
                     )
+
+                    var showRating by remember { mutableStateOf(false) }
+
+                    var rating by remember { mutableIntStateOf(0) }
+
+
+
+                    Button(
+                        onClick = {
+                            showRating = true
+                        }
+                    ) { Text("Rate campsite") }
+
+                    if (showRating){
+
+                        StarRating(
+                            rating = rating,
+                            onRatingChange = { number ->
+                                rating = number
+                                println("User picked $number")
+                            }
+                        )
+
+
+                        Button(onClick = { saveRating(campsite.id, deviceId = deviceId, rating) }) {
+                            Text("Submit")
+                        }
+
+
+
+                    }
                 }
             }
 
+
+
             Spacer(modifier = Modifier.height(12.dp))
         }
+    }
+}
+
+@Composable
+fun StarRating(
+    rating: Int,
+    onRatingChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    maxStars: Int = 5,
+    starSize: Dp = 32.dp
+) {
+    Row(modifier = modifier) {
+        for (i in 1..maxStars) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = "$i stars",
+                tint = if (i <= rating) Color(0xFFFFC107) else Color.LightGray,
+                modifier = Modifier
+                    .size(starSize)
+                    .clickable { onRatingChange(i) }
+            )
+        }
+    }
+}
+
+fun saveRating(campsiteId: String, deviceId: String, newStars: Int) {
+    val db = Firebase.firestore
+    val campsiteRef = db.collection("campsites").document(campsiteId)
+    val ratingRef = campsiteRef.collection("ratings").document(deviceId)
+
+    ratingRef.get().addOnSuccessListener { old ->
+        val oldStars = old.getLong("stars")
+        val change = if (oldStars != null) newStars - oldStars else newStars.toLong()
+        val newCount = if (oldStars == null) 1L else 0L
+
+        val batch = db.batch()
+        batch.set(
+            ratingRef,
+            mapOf("stars" to newStars, "createdAt" to FieldValue.serverTimestamp())
+        )
+        batch.set(
+            campsiteRef,
+            mapOf(
+                "ratingSum" to FieldValue.increment(change),
+                "ratingCount" to FieldValue.increment(newCount)
+            ),
+            SetOptions.merge()
+        )
+        batch.commit()
     }
 }

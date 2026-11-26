@@ -41,7 +41,7 @@ import com.example.campsiteapp.model.ReservationDatabase
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 
-fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, reservationDatabase: ReservationDatabase, onBack: () -> Unit){
+fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, onBack: () -> Unit, deviceId: String){
     val tabs = listOf("Campsites", "Lottery", "Reservations")
     var selectedIndex by remember { mutableIntStateOf(0) }
 
@@ -52,7 +52,7 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, reservationDatabase: R
         ) {
             Button(
                 onClick = {
-
+                    onBack()
                 }
             ) { Text("<-") }
             Text(text = "My Campsites")
@@ -85,23 +85,20 @@ fun OwnerHomeScreen(campsitesDatabase: CampsitesDatabase, reservationDatabase: R
             }
         }
 
-        val context = LocalContext.current
 
-        val deviceId by produceState(initialValue = "") {
-            value = DeviceIDs(context).fetchDeviceId()?:""
-        }
 
-        val ownerCampsiteController = OwnerCampsiteController()
+        val ownerCampsiteController = remember {  OwnerCampsiteController() }
 
         when (selectedIndex) {
             0 -> OwnerCampsiteListScreen().CampsitesList(
-                campsites = campsitesDatabase.campsites,
+                campsites = ownerCampsiteController.getCampsiteListById(deviceId),
                 onAddCampsite = { campsitesDatabase.addCampsite(it) },
                 onEditCampsite = { old, new ->
 
                     campsitesDatabase.updateCampsite(old, new)
 
-                })
+                }
+                )
             // 1 -> LotteryContent()
             2 -> OwnerReservationsList().ReservationsList(
                 activeReservations = ownerCampsiteController.getReservationsById(deviceId),

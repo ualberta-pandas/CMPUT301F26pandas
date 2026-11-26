@@ -49,9 +49,11 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation("androidx.compose.material:material-icons-core")
+
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.media3.common.ktx)
     testImplementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation("io.coil-kt:coil-compose:2.7.0")

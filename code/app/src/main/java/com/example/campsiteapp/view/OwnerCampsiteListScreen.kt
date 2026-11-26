@@ -52,24 +52,10 @@ class OwnerCampsiteListScreen {
     fun CampsitesList(
         campsites: List<Campsite>,
         onAddCampsite: (Campsite) -> Unit,
-        onEditCampsite: (Campsite, Campsite) -> Unit,
-        deviceId: String? = null
+        onEditCampsite: (Campsite, Campsite) -> Unit
     ) {
 
-        val myCampsites = mutableListOf<Campsite>()
 
-        val context = LocalContext.current
-        val lookedUpId by produceState(initialValue = "", deviceId) {
-            if (deviceId == null) value = DeviceIDs(context).fetchDeviceId() ?: ""
-        }
-        val currentId = deviceId ?: lookedUpId
-
-        for (campsite in campsites){
-            if (campsite.ownerId == deviceId){
-                myCampsites.add(campsite)
-            }
-
-        }
 
 
 
@@ -160,7 +146,7 @@ class OwnerCampsiteListScreen {
                             )
                         }
 
-                        if (index < myCampsites.lastIndex) {
+                        if (index < campsites.lastIndex) {
                             HorizontalDivider()
                         }
                     }

@@ -54,6 +54,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
+import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.model.Reservation
 import com.example.campsiteapp.model.ReservationDatabase
 
@@ -387,6 +388,21 @@ class OwnerCampsiteController (
                     Spacer(modifier = Modifier.height(10.dp))
 
                     TextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        label = { Text("Description") },
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = Color.Black,
+                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+                            )
+                            .fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    TextField(
                         value = tags,
                         onValueChange = { tags = it },
                         maxLines = 3,
@@ -434,10 +450,6 @@ class OwnerCampsiteController (
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val context = LocalContext.current
-//                    val ownerId by produceState(initialValue = "") {
-//                        val deviceIDs = DeviceIDs(context)
-//                        value = deviceIDs.fetchDeviceId() ?: deviceIDs.registerDeviceId()
-//                    }
 
                     Row(
                         horizontalArrangement = Arrangement.Center
@@ -508,7 +520,6 @@ class OwnerCampsiteController (
                                                 rules = rules,
                                                 image = imageUrl,
                                                 status = status,
-//                                                ownerId = ownerId
                                                 ownerId = deviceId
                                             )
                                         )
@@ -1065,6 +1076,7 @@ class OwnerCampsiteController (
     private val reservationDB by lazy { ReservationDatabase() }
     private val reservations: List<Reservation> get() = reservationDB.reservations
 
+
     fun getReservationsById(deviceId: String): List<Reservation> {
         val newReservations = mutableListOf<Reservation>()
 
@@ -1094,4 +1106,9 @@ class OwnerCampsiteController (
         return newReservations
     }
 
+    private val campsiteDB by lazy { CampsitesDatabase() }
+    private val campsites: List<Campsite> get() = campsiteDB.campsites
+
+    fun getCampsiteListById(deviceID: String): List<Campsite> =
+        campsites.filter {it.ownerId == deviceID}
 }
