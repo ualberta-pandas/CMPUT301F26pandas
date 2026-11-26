@@ -38,7 +38,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -66,8 +65,6 @@ import com.example.campsiteapp.controller.EntrantWaitlistController.verifyUserOn
 import com.example.campsiteapp.controller.EntrantWaitlistController.removeEntrantFromWaitlist
 
 import com.example.campsiteapp.data.DeviceIDs
-import com.example.campsiteapp.model.Quad
-
 private val pill = RoundedCornerShape(50)
 
 class CampsiteDetailsScreen : ComponentActivity() {
@@ -133,7 +130,7 @@ fun CampsiteView(
     waitlistSelectionClick: (userOnWaitlist: Boolean) -> Unit,
     onBack: () -> Unit,
 
-    updateByUserSearch: (search: Quad<String, String, String, String>) -> Unit,
+    updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
 
     openProfileScreen: () -> Unit,
     openOwnerScreen: () -> Unit,
@@ -143,10 +140,9 @@ fun CampsiteView(
     modifier: Modifier = Modifier
 ) {
     var entrantSearch by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
     var availableDates by remember { mutableStateOf("Select Dates") }
-    var guestCount by remember { mutableIntStateOf(0) }
-    val filters = Quad(entrantSearch,location,availableDates,guestCount.toString())
+    var guestCount by remember { mutableStateOf("Guest Count") }
+    val filters = Triple(entrantSearch,availableDates,guestCount)
 
     var menuOpen by remember { mutableStateOf(false) }
     var onWaitlist by remember { mutableStateOf(userOnWaitlist()) }
@@ -289,7 +285,6 @@ fun CampsiteView(
                 ${campsiteSelection.location}
                 ${campsiteSelection.occupancy} people maximum occupancy
                 ${campsiteSelection.rating}/5 ★
-                Your rating/5★
             """.trimIndent(),
             fontSize = 12.sp,
 

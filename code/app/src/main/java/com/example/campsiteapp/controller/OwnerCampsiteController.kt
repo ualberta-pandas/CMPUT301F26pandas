@@ -4,7 +4,6 @@ import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -55,9 +54,6 @@ import java.time.Instant
 import java.time.ZoneOffset
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
-import com.example.campsiteapp.data.CampsitesDatabase
-import com.example.campsiteapp.model.Reservation
-import com.example.campsiteapp.model.ReservationDatabase
 
 @RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
@@ -84,7 +80,6 @@ class OwnerCampsiteController (
 
         Column(
             modifier = Modifier.fillMaxWidth()
-                .verticalScroll(rememberScrollState(), enabled = true)
 
         ) {
             Card(
@@ -172,7 +167,6 @@ class OwnerCampsiteController (
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-
                     Row() {
                         TextField(
                             value = location,
@@ -186,13 +180,8 @@ class OwnerCampsiteController (
 
                         )
 
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                    }
-
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(){
                         TextField(
                             value = occupancy,
                             onValueChange = { occupancy = it },
@@ -203,10 +192,11 @@ class OwnerCampsiteController (
                                 shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
                             )
                         )
+
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
 
+                    Spacer(modifier = Modifier.height(10.dp))
                     Row() {
                         TextField(
                             value = owner,
@@ -253,11 +243,10 @@ class OwnerCampsiteController (
 
 
 
-                    }
 
-                    Spacer(modifier = Modifier.height(10.dp))
 
-                    Row(){
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         Button(
                             onClick = {
 
@@ -317,7 +306,9 @@ class OwnerCampsiteController (
                             }
                         }
 
+
                     }
+
 
                     var showMap by remember { mutableStateOf(false) }
 
@@ -382,32 +373,14 @@ class OwnerCampsiteController (
                         )
 
 
-                    }
+                        Spacer(modifier = Modifier.height(10.dp))
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Row(){
                         Button(
                             onClick = {
                                 showMap = true
                             }
                         ) { Text("Choose Location") }
                     }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    TextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        label = { Text("Description") },
-                        modifier = Modifier
-                            .border(
-                                width = 1.dp,
-                                color = Color.Black,
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                            )
-                            .fillMaxWidth()
-                    )
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -459,6 +432,10 @@ class OwnerCampsiteController (
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val context = LocalContext.current
+//                    val ownerId by produceState(initialValue = "") {
+//                        val deviceIDs = DeviceIDs(context)
+//                        value = deviceIDs.fetchDeviceId() ?: deviceIDs.registerDeviceId()
+//                    }
 
                     Row(
                         horizontalArrangement = Arrangement.Center
@@ -529,6 +506,7 @@ class OwnerCampsiteController (
                                                 rules = rules,
                                                 image = imageUrl,
                                                 status = status,
+//                                                ownerId = ownerId
                                                 ownerId = deviceId
                                             )
                                         )
@@ -1082,10 +1060,4 @@ class OwnerCampsiteController (
             }}
     }
 
-
-    private val campsiteDB by lazy { CampsitesDatabase() }
-    private val campsites: List<Campsite> get() = campsiteDB.campsites
-
-    fun getCampsiteListById(deviceID: String): List<Campsite> =
-        campsites.filter {it.ownerId == deviceID}
 }
