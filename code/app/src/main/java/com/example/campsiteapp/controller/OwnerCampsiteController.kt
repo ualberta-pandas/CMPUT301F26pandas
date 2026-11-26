@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,6 +55,9 @@ import java.time.Instant
 import java.time.ZoneOffset
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
+import com.example.campsiteapp.data.CampsitesDatabase
+import com.example.campsiteapp.model.Reservation
+import com.example.campsiteapp.model.ReservationDatabase
 
 /**
  * TODO: Move composable to view; redo controller to act like controller
@@ -79,6 +83,7 @@ class OwnerCampsiteController (
 
         Column(
             modifier = Modifier.fillMaxWidth()
+                .verticalScroll(rememberScrollState(), enabled = true)
 
         ) {
             Card(
@@ -453,10 +458,6 @@ class OwnerCampsiteController (
                     Spacer(modifier = Modifier.height(10.dp))
 
                     val context = LocalContext.current
-//                    val ownerId by produceState(initialValue = "") {
-//                        val deviceIDs = DeviceIDs(context)
-//                        value = deviceIDs.fetchDeviceId() ?: deviceIDs.registerDeviceId()
-//                    }
 
                     Row(
                         horizontalArrangement = Arrangement.End,
@@ -528,7 +529,6 @@ class OwnerCampsiteController (
                                                 rules = rules,
                                                 image = imageUrl,
                                                 status = status,
-//                                                ownerId = ownerId
                                                 ownerId = deviceId
                                             )
                                         )
@@ -1100,4 +1100,10 @@ class OwnerCampsiteController (
             }}
     }
 
+
+    private val campsiteDB by lazy { CampsitesDatabase() }
+    private val campsites: List<Campsite> get() = campsiteDB.campsites
+
+    fun getCampsiteListById(deviceID: String): List<Campsite> =
+        campsites.filter {it.ownerId == deviceID}
 }

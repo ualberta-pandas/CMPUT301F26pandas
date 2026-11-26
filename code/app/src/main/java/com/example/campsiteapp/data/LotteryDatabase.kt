@@ -1,6 +1,8 @@
 package com.example.campsiteapp.data
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.model.Lottery
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -13,24 +15,63 @@ import com.google.firebase.firestore.firestore
  * @property lotteries read-only view of lotteries currently in Firestore
  */
 class LotteryDatabase : LotteryStorage {
-    private val lotteriesRef = Firebase.firestore.collection("lotteries")
+    private val db = Firebase.firestore
+    private val lotteriesRef = db.collection("lotteries")
+    private val campsitesRef = db.collection("campsites")
+
     private val _lotteries = mutableStateListOf<Lottery>()
+    private val latestCampsites = mutableMapOf<String, Campsite>()
+    private var rawLotteries: List<Lottery> = emptyList()
 
     val lotteries: List<Lottery> get() = _lotteries
 
     init {
         lotteriesRef.addSnapshotListener { snapshots, error ->
-            if(error != null) {
+            if (error != null) {
+                Log.e("LotteryDatabase", "Lottery listen failed", error)
                 return@addSnapshotListener
             }
 
-            _lotteries.clear()
+            rawLotteries = snapshots?.documents?.mapNotNull { document ->
+                try {
+                    document.toObject(Lottery::class.java)?.copy(id = document.id)
+                } catch (e: Exception) {
+                    Log.e("LotteryDatabase", "Skipping bad lottery ${document.id}: ${e.message}")
+                    null
+                }
+            } ?: emptyList()
+
+            rebuild()
+        }
+
+        campsitesRef.addSnapshotListener { snapshots, error ->
+            if (error != null) {
+                Log.e("LotteryDatabase", "Campsite listen failed", error)
+                return@addSnapshotListener
+            }
+
             snapshots?.documents?.forEach { document ->
-                document.toObject(Lottery::class.java)?.let { lottery ->
-                    _lotteries.add(lottery.copy(id=document.id))
+                try {
+                    document.toObject(Campsite::class.java)
+                        ?.copy(id = document.id)
+                        ?.let { latestCampsites[document.id] = it }
+                } catch (e: Exception) {
+                    Log.e("LotteryDatabase", "Skipping bad campsite ${document.id}: ${e.message}")
                 }
             }
+
+            rebuild()
         }
+    }
+
+    // Puts the newest campsite data into each lottery, then updates the list
+    private fun rebuild() {
+        val merged = rawLotteries.map { lottery ->
+            val fresh = latestCampsites[lottery.campsite.id]
+            if (fresh != null) lottery.copy(campsite = fresh) else lottery
+        }
+        _lotteries.clear()
+        _lotteries.addAll(merged)
     }
 
     /**

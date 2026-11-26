@@ -39,6 +39,8 @@ import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.view.OwnerCampsiteListScreen
 import com.example.campsiteapp.view.LotteryOwnerScreen
 import com.example.campsiteapp.model.Lottery
+import com.example.campsiteapp.model.ReservationDatabase
+import com.example.campsiteapp.controller.OwnerReservationsController
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -113,6 +115,11 @@ fun OwnerHomeScreen(
             }
         }
 
+
+
+        val ownerCampsiteController = remember {  OwnerCampsiteController() }
+        val ownerReservationsController = remember { OwnerReservationsController() }
+
         when (selectedIndex) {
             0 -> OwnerCampsiteListScreen().CampsitesList(
                 campsites = myCampsites,
@@ -132,7 +139,14 @@ fun OwnerHomeScreen(
                 onUpdateLottery = lotteryController::updateLottery
             )
 
-            // 2 -> ReservationsContent()
+                }
+                )
+            // 1 -> LotteryContent()
+            2 -> OwnerReservationsList().ReservationsList(
+                activeReservations = ownerReservationsController.getReservationsById(deviceId),
+                pasReservations = ownerReservationsController.getPastReservationsById(deviceId),
+                cancelledReservations = ownerReservationsController.getCancelledReservationsById(deviceId)
+            )
         }
     }
 }
