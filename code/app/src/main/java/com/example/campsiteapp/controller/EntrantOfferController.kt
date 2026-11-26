@@ -33,7 +33,7 @@ object EntrantOfferController {
         Uses lottery.bookingStartDate, and lottery.bookingEndDate as the start and end date
      **/
     fun entrantAcceptOfferHandler(deviceId: String, lottery: Lottery): Reservation {
-        var reservation: Reservation = Reservation(
+        val reservation = Reservation(
             entrantId = deviceId,
             startDate = lottery.bookingStartDate,
             endDate = lottery.bookingEndDate,

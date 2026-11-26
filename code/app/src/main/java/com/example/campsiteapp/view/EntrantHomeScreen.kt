@@ -1,12 +1,9 @@
 package com.example.campsiteapp.view
 
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,7 +35,6 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenu
@@ -72,18 +68,16 @@ import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 import java.text.SimpleDateFormat
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneOffset
 import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.campsiteapp.model.Reservation
 
 private val pill = RoundedCornerShape(50)
 
 class EntrantHomeScreen : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -119,7 +113,7 @@ class EntrantHomeScreen : ComponentActivity() {
 @Composable
 fun EntrantHomeScreenView(
     modifier: Modifier = Modifier,
-    updateByUserSearch: (String) -> Unit,
+    updateByUserSearch: (Triple<String, String, String>) -> Unit,
     deviceId: String,
 
     openProfileScreen: () -> Unit,
@@ -134,7 +128,6 @@ fun EntrantHomeScreenView(
     var menuOpen by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showGuests by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     Column(modifier = modifier.fillMaxSize().padding(top = 5.dp)) {
         Column(
@@ -333,76 +326,41 @@ fun EntrantHomeScreenView(
 
         Spacer(modifier = Modifier.height(64.dp))
 
-            val reservations = EntrantCampsiteController.getReservationsById(deviceId)
-            val lotteries = EntrantCampsiteController.getLotteriesById(deviceId)
-            android.util.Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
+        val reservations = EntrantCampsiteController.getReservationsById(deviceId)
+        val lotteries = EntrantCampsiteController.getLotteriesById(deviceId)
+        android.util.Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
+
 
         Text("Your Confirmed Bookings", modifier = Modifier.padding(start = 16.dp))
-        LazyColumn(
-            modifier = Modifier.height(300.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            items(reservations) { reservation ->
-                val campsite: Campsite = reservation.campsite
+        DisplayBookingsAsCards(
+            modifier = Modifier.fillMaxWidth(),
+            reservations = reservations
+        )
 
-                Box(modifier = Modifier
-                    .size(width = 350.dp, height = 140.dp)
-                    .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
-                ){
-                    Column(
-                        modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-                    ){
-                        Text(text = campsite.name, fontSize = 18.sp)
-                        Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
-                        Text(text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
-                            fontSize = 12.sp)
-                        Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
+        Spacer(modifier = Modifier.height(32.dp))
+        Text("Your Pending Bookings", modifier = Modifier.padding(start = 16.dp))
 
-                        val status: Pair<String, Color> = Pair("Booked - Cancel Before ${campsite.startDate}", Color(0xFFB5C7BE))
-                        Text(
-                            text = status.first,
-                            color = Color.Black,
-                            modifier = Modifier
-                                .width(300.dp)
-                                .height(60.dp)
-                                .background(status.second, RoundedCornerShape(50))
-                                .padding(horizontal = 12.dp, vertical = 4.dp),
-                            fontSize = 12.sp
-                        )
-                    }
+        DisplayCampsitesAsCards(
+            modifier = Modifier.fillMaxWidth(),
+            lotteries = lotteries,
+            onClickEvent = { lottery ->
+                val hasOffer: Boolean = deviceId in lottery.winners
+                openEntrantOfferScreen(lottery, hasOffer)
+            },
+            getTextAttributes = { lottery ->
+                if (deviceId in lottery.winners) {
+                    Pair(
+                        "Campsite won - respond before ${lottery.bookingEndDate}",
+                        Color(0xFFE6DDB0)
+                    )
+                } else if (lottery.lotteryEndDate <= LocalDate.now().toString()) {
+                    Pair("Entered in lottery", Color(0xFFD9D9D9))
+                } else {
+                    Pair("Entered in lottery", Color(0xFFD9D9D9))
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
             }
-        }
-
-
-            Spacer(modifier = Modifier.height(32.dp))
-            Text("Your Pending Bookings", modifier = Modifier.padding(start = 16.dp))
-
-            displayCampsitesAsCards(
-                modifier = Modifier.fillMaxWidth(),
-                lotteries = lotteries,
-                onClickEvent = { lottery ->
-                    val hasOffer: Boolean = deviceId in lottery.winners
-                    openEntrantOfferScreen(lottery, hasOffer)
-                },
-                getTextAttributes = { lottery ->
-                    if (deviceId in lottery.winners) {
-                        Pair(
-                            "Campsite won - respond before ${lottery.bookingEndDate}",
-                            Color(0xFFE6DDB0)
-                        )
-                    } else if (lottery.lotteryEndDate <= LocalDate.now().toString()) {
-                        Pair("Entered in lottery", Color(0xFFD9D9D9))
-                    } else {
-                        Pair("Entered in lottery", Color(0xFFD9D9D9))
-                    }
-                }
-            )
-        }
+        )
+    }
 
         Row(
             modifier = Modifier
@@ -448,53 +406,98 @@ fun EntrantHomeScreenView(
     }
 }
 
+
 @Composable
-fun displayBookingsAsCards(
-    reservation: Reservation,
-    modifier: Modifier
+fun CounterView(
+    count: Int,
+    onCountChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    min: Int = 0,
+    max: Int = 20
+) {
+    Row(
+        modifier = modifier
+            .border(1.dp, Color.Black, pill)
+            .padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = { if (count > min) onCountChange(count - 1) },
+            enabled = count > min
+        ) {
+            Icon(Icons.Default.Remove, contentDescription = "Less")
+        }
+
+        Text(text = "$count", fontSize = 16.sp)
+
+        IconButton(
+            onClick = { if (count < max) onCountChange(count + 1) },
+            enabled = count < max
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "More")
+        }
+    }
+}
+@Composable
+fun DisplayBookingsAsCards(
+    modifier: Modifier = Modifier,
+    reservations: List<Reservation>,
 ){
     /*
         the firestore document doesn't keep the serialized object, so
         reservationDB needs to fetch the campsite using the campsiteId as a column
     */
-    val campsite: Campsite = reservation.campsite // Reservation needs to fetch the campsite, and then I need to call
 
-    Box(
-        modifier = Modifier
-            .size(width = 350.dp, height = 170.dp)
-            .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
-        ) {
-            Text(text = campsite.name, fontSize = 18.sp)
-            Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
-            Text(
-                text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
-                fontSize = 12.sp
-            )
-            Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        reservations.forEach { reservation ->
+            val campsite: Campsite = reservation.campsite // Reservation needs to fetch the campsite, and then I need to call
 
-            val status: Pair<String, Color> = Pair(
-                "Booked - Cancel Before ${campsite.startDate}",
-                Color(0xFFB5C7BE)
-            )
-            Text(
-                text = status.first,
-                color = Color.Black,
+            Box(
                 modifier = Modifier
-                    .width(300.dp)
-                    .height(32.dp)
-                    .background(status.second, RoundedCornerShape(50))
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
-                fontSize = 12.sp
-            )
+                    .size(width = 350.dp, height = 170.dp)
+                    .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
+                ) {
+                    Text(text = campsite.name, fontSize = 18.sp)
+                    Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
+                    Text(
+                        text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
+                        fontSize = 12.sp
+                    )
+                    Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
+
+                    val status: Pair<String, Color> = Pair(
+                        "Booked - Cancel Before ${campsite.startDate}",
+                        Color(0xFFB5C7BE)
+                    )
+                    Text(
+                        text = status.first,
+                        color = Color.Black,
+                        modifier = Modifier
+                            .width(300.dp)
+                            .height(32.dp)
+                            .background(status.second, RoundedCornerShape(50))
+                            .padding(horizontal = 12.dp, vertical = 4.dp),
+                        fontSize = 12.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+            }
         }
+
     }
+
 }
 @Composable
-fun displayCampsitesAsCards(modifier: Modifier = Modifier,
+fun DisplayCampsitesAsCards(modifier: Modifier = Modifier,
                             lotteries: List<Lottery>, onClickEvent: (Lottery) -> Unit,
                             getTextAttributes: (Lottery) -> Pair<String, Color>,
 ){
