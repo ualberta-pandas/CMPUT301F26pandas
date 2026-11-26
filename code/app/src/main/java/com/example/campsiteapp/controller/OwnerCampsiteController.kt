@@ -55,7 +55,11 @@ import java.time.ZoneOffset
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 
-
+/**
+ * TODO: Move composable to view; redo controller to act like controller
+ * TODO: Add KDOC
+ *
+ */
 @RequiresApi(Build.VERSION_CODES.O)
 class OwnerCampsiteController (
 
