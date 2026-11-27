@@ -5,7 +5,9 @@ import com.example.campsiteapp.model.Lottery
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
-import java.time.LocalDate
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object PoolingSystem {
     val db = Firebase.firestore.collection("lotteries")
@@ -18,7 +20,9 @@ object PoolingSystem {
      **/
     fun getTerminatedLotteries(): ArrayList<Lottery>{
         val drawnLotteries: ArrayList<Lottery> = ArrayList()
-        val query: Query = db.whereLessThan("lotteryEndDate", LocalDate.now().toString())
+
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        val query: Query = db.whereLessThan("lotteryEndDate", today)
 
         query.get().addOnSuccessListener { result ->
             for (doc in result){
@@ -26,7 +30,10 @@ object PoolingSystem {
                 if (lottery.winners.isNotEmpty() || lottery.waitlist.isEmpty()) continue
 
                 drawnLotteries.add(lottery) // Might help when it comes to debugging
-                drawLotteryWinner(lottery)
+
+                for (i in 1..lottery.numWinners) {
+                    drawLotteryWinner(lottery)
+                }
 
                 lotteryDatabase.updateLottery(lottery)
             }
@@ -43,21 +50,12 @@ object PoolingSystem {
         val lotteryWaitlist = lottery.waitlist.filter { it.isNotBlank() }.toMutableList()
 
         if (lotteryWaitlist.isNotEmpty()) {
-            var winnersIncr: Int = 0;
-            for (i in 1..lotteryWaitlist.size){
-                if (winnersIncr == lottery.numWinners) break;
-
-                val randomDeviceId: String = lotteryWaitlist.random()
-                lottery.winners.add(randomDeviceId)
-                lotteryWaitlist.remove(randomDeviceId)
-
-                winnersIncr++
-            }
+            val randomDeviceId: String = lotteryWaitlist.random()
+            lottery.winners.add(randomDeviceId)
+            lotteryWaitlist.remove(randomDeviceId)
 
         } else {
-            for (i in 1..lottery.numWinners){
-                lottery.winners.add("NullPerson")
-            }
+            lottery.winners.add("NullPerson")
         }
     }
 }
