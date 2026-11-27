@@ -26,7 +26,7 @@ class OwnerActivity: ComponentActivity() {
         val reservationDatabase = ReservationDatabase()
         setContent {
             CampsiteAppTheme {
-                OwnerHomeScreen(campsitesDatabase, lotteryDatabase, reservationDatabase,onBack = {finish()}, deviceId = deviceId)
+                OwnerHomeScreen(campsitesDatabase, lotteryDatabase, reservationDatabase, onBack = { finish() })
             }
         }
     }

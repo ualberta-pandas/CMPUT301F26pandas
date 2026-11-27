@@ -41,7 +41,7 @@ import com.example.campsiteapp.view.OwnerCampsiteListScreen
 import com.example.campsiteapp.view.LotteryOwnerScreen
 import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.model.ReservationDatabase
-import com.example.campsiteapp.controller.OwnerReservationsController
+//import com.example.campsiteapp.controller.OwnerReservationsController
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -57,11 +57,6 @@ fun OwnerHomeScreen(
     val tabs = listOf("Campsites", "Lottery", "Reservations")
     val lotteryController = remember { LotteryController(lotteryDatabase) }
     var selectedIndex by remember { mutableIntStateOf(0) }
-
-    val context = LocalContext.current
-    val deviceId by produceState(initialValue = "") {
-        value = DeviceIDs(context).fetchDeviceId() ?: ""
-    }
 
     val context = LocalContext.current
     var lookupCount by remember { mutableIntStateOf(0) }
@@ -131,7 +126,7 @@ fun OwnerHomeScreen(
 
 
         val ownerCampsiteController = remember { OwnerCampsiteController() }
-        val ownerReservationsController = remember { OwnerReservationsController() }
+//        val ownerReservationsController = remember { OwnerReservationsController() }
 
         when (selectedIndex) {
             0 -> OwnerCampsiteListScreen().CampsitesList(
@@ -145,10 +140,10 @@ fun OwnerHomeScreen(
 
                 })
             // Owners only see and run lotteries for their own campsites.
-            1 -> if (deviceId.isNotEmpty()) LotteryOwnerScreen().LotteryList(
-                lotteries = lotteryDatabase.lotteries.filter { it.ownerId == deviceId },
-                campsites = campsitesDatabase.campsites.filter { it.ownerId == deviceId },
-                onCreateLottery = { lotteryController.createLottery(it) },
+            1 -> LotteryOwnerScreen().LotteryList(
+                lotteries = myLotteries,
+                campsites = myCampsites,
+                onCreateLottery = { lotteryController.createLottery(it.copy(ownerId = ownerId ?: "")) },
                 onUpdateLottery = { lotteryController.updateLottery(it) }
             )
 
