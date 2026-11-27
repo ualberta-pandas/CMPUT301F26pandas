@@ -312,7 +312,7 @@ fun EntrantOfferView(
 
         val reservation = remember { mutableStateOf<Reservation?>(null) }
 
-        if (hasOffer && !offerAccepted.value){
+        if (hasOffer && !offerAccepted.value && !offerRejected.value){
             AcceptRejectOffer(lottery, acceptUserOffer, rejectUserOffer,
                 offerAccepted = offerAccepted,
                 offerRejected = offerRejected,
