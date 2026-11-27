@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.campsiteapp.model.Campsite
 import org.junit.Assert.assertEquals
@@ -74,7 +75,7 @@ class AdminCampsiteListScreenTest {
         setScreen()
 
         composeRule.onNodeWithText("Lakeview").performClick()
-        composeRule.onNodeWithTag("removeButton").performClick()
+        composeRule.onNodeWithTag("removeButton").performScrollTo().performClick()
         composeRule.onNodeWithTag("confirmRemoveButton").performClick()
 
         assertEquals(listOf(lakeview), removed)
