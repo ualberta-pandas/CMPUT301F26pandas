@@ -5,7 +5,10 @@ import com.example.campsiteapp.model.Lottery
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Date
+import java.util.Locale
 
 object PoolingSystem {
     val db = Firebase.firestore.collection("lotteries")
@@ -18,7 +21,9 @@ object PoolingSystem {
      **/
     fun getTerminatedLotteries(): ArrayList<Lottery>{
         val drawnLotteries: ArrayList<Lottery> = ArrayList()
-        val query: Query = db.whereLessThan("lotteryEndDate", LocalDate.now().toString())
+
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        val query: Query = db.whereLessThan("lotteryEndDate", today)
 
         query.get().addOnSuccessListener { result ->
             for (doc in result){
