@@ -26,10 +26,17 @@ class ReservationController(entrantId: String) {
     val pastReservations: List<Reservation>
         get() = _pastReservations
 
+    val pastStatuses = listOf(
+        ReservationStatus.COMPLETED,
+        ReservationStatus.CANCELLED,
+        ReservationStatus.REJECTED,
+        ReservationStatus.EXPIRED
+    ).map { it.name }
+
     init {
         Firebase.firestore.collection("reservations")
             .whereEqualTo("entrantId", entrantId)
-            .whereIn("status", ReservationStatus.entries.map { it.name })
+            .whereIn("status", pastStatuses)
             .addSnapshotListener { snapshots, error ->
                 if (error != null) return@addSnapshotListener
                 _pastReservations.clear()

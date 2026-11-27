@@ -561,38 +561,7 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
                         fontSize = 12.sp
                     )
 
-                    var showRating by remember { mutableStateOf(false) }
 
-                    var rating by remember { mutableIntStateOf(0) }
-
-
-
-                    Button(
-                        onClick = {
-                            showRating = true
-                        }
-                    ) { Text("Rate campsite") }
-
-                    if (showRating){
-
-                        StarRating(
-                            rating = rating,
-                            onRatingChange = { number ->
-                                rating = number
-                                println("User picked $number")
-                            }
-                        )
-
-
-                        Button(onClick = {
-                        saveRating(campsite.id, deviceId = deviceId, rating)
-                        showRating = false}) {
-                            Text("Submit")
-                        }
-
-
-
-                    }
                 }
             }
 
@@ -603,51 +572,3 @@ fun displayCampsitesAsCards(modifier: Modifier = Modifier,
     }
 }
 
-@Composable
-fun StarRating(
-    rating: Int,
-    onRatingChange: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    maxStars: Int = 5,
-    starSize: Dp = 32.dp
-) {
-    Row(modifier = modifier) {
-        for (i in 1..maxStars) {
-            Icon(
-                imageVector = Icons.Filled.Star,
-                contentDescription = "$i stars",
-                tint = if (i <= rating) Color(0xFFFFC107) else Color.LightGray,
-                modifier = Modifier
-                    .size(starSize)
-                    .clickable { onRatingChange(i) }
-            )
-        }
-    }
-}
-
-fun saveRating(campsiteId: String, deviceId: String, newStars: Int) {
-    val db = Firebase.firestore
-    val campsiteRef = db.collection("campsites").document(campsiteId)
-    val ratingRef = campsiteRef.collection("ratings").document(deviceId)
-
-    ratingRef.get().addOnSuccessListener { old ->
-        val oldStars = old.getLong("stars")
-        val change = if (oldStars != null) newStars - oldStars else newStars.toLong()
-        val newCount = if (oldStars == null) 1L else 0L
-
-        val batch = db.batch()
-        batch.set(
-            ratingRef,
-            mapOf("stars" to newStars, "createdAt" to FieldValue.serverTimestamp())
-        )
-        batch.set(
-            campsiteRef,
-            mapOf(
-                "ratingSum" to FieldValue.increment(change),
-                "ratingCount" to FieldValue.increment(newCount)
-            ),
-            SetOptions.merge()
-        )
-        batch.commit()
-    }
-}
