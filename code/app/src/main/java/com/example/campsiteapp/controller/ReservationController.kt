@@ -8,15 +8,21 @@
  */
 package com.example.campsiteapp.controller
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import com.example.campsiteapp.model.Reservation
 import com.example.campsiteapp.model.ReservationStatus
+import com.example.campsiteapp.view.AdminActivity
+import com.example.campsiteapp.view.PastReservationsScreen
+import com.example.campsiteapp.view.PastReservationsView
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.firestore
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 /**
  * Loads the past reservations of one entrant and keeps them up to date.
@@ -62,19 +68,25 @@ class ReservationController(entrantId: String) {
 
     private fun completeFinishedReservations(entrantId: String) {
         val db = Firebase.firestore
+        val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
         db.collection("reservations")
             .whereEqualTo("entrantId", entrantId)
             .get()
             .addOnSuccessListener { snapshots ->
-                val now = Timestamp.now()
+                val now = LocalDate.now()
                 val batch = db.batch()
                 var changed = 0
 
                 for (document in snapshots.documents) {
                     val status = document.getString("status")
-                    val endDate = document.getTimestamp("endDate")
 
-                    if (status in openStatuses && endDate != null && endDate < now) {
+                    val endDate = try {
+                        document.getString("endDate")?.let { LocalDate.parse(it, formatter) }
+                    } catch (e: DateTimeParseException) {
+                        null
+                    }
+
+                    if (status in openStatuses && endDate != null && endDate.isBefore(now)) {
                         batch.update(
                             document.reference,
                             "status",
@@ -93,5 +105,9 @@ class ReservationController(entrantId: String) {
             .addOnFailureListener { e ->
                 Log.e("ReservationController", "Could not check reservations", e)
             }
+    }
+
+    fun togglePastReservationsScreen(context: Context) {
+        context.startActivity(Intent(context, PastReservationsScreen::class.java))
     }
 }

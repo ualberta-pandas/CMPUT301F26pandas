@@ -1,6 +1,7 @@
 package com.example.campsiteapp.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,6 +38,7 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenu
@@ -75,6 +78,7 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.campsiteapp.controller.ReservationController
 import com.example.campsiteapp.model.Quad
 import com.example.campsiteapp.model.Reservation
 
@@ -108,8 +112,7 @@ class EntrantHomeScreen : ComponentActivity() {
                         },
 
                         openReservationScreen = {
-                            // TO-DO
-                            // toggle reservation screen
+                            ReservationController(entrantId = deviceId).togglePastReservationsScreen(this@EntrantHomeScreen)
                         }
                     )
                 }
@@ -344,7 +347,7 @@ fun EntrantHomeScreenView(
 
         val reservations = EntrantCampsiteController.getReservationsById(deviceId)
         val lotteries = EntrantCampsiteController.getLotteriesById(deviceId)
-        android.util.Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
+        Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
 
 
         Text("Your Confirmed Bookings", modifier = Modifier.padding(start = 16.dp))
@@ -386,13 +389,16 @@ fun EntrantHomeScreenView(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
             Text(
                 text = "See past reservations",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
-                    .clickable { }
+                    .clickable { openReservationScreen()}
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
+
+
 
             IconButton(onClick = { }) {
                 Icon(

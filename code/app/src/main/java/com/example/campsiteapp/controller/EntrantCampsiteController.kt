@@ -84,7 +84,7 @@ object EntrantCampsiteController {
     fun toggleCampsiteDetailsScreen(context: Context, lotteryId: String){
         val intent = Intent(context, CampsiteDetailsScreen::class.java)
 
-        var lottery: Lottery? = lotteries.firstOrNull{ it.id == lotteryId }
+        val lottery: Lottery? = lotteries.firstOrNull{ it.id == lotteryId }
 
         if (lottery == null){
             return Unit
