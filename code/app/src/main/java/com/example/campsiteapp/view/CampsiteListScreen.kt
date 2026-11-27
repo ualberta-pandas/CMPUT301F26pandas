@@ -35,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,6 +54,7 @@ import com.example.campsiteapp.controller.EntrantCampsiteController
 
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleCampsiteDetailsScreen
+import com.example.campsiteapp.model.Quad
 import java.time.LocalDate
 
 private val pill = RoundedCornerShape(50)
@@ -64,10 +66,11 @@ class CampsiteListScreen : ComponentActivity() {
 
         // TODO: get these from your controllers /
 
-        val searchResult = Triple(
+        val searchResult = Quad(
             intent.getStringExtra("search") ?: "",
+            intent.getStringExtra("location") ?: "",
             intent.getStringExtra("dates") ?: "",
-            intent.getStringExtra("guests") ?: ""
+            intent.getStringExtra("guests")?:""
         )
 
         setContent {
@@ -103,7 +106,7 @@ class CampsiteListScreen : ComponentActivity() {
 @Composable
 fun CampsiteListView(
     modifier: Modifier = Modifier,
-    updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
+    updateByUserSearch: (search: Quad<String, String, String, String>) -> Unit,
     onLotteryClick: (String) -> Unit,
 
     openProfileScreen: () -> Unit, // confirm if the user should be able to open their profile screen from here
@@ -114,9 +117,10 @@ fun CampsiteListView(
     lotteries: List<Lottery>,
 ) {
     var entrantSearch by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
     var availableDates by remember { mutableStateOf("Select Dates") }
-    var guestCount by remember { mutableStateOf("Guest Count") }
-    val filters = Triple(entrantSearch,availableDates,guestCount)
+    var guestCount by remember { mutableIntStateOf(0) }
+    val filters = Quad(entrantSearch,location,availableDates,guestCount.toString())
     var menuOpen by remember { mutableStateOf(false) }
 
     Column(

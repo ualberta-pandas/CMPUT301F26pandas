@@ -37,7 +37,7 @@ object EntrantOfferController {
             entrantId = deviceId,
             startDate = lottery.bookingStartDate,
             endDate = lottery.bookingEndDate,
-            status = ReservationStatus.COMPLETED,
+            status = ReservationStatus.ACCEPTED,
             campsite = lottery.campsite
         )
 

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -44,6 +45,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -73,6 +75,7 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.campsiteapp.model.Quad
 import com.example.campsiteapp.model.Reservation
 
 private val pill = RoundedCornerShape(50)
@@ -305,6 +308,11 @@ fun EntrantHomeScreenView(
                         onClick = { showGuests = true }
                     )
             )
+                TextField(
+                    value = location,
+                    onValueChange = {location = it},
+                    label = { Text("Location") }
+                )
 
             if (showGuests) {
                 Dialog(
@@ -329,11 +337,6 @@ fun EntrantHomeScreenView(
                 }
             }
 
-            TextField(
-                value = location,
-                onValueChange = {location = it},
-                label = { Text("Location") }
-            )
         }
 
 

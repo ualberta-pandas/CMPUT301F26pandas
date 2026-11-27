@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.data.LotteryDatabase
+import com.example.campsiteapp.model.Quad
 import com.example.campsiteapp.model.Reservation
 import com.example.campsiteapp.model.ReservationDatabase
 import com.example.campsiteapp.view.AdminActivity
@@ -29,7 +30,7 @@ object EntrantCampsiteController {
      Returns a list of the lotteries that have their campsites matching
      the user result. Probably going to be done by some regex
      **/
-    fun getResultsBySearch(searchResult: Triple<String, String, String>): List<Lottery>{
+    fun getResultsBySearch(searchResult: Quad<String, String, String, String>): List<Lottery>{
         val campName = Regex(Regex.escape(searchResult.first), RegexOption.IGNORE_CASE)
 
 
@@ -71,11 +72,12 @@ object EntrantCampsiteController {
         return newReservations
     }
 
-    fun toggleSearchResultsScreen(context: Context, userSearch: Triple<String,String,String>){
+    fun toggleSearchResultsScreen(context: Context, userSearch: Quad<String, String, String, String>){
         val intent = Intent(context, CampsiteListScreen::class.java)
         intent.putExtra("search", userSearch.first)
-        intent.putExtra("dates", userSearch.second)
-        intent.putExtra("guests", userSearch.third)
+        intent.putExtra("location", userSearch.second)
+        intent.putExtra("dates", userSearch.third)
+        intent.putExtra("guests", userSearch.fourth)
         context.startActivity(intent)
     }
 
