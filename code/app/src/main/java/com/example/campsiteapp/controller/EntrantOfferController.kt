@@ -43,6 +43,9 @@ object EntrantOfferController {
 
         reservationDB.addReservation(reservation)
 
+        lottery.waitlist.remove(deviceId)
+        lotteryDB.updateLottery(lottery)
+
         return reservation
     }
 
