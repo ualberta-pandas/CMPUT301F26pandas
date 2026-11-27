@@ -26,7 +26,10 @@ object PoolingSystem {
                 if (lottery.winners.isNotEmpty() || lottery.waitlist.isEmpty()) continue
 
                 drawnLotteries.add(lottery) // Might help when it comes to debugging
-                drawLotteryWinner(lottery)
+
+                for (i in 1..lottery.numWinners) {
+                    drawLotteryWinner(lottery)
+                }
 
                 lotteryDatabase.updateLottery(lottery)
             }
@@ -43,21 +46,12 @@ object PoolingSystem {
         val lotteryWaitlist = lottery.waitlist.filter { it.isNotBlank() }.toMutableList()
 
         if (lotteryWaitlist.isNotEmpty()) {
-            var winnersIncr: Int = 0;
-            for (i in 1..lotteryWaitlist.size){
-                if (winnersIncr == lottery.numWinners) break;
-
-                val randomDeviceId: String = lotteryWaitlist.random()
-                lottery.winners.add(randomDeviceId)
-                lotteryWaitlist.remove(randomDeviceId)
-
-                winnersIncr++
-            }
+            val randomDeviceId: String = lotteryWaitlist.random()
+            lottery.winners.add(randomDeviceId)
+            lotteryWaitlist.remove(randomDeviceId)
 
         } else {
-            for (i in 1..lottery.numWinners){
-                lottery.winners.add("NullPerson")
-            }
+            lottery.winners.add("NullPerson")
         }
     }
 }
