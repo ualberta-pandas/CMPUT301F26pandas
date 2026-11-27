@@ -6,43 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Download
-
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,16 +23,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
 import com.example.campsiteapp.controller.EntrantCampsiteController
+import com.example.campsiteapp.controller.EntrantOfferController
+import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.model.Lottery
+import com.example.campsiteapp.model.Reservation
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
-
-import com.example.campsiteapp.data.DeviceIDs
 private val pill = RoundedCornerShape(50)
 
 class EntrantOfferScreen : ComponentActivity() {
@@ -85,11 +58,36 @@ class EntrantOfferScreen : ComponentActivity() {
                         campsiteSelection = campsite,
                         lottery = lottery,
                         hasOffer = hasOffer,
+                        deviceId = deviceId,
 
-                        openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@EntrantOfferScreen) },
-                        openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@EntrantOfferScreen) },
-                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@EntrantOfferScreen) },
-                        openMenuScreen = {EntrantCampsiteController.toggleMenuScreen(this@EntrantOfferScreen)},
+                        openProfileScreen = {
+                            EntrantCampsiteController.toggleProfileScreen(this@EntrantOfferScreen)
+                        },
+                        openAdminScreen = {
+                            EntrantCampsiteController.toggleAdminScreen(this@EntrantOfferScreen)
+                        },
+                        openOwnerScreen = {
+                            EntrantCampsiteController.toggleOwnerScreen(this@EntrantOfferScreen)
+                        },
+                        openMenuScreen = {
+                            EntrantCampsiteController.toggleMenuScreen(this@EntrantOfferScreen)
+                        },
+
+                        acceptUserOffer = {deviceId, lottery ->
+                            EntrantOfferController.entrantAcceptOfferHandler(deviceId, lottery)
+
+                            // TODO: Controller here to accept the user offer
+                        },
+
+                        rejectUserOffer = {deviceId, lottery ->
+                            EntrantOfferController.entrantRejectOfferHandler(deviceId, lottery)
+                            // TODO: Controller here to reject the user offer
+                        },
+
+                        downloadUserOffer = { deviceId, reservation ->
+                            EntrantOfferController.downloadUserOffer(this@EntrantOfferScreen, deviceId, reservation)
+                        },
+
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -103,18 +101,24 @@ fun EntrantOfferView(
     campsiteSelection: Campsite,
     lottery: Lottery,
     hasOffer: Boolean,
+    deviceId: String,
 
     openProfileScreen: () -> Unit,
     openOwnerScreen: () -> Unit,
     openAdminScreen: () -> Unit,
     openMenuScreen: () -> Unit,
 
+    acceptUserOffer: (deviceId: String, lottery: Lottery) -> Reservation,
+    rejectUserOffer: (deviceId: String, lottery: Lottery) -> Unit,
+    downloadUserOffer: (deviceId: String, reservation: Reservation) -> Unit,
 
     modifier: Modifier = Modifier
 ) {
+
     var entrantSearch by remember { mutableStateOf("") }
     var menuOpen by remember { mutableStateOf(false) }
-    var offerAccepted by remember {mutableStateOf(false)}
+    val offerAccepted = remember { mutableStateOf(false) }
+    val offerRejected = remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -306,126 +310,148 @@ fun EntrantOfferView(
             )
         }
 
-        if (hasOffer && !offerAccepted) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Offer Deadline ${lottery.bookingEndDate}",
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                )
-            }
-            // Color(0xFFC0392B)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
-            ) {
-                Button(
-                    onClick = {
-                        offerAccepted = true
-                    },
-                    shape = pill,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5C7BE)),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp)
-                        .height(40.dp)
-                ) {
-                    Text("Accept Offer", fontSize = 16.sp)
-                }
+        val reservation = remember { mutableStateOf<Reservation?>(null) }
 
-                Button(
-                    onClick = {},
-                    shape = pill,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0392B)),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp)
-                        .height(40.dp)
-                ) {
-                    Text("Reject Offer", fontSize = 16.sp)
-                }
-            }
+        if (hasOffer && !offerAccepted.value && !offerRejected.value){
+            AcceptRejectOffer(lottery, acceptUserOffer, rejectUserOffer,
+                offerAccepted = offerAccepted,
+                offerRejected = offerRejected,
+                deviceId = deviceId,
+                reservation = reservation
+                )
         }
 
-        if (offerAccepted){
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
-            ){
-                Text(
-                    text = "Offer Accepted",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(8.dp)
-                        .background(Color(0xFFB5C7BE), pill)
-                        .height(40.dp)
-                        .wrapContentHeight(Alignment.CenterVertically)
+        if (offerAccepted.value || offerRejected.value){
+            DownloadOffer(
+                downloadUserOffer,
+                offerRejected,
+                deviceId = deviceId,
+                reservation = reservation
                 )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
-            ){
-                OutlinedButton(
-                    onClick = {},
-                    shape = pill,
-                    modifier = Modifier
-                        .width(64.dp)
-                        .padding(8.dp)
-                        .height(40.dp)
-                ) {
-                    Icon(Icons.Outlined.Download, contentDescription = "download confirmation CSV")
-                }
-            }
         }
     }
 }
 
-
-@Preview(showBackground = true)
 @Composable
-fun CampsiteViewPreview() {
-    val campsite = Campsite(
-        id = "c1",
-        name = "ABC Park",
-        location = "123 Jasper, Edmonton, AB",
-        occupancy = 8.0,
-        rating = 4.4,
-        startDate = "2026-09-22",
-        description = "Campsite description open - lorem ipsum dolor sit amet.\n\nAmenities\n• Running water on site\n• Grill on site"
-    )
-    val lottery = Lottery(
-        id = "l1",
-        campsite = campsite,
-        lotteryStartDate = "2026-09-23",
-        lotteryEndDate = "2026-10-30",
-        bookingEndDate = "2027-03-03",
-        waitlistMax = 50,
-        winners = arrayListOf("abc123")
-    )
-    CampsiteAppTheme {
-        EntrantOfferView(
-            campsiteSelection = campsite,
-            lottery = lottery,
-            hasOffer = true,
-            openProfileScreen = {},
-            openOwnerScreen = {},
-            openAdminScreen = {},
-            openMenuScreen = {}
+fun AcceptRejectOffer(
+    lottery: Lottery,
+    acceptUserOffer: (String, Lottery) -> Reservation,
+    rejectUserOffer: (String, Lottery) -> Unit,
+
+    offerAccepted: MutableState<Boolean>,
+    offerRejected: MutableState<Boolean>,
+    reservation: MutableState<Reservation?>,
+
+    deviceId: String
+){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Offer Deadline ${lottery.bookingEndDate}",
+            modifier = Modifier
+                .padding(horizontal = 12.dp, vertical = 4.dp)
         )
+    }
+    // Color(0xFFC0392B)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal= 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
+    ) {
+        Button(
+            onClick = {
+                offerAccepted.value = true
+                offerRejected.value = false
+                reservation.value = acceptUserOffer(deviceId, lottery)
+            },
+            shape = pill,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5C7BE)),
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp)
+                .height(40.dp)
+        ) {
+            Text(
+                text = "Accept Offer",
+                fontSize = 16.sp
+            )
+        }
+
+        Button(
+            onClick = {
+                offerRejected.value = true
+                offerAccepted.value = false
+                rejectUserOffer(deviceId, lottery)
+            },
+            shape = pill,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC0392B)),
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp)
+                .height(40.dp)
+        ) {
+            Text(
+                text = "Reject Offer",
+                fontSize = 16.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun DownloadOffer(
+    downloadUserOffer: (deviceId: String, reservation: Reservation) -> Unit,
+    offerRejected: MutableState<Boolean>,
+
+    deviceId: String,
+    reservation: MutableState<Reservation?>
+){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
+    ){
+        Text(
+            text = if (!offerRejected.value) "Offer Accepted" else "Offer Rejected",
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .weight(1f)
+                .padding(8.dp)
+                .background(
+                    if (!offerRejected.value) Color(0xFFB5C7BE) else Color(0xFFE5A9A9),
+                    pill
+                )
+                .height(40.dp)
+                .wrapContentHeight(Alignment.CenterVertically)
+        )
+    }
+
+    if (!offerRejected.value) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
+        ) {
+            OutlinedButton(
+                onClick = {
+                    reservation.value?.let { downloadUserOffer(deviceId, it) } // to handle the NULL value
+                },
+                shape = pill,
+                modifier = Modifier
+                    .width(64.dp)
+                    .padding(8.dp)
+                    .height(40.dp)
+            ) {
+                Icon(Icons.Outlined.Download, contentDescription = "download confirmation CSV")
+            }
+        }
     }
 }
