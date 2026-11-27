@@ -28,3 +28,11 @@ class MainActivity : ComponentActivity() {
         finish()
     }
 }
+
+
+
+
+/*
+    Entrant Issues:
+    1. if the entrant isn't chosen for the lottery when the lottery ends
+*/
