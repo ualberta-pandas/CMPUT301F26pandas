@@ -64,7 +64,15 @@ fun LotteryForm(
                 style = MaterialTheme.typography.titleLarge
             )
 
-            Text("Campsites in this lottery", fontWeight = FontWeight.Bold)
+            Text(
+                if(campsites.isNotEmpty()) {
+                    "Campsites in this lottery"
+                } else {
+                    "No Owned Campsites"
+                },
+
+                fontWeight = FontWeight.Bold
+            )
             campsites.forEach { campsite ->
                 Row(
                     modifier = Modifier
@@ -176,6 +184,17 @@ private fun LotteryFormPreview() {
             Campsite(id = "2", name = "Campsite 2"),
             Campsite(id = "3", name = "Campsite 3"),
         ),
+        onSave = { null },
+        onClose = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LotteryFormPreview2() {
+    LotteryForm(
+        initial = null,
+        campsites = emptyList(),
         onSave = { null },
         onClose = {}
     )

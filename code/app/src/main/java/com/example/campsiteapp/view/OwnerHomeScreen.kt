@@ -22,11 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.campsiteapp.controller.LotteryController
@@ -55,7 +57,6 @@ fun OwnerHomeScreen(
     val tabs = listOf("Campsites", "Lottery", "Reservations")
     val lotteryController = remember { LotteryController(lotteryDatabase) }
     var selectedIndex by remember { mutableIntStateOf(0) }
-    val lotteryController = remember(lotteryDatabase) { LotteryController(lotteryDatabase) }
 
     val context = LocalContext.current
     val deviceId by produceState(initialValue = "") {
