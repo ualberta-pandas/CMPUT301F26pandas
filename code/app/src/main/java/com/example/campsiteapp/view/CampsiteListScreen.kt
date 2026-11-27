@@ -26,13 +26,20 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDateRangePickerState
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,6 +53,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
 
 import com.example.campsiteapp.model.Lottery
@@ -55,7 +64,10 @@ import com.example.campsiteapp.controller.EntrantCampsiteController
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleCampsiteDetailsScreen
 import com.example.campsiteapp.model.Quad
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Date
+import java.util.Locale
 
 private val pill = RoundedCornerShape(50)
 
@@ -122,6 +134,8 @@ fun CampsiteListView(
     var guestCount by remember { mutableIntStateOf(0) }
     val filters = Quad(entrantSearch,location,availableDates,guestCount.toString())
     var menuOpen by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showGuests by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -215,17 +229,103 @@ fun CampsiteListView(
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .clickable(
+                        onClick = { showDatePicker = true }
+                    )
             )
+
+
+            val dateRangePickerState = rememberDateRangePickerState()
+            var startDate by remember { mutableStateOf("") }
+            var endDate by remember { mutableStateOf("") }
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+
+                    confirmButton = {
+                        Button(
+                            onClick = {
+
+                                val start = dateRangePickerState.selectedStartDateMillis
+                                val end = dateRangePickerState.selectedEndDateMillis
+
+                                if (start != null && end != null) {
+                                    val formatter = SimpleDateFormat(
+                                        "dd/MM/yyyy",
+                                        Locale.getDefault()
+                                    )
+
+                                    availableDates =
+                                        "${formatter.format(Date(start))} - " +
+                                                formatter.format(Date(end))
+
+                                    startDate = "${formatter.format(Date(start))}"
+                                    endDate = "${formatter.format(Date(end))}"
+
+
+                                }
+
+
+                                showDatePicker = false
+                            }
+                        ) { Text("Ok") }
+                    },
+
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                showDatePicker = false
+                            }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                ) {
+
+                    DateRangePicker(state = dateRangePickerState)
+                }
+            }
 
             Spacer(modifier = Modifier.width(6.dp))
 
             Text(
-                text = guestCount,
+                text = "Guest Count: $guestCount",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .clickable(
+                        onClick = { showGuests = true }
+                    )
+            )
+            TextField(
+                value = location,
+                onValueChange = {location = it},
+                label = { Text("Location") }
             )
 
+            if (showGuests) {
+                Dialog(
+
+                    onDismissRequest = { showGuests = false },
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    )
+                ) {
+                    Surface(shape = RoundedCornerShape(16.dp)) {
+                        Box(modifier = Modifier.padding(26.dp)) {
+
+                            CounterView(
+                                count = guestCount,
+                                onCountChange = { guestCount = it },
+                                min = 1,
+                                max = 100
+                            )
+                        }
+
+                    }
+                }
+            }
 
         }
 
