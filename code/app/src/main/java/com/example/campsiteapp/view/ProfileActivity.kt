@@ -26,7 +26,7 @@ class ProfileActivity : ComponentActivity() {
             val context = LocalContext.current
             val initialDeviceId = intent.getStringExtra("DEVICE_ID")
             val role = intent.getStringExtra("ROLE")
-            val targetProfileDeviceId = intent.getStringExtra("DEVICE_ID")
+            val targetProfileDeviceId = intent.getStringExtra("TARGET_DEVICE_ID")
 
             val deviceId by produceState<String?>(null, context) {
                     val deviceIds = DeviceIDs(context)
