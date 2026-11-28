@@ -49,6 +49,8 @@ fun EntrantScreenHeader(
     context: Activity,
     modifier: Modifier,
     updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
+    availableDates: String = "Select Dates",
+    guestCount: String = "Guest Count",
 ){
     var entrantSearch by remember { mutableStateOf("") }
     var menuOpen by remember { mutableStateOf(false) }

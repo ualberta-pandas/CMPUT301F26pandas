@@ -137,12 +137,7 @@ fun CampsiteView(
 
     modifier: Modifier = Modifier
 ) {
-    var entrantSearch by remember { mutableStateOf("") }
-    var availableDates by remember { mutableStateOf("Select Dates") }
-    var guestCount by remember { mutableStateOf("Guest Count") }
-    val filters = Triple(entrantSearch,availableDates,guestCount)
 
-    var menuOpen by remember { mutableStateOf(false) }
     var onWaitlist by remember { mutableStateOf(userOnWaitlist()) }
 
     Column(
