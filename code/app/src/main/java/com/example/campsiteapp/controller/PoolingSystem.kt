@@ -52,6 +52,8 @@ object PoolingSystem {
         if (lotteryWaitlist.isNotEmpty()) {
             val randomDeviceId: String = lotteryWaitlist.random()
             lottery.winners.add(randomDeviceId)
+
+            lottery.waitlist.remove(randomDeviceId)
             lotteryWaitlist.remove(randomDeviceId)
 
         } else {

@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,8 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,6 +62,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campsiteapp.controller.EntrantCampsiteController
 import com.example.campsiteapp.controller.EntrantOfferController
+
+import com.example.campsiteapp.view.PastReservationsView
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.Lottery
@@ -104,9 +105,12 @@ class EntrantHomeScreen : ComponentActivity() {
                             EntrantOfferController.toggleOfferScreen(this@EntrantHomeScreen, lottery, hasOffer)
                         },
 
-                        openReservationScreen = {
-                            // TO-DO
-                            // toggle reservation screen
+                        openReservationDetailsScreen = {
+                            // TO-DO: toggle reservation screen
+                        },
+
+                        openPastReservationsScreen = {
+                            context.startActivity(Intent(context, PastReservationsScreen::class.java))
                         }
                     )
                 }
@@ -125,7 +129,8 @@ fun EntrantHomeScreenView(
     openOwnerScreen: () -> Unit,
     openAdminScreen: () -> Unit,
     openEntrantOfferScreen: (lottery: Lottery, hasOffer: Boolean) -> Unit,
-    openReservationScreen: () -> Unit
+    openReservationDetailsScreen: () -> Unit,
+    openPastReservationsScreen: () -> Unit
 ) {
     var entrantSearch by remember { mutableStateOf("") }
     var availableDates by remember { mutableStateOf("Select Dates") }
@@ -341,7 +346,7 @@ fun EntrantHomeScreenView(
         DisplayBookingsAsCards(
             modifier = Modifier.fillMaxWidth(),
             reservations = reservations,
-            onReservationEvent = openReservationScreen
+            onReservationEvent = openReservationDetailsScreen
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -380,11 +385,14 @@ fun EntrantHomeScreenView(
                 text = "See past reservations",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
-                    .clickable { }
+                    .clickable {
+                        openPastReservationsScreen()
+                    }
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
 
-            IconButton(onClick = { }) {
+            IconButton(onClick = {
+            }) {
                 Icon(
                     imageVector = Icons.Outlined.ChatBubbleOutline,
                     contentDescription = "Messages"
