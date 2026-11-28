@@ -540,6 +540,8 @@ fun DisplayBookingsAsCards(
     }
 
 }
+
+
 @Composable
 fun DisplayCampsitesAsCards(modifier: Modifier = Modifier,
                             lotteries: List<Lottery>, onClickEvent: (Lottery) -> Unit,

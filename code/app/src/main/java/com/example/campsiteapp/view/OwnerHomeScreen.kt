@@ -1,6 +1,7 @@
 package com.example.campsiteapp.view
 
 
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -14,7 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
@@ -36,8 +41,6 @@ import com.example.campsiteapp.controller.OwnerReservationsController
 import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.data.LotteryDatabase
-import com.example.campsiteapp.model.Campsite
-import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -57,7 +60,7 @@ fun OwnerHomeScreen(
         value = DeviceIDs(context).fetchDeviceId() ?: ""
     }
 
-    Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
+      Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
@@ -68,6 +71,16 @@ fun OwnerHomeScreen(
                 }
             ) { Text("<-") }
             Text(text = "My Campsites")
+
+            IconButton(onClick = {
+
+                context.startActivity(Intent(context, NotificationsActivity::class.java))
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Notifications"
+                )
+            }
         }
 
         SecondaryTabRow(
