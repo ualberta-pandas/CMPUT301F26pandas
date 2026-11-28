@@ -1,5 +1,6 @@
 package com.example.campsiteapp.data
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import com.example.campsiteapp.model.Lottery
 import com.google.firebase.Firebase
@@ -26,7 +27,14 @@ class LotteryDatabase : LotteryStorage {
 
             _lotteries.clear()
             snapshots?.documents?.forEach { document ->
+
                 document.toObject(Lottery::class.java)?.let { lottery ->
+                    Log.d(
+                        "LOTTERY",
+                        "doc=${document.id} campsiteId='${lottery.campsite.id}' " +
+                                "sum=${lottery.campsite.ratingSum} count=${lottery.campsite.ratingCount} " +
+                                "fromCache=${snapshots.metadata.isFromCache}"
+                    )
                     _lotteries.add(lottery.copy(id=document.id))
                 }
             }

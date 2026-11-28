@@ -30,14 +30,20 @@ import androidx.compose.material.icons.filled.Search
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -52,6 +58,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.IntentCompat
 import coil.compose.AsyncImage
 import com.example.campsiteapp.controller.EntrantCampsiteController
@@ -65,6 +73,11 @@ import com.example.campsiteapp.controller.EntrantWaitlistController.verifyUserOn
 import com.example.campsiteapp.controller.EntrantWaitlistController.removeEntrantFromWaitlist
 
 import com.example.campsiteapp.data.DeviceIDs
+import com.example.campsiteapp.model.Quad
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 private val pill = RoundedCornerShape(50)
 
 class CampsiteDetailsScreen : ComponentActivity() {
@@ -130,7 +143,7 @@ fun CampsiteView(
     waitlistSelectionClick: (userOnWaitlist: Boolean) -> Unit,
     onBack: () -> Unit,
 
-    updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
+    updateByUserSearch: (search: Quad<String, String, String, String>) -> Unit,
 
     openProfileScreen: () -> Unit,
     openOwnerScreen: () -> Unit,
@@ -140,10 +153,12 @@ fun CampsiteView(
     modifier: Modifier = Modifier
 ) {
     var entrantSearch by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
     var availableDates by remember { mutableStateOf("Select Dates") }
-    var guestCount by remember { mutableStateOf("Guest Count") }
-    val filters = Triple(entrantSearch,availableDates,guestCount)
-
+    var guestCount by remember { mutableIntStateOf(0) }
+    val filters = Quad(entrantSearch,location,availableDates,guestCount.toString())
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showGuests by remember { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
     var onWaitlist by remember { mutableStateOf(userOnWaitlist()) }
 
@@ -157,7 +172,7 @@ fun CampsiteView(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
-        ){
+        ) {
             Box {
                 IconButton(onClick = { menuOpen = true }) {
                     Icon(
@@ -169,20 +184,23 @@ fun CampsiteView(
                 DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                     DropdownMenuItem(
                         text = { Text("Admin") },
-                        onClick = { menuOpen = false
+                        onClick = {
+                            menuOpen = false
                             openAdminScreen()
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Owner") },
-                        onClick = { menuOpen = false
+                        onClick = {
+                            menuOpen = false
                             openOwnerScreen()
                         }
                     )
 
                     DropdownMenuItem(
                         text = { Text("Main Menu") },
-                        onClick = { menuOpen = false
+                        onClick = {
+                            menuOpen = false
                             openMenuScreen()
                         }
                     )
@@ -202,36 +220,157 @@ fun CampsiteView(
                     tint = Color(0xFF4F378B)
                 )
             }
+
+
+
+            BasicTextField(
+                value = entrantSearch,
+                onValueChange = { entrantSearch = it },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
+                textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+                    .border(1.dp, Color.LightGray, pill)
+                    .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+                decorationBox = { innerTextField ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            if (entrantSearch.isEmpty()) {
+                                Text("search campsites", color = Color.Gray, fontSize = 14.sp)
+                            }
+                            innerTextField()
+                        }
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            modifier = Modifier.size(20.dp)
+                                .clickable(
+                                    onClick = {updateByUserSearch(filters)}
+                                )
+                        )
+                    }
+                }
+            )
         }
 
-        BasicTextField(
-            value = entrantSearch,
-            onValueChange = { entrantSearch = it },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
-            textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .border(1.dp, Color.LightGray, pill)
-                .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
-            decorationBox = { innerTextField ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (entrantSearch.isEmpty()) {
-                            Text("search campsites", color = Color.Gray, fontSize = 14.sp)
-                        }
-                        innerTextField()
-                    }
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        modifier = Modifier.size(20.dp)
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            Text(
+                text = availableDates,
+                modifier = Modifier
+                    .border(1.dp, Color.Black, pill)
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .clickable(
+                        onClick = { showDatePicker = true }
                     )
+            )
+
+
+            val dateRangePickerState = rememberDateRangePickerState()
+            var startDate by remember { mutableStateOf("") }
+            var endDate by remember { mutableStateOf("") }
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+
+                    confirmButton = {
+                        Button(
+                            onClick = {
+
+                                val start = dateRangePickerState.selectedStartDateMillis
+                                val end = dateRangePickerState.selectedEndDateMillis
+
+                                if (start != null && end != null) {
+                                    val formatter = SimpleDateFormat(
+                                        "dd/MM/yyyy",
+                                        Locale.getDefault()
+                                    )
+
+                                    availableDates =
+                                        "${formatter.format(Date(start))} - " +
+                                                formatter.format(Date(end))
+
+                                    startDate = "${formatter.format(Date(start))}"
+                                    endDate = "${formatter.format(Date(end))}"
+
+
+                                }
+
+
+                                showDatePicker = false
+                            }
+                        ) { Text("Ok") }
+                    },
+
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                showDatePicker = false
+                            }
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                ) {
+
+                    DateRangePicker(state = dateRangePickerState)
                 }
             }
-        )
+
+            Spacer(modifier = Modifier.width(6.dp))
+
+            Text(
+                text = "Guest Count: $guestCount",
+                modifier = Modifier
+                    .border(1.dp, Color.Black, pill)
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .clickable(
+                        onClick = { showGuests = true }
+                    )
+            )
+            TextField(
+                value = location,
+                onValueChange = {location = it},
+                label = { Text("Location") }
+            )
+
+            if (showGuests) {
+                Dialog(
+
+                    onDismissRequest = { showGuests = false },
+                    properties = DialogProperties(
+                        usePlatformDefaultWidth = false
+                    )
+                ) {
+                    Surface(shape = RoundedCornerShape(16.dp)) {
+                        Box(modifier = Modifier.padding(26.dp)) {
+
+                            CounterView(
+                                count = guestCount,
+                                onCountChange = { guestCount = it },
+                                min = 1,
+                                max = 100
+                            )
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+
 
         Row(
             modifier = Modifier
@@ -279,12 +418,18 @@ fun CampsiteView(
             )
         }
 
+        val averageRating = if (campsiteSelection.ratingCount > 0) {
+            "%.1f".format(campsiteSelection.ratingSum.toDouble() / campsiteSelection.ratingCount)
+        } else {
+            "0.0"
+        }
+
         Text(
             text = """
                 ${campsiteSelection.name}
                 ${campsiteSelection.location}
                 ${campsiteSelection.occupancy} people maximum occupancy
-                ${campsiteSelection.rating}/5 ★
+                $averageRating/5 ★
             """.trimIndent(),
             fontSize = 12.sp,
 

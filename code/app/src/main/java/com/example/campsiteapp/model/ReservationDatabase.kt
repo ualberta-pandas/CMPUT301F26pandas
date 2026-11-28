@@ -36,6 +36,7 @@ class ReservationDatabase {
                 "entrantId" to reservation.entrantId,
                 "startDate" to reservation.startDate,
                 "endDate" to reservation.endDate,
+                "campsite" to reservation.campsite,
                 "status" to reservation.status
             )
         )

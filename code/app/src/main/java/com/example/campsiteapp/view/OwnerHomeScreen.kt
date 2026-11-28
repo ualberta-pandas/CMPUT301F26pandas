@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
 import com.example.campsiteapp.controller.LotteryController
+import com.example.campsiteapp.controller.OwnerReservationsController
 import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.data.LotteryDatabase
@@ -63,7 +64,7 @@ fun OwnerHomeScreen(
         ) {
             Button(
                 onClick = {
-
+                    onBack()
                 }
             ) { Text("<-") }
             Text(text = "My Campsites")
@@ -97,7 +98,7 @@ fun OwnerHomeScreen(
         }
 
         when (selectedIndex) {
-            0 -> OwnerCampsiteListScreen().CampsitesList(
+            0 -> if (deviceId.isNotEmpty()) OwnerCampsiteListScreen().CampsitesList(
                 campsites = campsitesDatabase.campsites,
                 onAddCampsite = { campsitesDatabase.addCampsite(it) },
                 onEditCampsite = { old, new ->
@@ -112,10 +113,13 @@ fun OwnerHomeScreen(
                 onCreateLottery = { lotteryController.createLottery(it) },
                 onUpdateLottery = { lotteryController.updateLottery(it) }
             )
-            // 2 -> ReservationsContent()
-        }
+            2 -> if (deviceId.isNotEmpty()) OwnerReservationsList().ReservationsList(
+                activeReservations = OwnerReservationsController().getReservationsById(deviceId),
+                pasReservations = OwnerReservationsController().getPastReservationsById(deviceId),
+                cancelledReservations = OwnerReservationsController().getCancelledReservationsById(deviceId)
+            )
     }
-}
+}}
 
 
 
