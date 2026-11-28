@@ -339,11 +339,6 @@ fun CampsiteView(
                         onClick = { showGuests = true }
                     )
             )
-            TextField(
-                value = location,
-                onValueChange = {location = it},
-                label = { Text("Location") }
-            )
 
             if (showGuests) {
                 Dialog(
@@ -367,6 +362,17 @@ fun CampsiteView(
                     }
                 }
             }
+
+        }
+
+        Spacer(modifier= Modifier.height(8.dp))
+
+        Row() {
+            TextField(
+                value = location,
+                onValueChange = {location = it},
+                label = { Text("Location") }
+            )
 
         }
 

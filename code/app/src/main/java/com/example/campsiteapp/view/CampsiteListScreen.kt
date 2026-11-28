@@ -298,11 +298,7 @@ fun CampsiteListView(
                         onClick = { showGuests = true }
                     )
             )
-            TextField(
-                value = location,
-                onValueChange = {location = it},
-                label = { Text("Location") }
-            )
+
 
             if (showGuests) {
                 Dialog(
@@ -330,6 +326,15 @@ fun CampsiteListView(
         }
 
         Spacer(modifier = Modifier.height(15.dp))
+
+        Row() {
+            TextField(
+                value = location,
+                onValueChange = {location = it},
+                label = { Text("Location") }
+            )
+
+        }
 
         val openIfOpen: (Lottery) -> Unit = { lottery ->
             if (lottery.lotteryEndDate >= LocalDate.now().toString()) {
