@@ -36,9 +36,11 @@ object EntrantCampsiteController {
         val newLotteries = mutableListOf<Lottery>()
 
         for (lottery in lotteries) {
-            if (campName.containsMatchIn(lottery.campsite.name) || searchResult.second == lottery.campsite.startDate+'-'+lottery.campsite.endDate ||
-                lottery.campsite.occupancy >=searchResult.third.toInt())  {
+            if (campName.containsMatchIn(lottery.campsite.name) || searchResult.second == lottery.campsite.startDate + '-' + lottery.campsite.endDate ||
+                lottery.campsite.occupancy >= (searchResult.third.toIntOrNull() ?: 0)
+            ) {
                 newLotteries.add(lottery)
+
             }
         }
 

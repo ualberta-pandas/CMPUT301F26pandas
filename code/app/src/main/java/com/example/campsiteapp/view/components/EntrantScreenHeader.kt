@@ -50,7 +50,7 @@ fun EntrantScreenHeader(
     modifier: Modifier,
     updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
     availableDates: String = "Select Dates",
-    guestCount: String = "Guest Count",
+    guestCount: String = "0",
 ){
     var entrantSearch by remember { mutableStateOf("") }
     var menuOpen by remember { mutableStateOf(false) }
