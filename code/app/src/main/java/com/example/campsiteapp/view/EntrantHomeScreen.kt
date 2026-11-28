@@ -315,12 +315,6 @@ fun EntrantHomeScreenView(
                             onClick = { showGuests = true }
                         )
                 )
-                TextField(
-                    value = location,
-                    onValueChange = {location = it},
-                    label = { Text("Location") }
-                )
-
                 if (showGuests) {
                     Dialog(
 
@@ -348,6 +342,15 @@ fun EntrantHomeScreenView(
 
 
             Spacer(modifier = Modifier.height(64.dp))
+
+            Row() {
+                TextField(
+                    value = location,
+                    onValueChange = {location = it},
+                    label = { Text("Location") }
+                )
+
+            }
 
             val reservations = EntrantCampsiteController.getReservationsById(deviceId)
             val lotteries = EntrantCampsiteController.getLotteriesById(deviceId)
