@@ -6,7 +6,6 @@ Outstanding issues:
  */
 package com.example.campsiteapp.view
 
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,12 +15,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -29,15 +29,24 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,52 +58,50 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.startActivity
-import androidx.navigation.NavController
 import com.example.campsiteapp.data.ProfileDatabase
-import com.example.campsiteapp.data.DeviceIDs
 import kotlinx.coroutines.launch
 import com.example.campsiteapp.model.User
 import com.example.campsiteapp.controller.ImageUploadService
 import com.example.campsiteapp.view.components.CancelOrProceedTextButtonsPair
 import com.example.campsiteapp.view.components.CustomPopup
 import com.example.campsiteapp.view.components.ProfilePicture
-import kotlin.collections.getValue
-import kotlin.getValue
+import kotlin.text.contains
 
-/**
- * Used to handle distinct ui states
- *
- * Used by [ProfileScreen] to display and differentiate between ui states
- */
-enum class  ProfileScreenState{
+enum class  ProfileScreenState {
     /**
      * While LaunchedEffect is running, screens cannot be rendered
      */
     LOADING,
+
     /**
      * Show a prompt for the user to create a profile
      */
     CREATEPROMPT,
+
     /**
      * Allow user to interact with profile creation form
      */
     CREATE,
+
     /**
      * Allow user to interact with profile editing form
      */
     EDIT,
+
     /**
      * Display the user's own profile
      */
     VIEWOWN,
+
     /**
      * Display a different user's profile
      */
     VIEW,
+
     /**
      * Display message interface
      */
@@ -112,16 +119,18 @@ enum class  ProfileScreenState{
  * - displays that user’s profile with messaging option
  *
  * @param deviceId the unique device id associated with the user
- * @param profile optional User passed in when viewing another user’s profile
- * @param roles the roles of the user
+ * @param role the role of the user opening a profile, used in creating profile
+ * @param targetProfileDeviceId optional User passed in when viewing another user’s profile
+ * @param onBack action taken when back button is pressed
  */
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    navController: NavController,
-    //deviceId is probably temporary but works better to pass in test values for now
     deviceId: String,
-    roles: MutableList<String>,
-    profile: User?,
+    role: String?,
+    targetProfileDeviceId: String?,
+    onBack: () -> Unit
 ){
     val scope = rememberCoroutineScope()
     val profileDatabase = ProfileDatabase()
@@ -129,18 +138,11 @@ fun ProfileScreen(
     //UI state (see possible states in enum class)
     var currentProfileScreenState by remember { mutableStateOf(ProfileScreenState.LOADING) }
     var profileScreenMode by remember { mutableStateOf("") }
-    var userProfile by remember { mutableStateOf<User?>(null) }
-    var profileToDisplay: User by remember { mutableStateOf(User()) }
-    var deviceId by remember {mutableStateOf("")}
-
     var newUserName by remember { mutableStateOf("") }
     var newUserEmail by remember { mutableStateOf("") }
     var newUserPhoneNumber by remember { mutableStateOf("") }
-    var newUserProfileImage by remember { mutableStateOf("") }
     var newUserNotificationPreference by remember { mutableStateOf(true) }
 
-    //This shouldn't be changed anywhere
-    val newUserRoles:MutableList<String> = remember {roles}
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -155,58 +157,40 @@ fun ProfileScreen(
 
     val context = LocalContext.current
 
+
+    val modifier = Modifier
+
+    val blankUser = User()
+    blankUser.deviceId = targetProfileDeviceId?:deviceId
+    var profileToDisplay by remember { mutableStateOf(blankUser) }
+
+
+
     //State and related variables must be determined inside LaunchedEffect so they are decided before rendering something other than LOADING screen
     LaunchedEffect(key1 = true) {
+        val getProfile: User?  = profileDatabase.getProfile(targetProfileDeviceId ?: deviceId)
+        Log.d("debug","deviceId: $deviceId")
 
-        val deviceIds = DeviceIDs(context)
-        deviceId = deviceIds.fetchDeviceId()?:deviceIds.registerDeviceId()
-        //get deviceId
+        Log.d("debug","got profile: ${getProfile?.deviceId ?:"null"}")
 
-        //Return profile with specified device id if it exists
-        userProfile = profileDatabase.getProfile(deviceId)
-
-        //Display profile if something is passed in, display own profile if it exists, else, prompt to create profile
-        profileToDisplay = profile ?: userProfile ?: User()
-
-
-        //Set defaults for creation form based on whether a profile exists for the user
-        newUserName = if (profileToDisplay.name == "") {
-            "Name"
-        } else {
-            profileToDisplay.name
-        }
-        newUserEmail = if (profileToDisplay.email == "") {
-            "Email"
-        } else {
-            profileToDisplay.email
-        }
-        newUserPhoneNumber = if (profileToDisplay.phone == "") {
-            "Phone number"
-        } else {
-            profileToDisplay.phone
-        }
-        if (profileToDisplay.profileImage != "") {
-            newUserProfileImage = profileToDisplay.profileImage
-        }
-        if (!profileToDisplay.notificationsEnabled) {
-            newUserNotificationPreference = false
-        }
-
-        //set state and title
-        if (profile != null) {
+        currentProfileScreenState = if (targetProfileDeviceId != null){
             // Display messaging option if is someone else's profile (something is passed in for profile)
-            profileScreenMode = "View Profile"
-            currentProfileScreenState = ProfileScreenState.VIEW
-        } else if (userProfile != null) {
+            ProfileScreenState.VIEW
+        } else if (getProfile != null){
             // Display editing options, settings if is user's own profile
-            profileScreenMode = "My Profile"
-            currentProfileScreenState = ProfileScreenState.VIEWOWN
+            ProfileScreenState.VIEWOWN
         } else {
-            // In create mode if no profile with device id is found
-            profileScreenMode = "Create Profile"
-            currentProfileScreenState = ProfileScreenState.CREATEPROMPT
+            // Prompt user to create profile
+            ProfileScreenState.CREATEPROMPT
         }
+        profileToDisplay = getProfile?: blankUser
+    }
 
+    if ((targetProfileDeviceId==null)&&(role!=null)){
+        if(!profileToDisplay.roles.contains(role)){
+            profileToDisplay.roles.add(role)
+            blankUser.roles.add(role)
+        }
     }
 
     Log.d("profile", "profile screen state $currentProfileScreenState")
@@ -223,377 +207,358 @@ fun ProfileScreen(
             )
         }
         else -> {
-            Box {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    //Only display top text if not in CREATEPROMPT or LOADING state
-                    if ((currentProfileScreenState != ProfileScreenState.CREATEPROMPT) and (currentProfileScreenState != ProfileScreenState.LOADING)) {
-                        Text(
-                            profileScreenMode,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    when (currentProfileScreenState) {
-                        //Display create option if user has no profile
-                        ProfileScreenState.CREATEPROMPT -> {
-                            Row {
-                                Text(
-                                    "You have no profile."
-                                )
-                            }
-                            Row {
-                                //Exit prompt and enter creation screen
-                                Button(
-                                    onClick = { currentProfileScreenState = ProfileScreenState.CREATE }
-                                ) {
-                                    Text("Create profile")
+            Box (
+                modifier
+                    .fillMaxSize()
+                    .imePadding()
+            ){
+                var imageToDisplay by remember { mutableStateOf("") }
+                Scaffold(
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            title = {
+                                if (!((currentProfileScreenState == ProfileScreenState.CREATEPROMPT) || (currentProfileScreenState == ProfileScreenState.LOADING))) {
+                                    Text(profileScreenMode)
                                 }
-                            }
-                        }
-                        //Creation and editing have mostly same options
-                        (ProfileScreenState.CREATE), (ProfileScreenState.EDIT) -> {
-                            Box(
-                                modifier = Modifier
-                                    .height(120.dp)
-                                    .fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                //clicking cancels editing
-                                Icon(
-                                    imageVector = Icons.Default.ChevronLeft,
-                                    "Back button",
-                                    modifier = Modifier
-                                        .align(Alignment.TopStart)
-                                        .size(40.dp)
-                                        .clip(CircleShape)
-                                        .background(Color.DarkGray)
-                                        .padding(8.dp)
-                                        .clickable {
-                                            profileScreenMode = "My Profile"
-                                            currentProfileScreenState = ProfileScreenState.VIEWOWN
-                                        },
-                                    tint = Color.White
-                                )
-                                //Only if editing
-                                if (currentProfileScreenState == ProfileScreenState.EDIT) {
-                                    //clicking opens a window to confirm deletion
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        "Delete button",
-                                        modifier = Modifier
-                                            .align(Alignment.TopEnd)
-                                            .size(40.dp)
-                                            .clip(CircleShape)
-                                            .background(Color.Red)
-                                            .padding(8.dp)
-                                            .clickable {
-                                                openDeletionConfirmation = true
-                                            },
-                                        tint = Color.White
-                                    )
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .size(120.dp)
-                                ) {
-                                    //profile image is displayed
-                                    //If a new image is selected, display it
-                                    var imageToDisplay by remember { mutableStateOf("") }
-                                    imageToDisplay = imageUri?.toString() ?: newUserProfileImage
-                                    ProfilePicture(
-                                        Modifier.Companion,
-                                        imageToDisplay,
-                                        120.dp,
-                                        "Selected image",
-                                        {
-                                            fun onImageSelected(uri:Uri?){
-                                                imageUri=uri
+                            },
+                            navigationIcon = {
+                                TopAppBarButton(
+                                    {
+                                        Log.d("debug", "clicked back button")
+                                        when (currentProfileScreenState) {
+                                            ProfileScreenState.CREATE -> {
+                                                profileScreenMode = "Create Profile"
+                                                currentProfileScreenState =
+                                                    ProfileScreenState.CREATEPROMPT
                                             }
-                                            val imagePicker = rememberLauncherForActivityResult(
-                                                contract = ActivityResultContracts.PickVisualMedia()
-                                            ) { uri ->
-                                                onImageSelected(uri)
-                                            }
-                                            //click to change image/open image picker
-                                            Icon(
-                                                imageVector = Icons.Default.Edit,
-                                                "Edit button",
-                                                modifier = Modifier
-                                                    .size(40.dp)
-                                                    .clip(CircleShape)
-                                                    .background(Color.DarkGray)
-                                                    .padding(8.dp)
-                                                    .align(Alignment.BottomEnd)
-                                                    .clickable {
-                                                        imagePicker.launch(
-                                                            PickVisualMediaRequest(
-                                                                ActivityResultContracts.PickVisualMedia.ImageOnly
-                                                            )
-                                                        )
-                                                    },
-                                                tint = Color.White
-                                            )
-                                        }
-                                    )
-                                }
-                            }
-                            //OutlinedTextFields allow for changing of profile details
-                            Row(
-                                modifier = Modifier
-                                    .padding(3.dp)
-                            ) {
-                                OutlinedTextField(
-                                    value = newUserName,
-                                    onValueChange = { newUserName = it },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(16.dp)
-                                )
-                            }
-                            Row(
-                                modifier = Modifier
-                                    .padding(3.dp)
-                            ) {
-                                OutlinedTextField(
-                                    value = newUserEmail,
-                                    onValueChange = { newUserEmail = it },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-
-                                )
-                            }
-                            Row(
-                                modifier = Modifier
-                                    .padding(3.dp)
-                            ) {
-                                OutlinedTextField(
-                                    value = newUserPhoneNumber,
-                                    onValueChange = { newUserPhoneNumber = it },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
-                                )
-                            }
-
-                            val context = LocalContext.current
-                            Row(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalArrangement = Arrangement.End,
-                                verticalAlignment = Alignment.Bottom
-                            ) {
-
-                                //clicking completes editing or creating and uploads image, saves profile info in database
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = "Complete button",
-                                    modifier = Modifier
-                                        .align(Alignment.Bottom)
-                                        .size(70.dp)
-                                        .clip(CircleShape)
-                                        .background(Color.DarkGray)
-                                        .padding(8.dp)
-                                        .clickable {
-
-                                            scope.launch {
-                                                //Upload image if one was chosen
-                                                if (imageUri != null) {
-                                                    newUserProfileImage =
-                                                        imageUploadService.uploadImage(
-                                                            context,
-                                                            imageUri!!,
-                                                            deviceId
-                                                        )
-                                                }
-                                                //copy values to an empty User object
-                                                val newProfile = User()
-                                                newProfile.roles = newUserRoles
-                                                newProfile.deviceId = deviceId
-                                                newProfile.name = newUserName
-                                                newProfile.email = newUserEmail
-                                                newProfile.phone = newUserPhoneNumber
-                                                newProfile.profileImage = newUserProfileImage
-                                                newProfile.notificationsEnabled =
-                                                    newUserNotificationPreference
-                                                //Add profile if in create mode
-                                                if (currentProfileScreenState == ProfileScreenState.CREATE) {
-                                                    profileDatabase.addProfile(newProfile)
-                                                    //Update existing profile if in edit mode
-                                                } else {
-                                                    profileDatabase.updateProfile(
-                                                        deviceId,
-                                                        newProfile
-                                                    )
-                                                }
-                                                //display new/updated profile
+                                            ProfileScreenState.EDIT -> {
+                                                newUserName = profileToDisplay.name
+                                                newUserEmail = profileToDisplay.email
+                                                newUserPhoneNumber = profileToDisplay.phone
+                                                imageToDisplay = profileToDisplay.profileImage
                                                 profileScreenMode = "My Profile"
-                                                profileToDisplay = newProfile
                                                 currentProfileScreenState =
                                                     ProfileScreenState.VIEWOWN
                                             }
-                                        },
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                        //Text is not displayed as editable fields in view mode
-                        ProfileScreenState.VIEW, ProfileScreenState.VIEWOWN -> {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(120.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    //Edit option if is user's own profile
-                                    if (currentProfileScreenState == ProfileScreenState.VIEWOWN) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            "Edit button",
-                                            modifier = Modifier
-                                                .align(Alignment.TopEnd)
-                                                .size(40.dp)
-                                                .clip(CircleShape)
-                                                .background(Color.DarkGray)
-                                                .padding(8.dp)
-                                                .clickable {
-                                                    profileScreenMode = "Edit Profile"
-                                                    currentProfileScreenState =
-                                                        ProfileScreenState.EDIT
-                                                },
-                                            tint = Color.White
-                                        )
-                                        //message option, back button if is other's profile
-                                    } else if (currentProfileScreenState == ProfileScreenState.VIEW) {
-                                        Icon(
-                                            imageVector = Icons.Default.Mail,
-                                            "Message button",
-                                            modifier = Modifier
-                                                .align(Alignment.TopEnd)
-                                                .size(40.dp)
-                                                .clip(CircleShape)
-                                                .background(Color.DarkGray)
-                                                .padding(8.dp)
-                                                .clickable {
-                                                    currentProfileScreenState =
-                                                        ProfileScreenState.MESSAGE
-                                                },
-                                            tint = Color.White
-                                        )
-                                    }
-                                    Icon(
-                                        imageVector = Icons.Default.ChevronLeft,
-                                        "Back button",
-                                        modifier = Modifier
-                                            .align(Alignment.TopStart)
-                                            .size(40.dp)
-                                            .clip(CircleShape)
-                                            .background(Color.DarkGray)
-                                            .padding(8.dp)
-                                            .clickable {
-                                                val intent =
-                                                    Intent(context, EntrantHomeScreen::class.java)
-                                                startActivity(context, intent, null)
-                                            },
-                                        tint = Color.White
-                                    )
-                                    //profile picture
-                                    ProfilePicture(
-                                        Modifier.Companion,
-                                        profileToDisplay.profileImage,
-                                        120.dp,
-                                        "Selected image",
-                                        @Composable {},
-                                    )
-                                }
-                            }
-
-                            //profile name
-                            Row {
-                                Text(
-                                    profileToDisplay.name,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                            //profile email
-                            Row {
-                                Text(
-                                    profileToDisplay.email,
-                                    textAlign = TextAlign.Left,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                            //profile phone number
-                            Row {
-                                Text(
-                                    profileToDisplay.phone,
-                                    textAlign = TextAlign.Left,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                            //Opt in/out of notifications, view guidelines options if is user's profile
-                            if (currentProfileScreenState == ProfileScreenState.VIEWOWN) {
-                                Row {
-                                    var buttonText by remember {
-                                        if (profileToDisplay.notificationsEnabled) {
-                                            mutableStateOf("Opt out of notifications")
-                                        } else {
-                                            mutableStateOf("Opt in to notifications")
-                                        }
-                                    }
-                                    Button(
-                                        onClick = {
-                                            //replaces profile with copy
-                                            val newProfile = User()
-                                            newProfile.deviceId = profileToDisplay.deviceId
-                                            newProfile.name = profileToDisplay.name
-                                            newProfile.email = profileToDisplay.email
-                                            newProfile.phone = profileToDisplay.phone
-                                            newProfile.profileImage = profileToDisplay.profileImage
-                                            newProfile.notificationsEnabled =
-                                                !profileToDisplay.notificationsEnabled
-                                            profileDatabase.updateProfile(deviceId,newProfile)
-                                            //ensure modification is conserved in display version
-                                            profileToDisplay.notificationsEnabled =
-                                                newProfile.notificationsEnabled
-                                            //update button text when clicked
-                                            buttonText = if (profileToDisplay.notificationsEnabled) {
-                                                "Opt out of notifications"
-                                            } else {
-                                                "Opt in to notifications"
+                                            else -> {
+                                                onBack()
                                             }
                                         }
-                                    ) {
-                                        Text(buttonText)
+                                    },
+                                    Color.Gray,
+                                    Color.White,
+                                    Icons.Default.ChevronLeft,
+                                    "Back button"
+                                )
+                            },
+                            actions = {
+                                if (currentProfileScreenState == ProfileScreenState.EDIT) {
+                                    TopAppBarButton(
+                                        { openDeletionConfirmation = true },
+                                        Color.Red,
+                                        Color.White,
+                                        Icons.Default.Delete,
+                                        "Delete button"
+                                    )
+                                } else if (currentProfileScreenState == ProfileScreenState.VIEW) {
+                                    TopAppBarButton(
+                                        {
+                                            currentProfileScreenState =
+                                                ProfileScreenState.MESSAGE
+                                        },
+                                        Color.DarkGray,
+                                        Color.White,
+                                        Icons.AutoMirrored.Default.Message,
+                                        "Message button"
+                                    )
+                                } else if (currentProfileScreenState == ProfileScreenState.VIEWOWN) {
+                                    TopAppBarButton(
+                                        {
+                                            newUserName = profileToDisplay.name
+                                            newUserEmail = profileToDisplay.email
+                                            newUserPhoneNumber = profileToDisplay.phone
+                                            imageToDisplay = profileToDisplay.profileImage
+                                            profileScreenMode = "Edit Profile"
+                                            currentProfileScreenState =
+                                                ProfileScreenState.EDIT
+                                        },
+                                        Color.DarkGray,
+                                        Color.White,
+                                        Icons.Default.Edit,
+                                        "Edit button"
+                                    )
+                                }
+                            }
+                        )
+                    },
+                    content = { padding ->
+                        Column(
+                            modifier
+                                .padding(top = TopAppBarDefaults.TopAppBarExpandedHeight)
+                                .padding(20.dp)
+                                .fillMaxSize(),
+                            verticalArrangement = Arrangement.Top,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            when (currentProfileScreenState) {
+                                ProfileScreenState.CREATEPROMPT -> {
+                                    Row {
+                                        Text(
+                                            "You have no profile."
+                                        )
+                                    }
+                                    Row {
+                                        //Exit prompt and enter creation screen
+                                        Button(
+                                            onClick = {
+                                                currentProfileScreenState =
+                                                    ProfileScreenState.CREATE
+                                            },
+                                        ) {
+                                            Text("Create profile")
+                                        }
                                     }
                                 }
-                                Row {
-                                    //opens View App Policy and Guidelines popup
-                                    Button(
-                                        onClick = {
-                                            viewGuidelines = true
-                                        }
+
+                                ProfileScreenState.VIEW, ProfileScreenState.VIEWOWN, ProfileScreenState.CREATE, ProfileScreenState.EDIT -> {
+                                    Box(
+                                        modifier
+                                            .size(120.dp)
                                     ) {
-                                        Text("View App Policy and Guidelines")
+                                        //profile image is displayed
+                                        //If a new image is selected, display it
+
+                                        fun onImageRemove() {
+                                            imageUri = null
+                                            imageToDisplay = ""
+                                        }
+                                        ProfilePicture(
+                                            modifier,
+                                            imageToDisplay,
+                                            120.dp,
+                                            "Profile image",
+                                            {
+                                                if ((currentProfileScreenState == ProfileScreenState.CREATE) || (currentProfileScreenState == ProfileScreenState.EDIT)) {
+
+                                                    fun onImageSelected(uri: Uri?) {
+                                                        imageUri = uri
+                                                        imageToDisplay = imageUri.toString()
+                                                    }
+
+                                                    val imagePicker =
+                                                        rememberLauncherForActivityResult(
+                                                            contract = ActivityResultContracts.PickVisualMedia()
+                                                        ) { uri ->
+                                                            onImageSelected(uri)
+                                                        }
+                                                    //click to change image/open image picker
+
+
+                                                    ProfilePictureOptionButton(
+                                                        {
+                                                            imagePicker.launch(
+                                                                PickVisualMediaRequest(
+                                                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                                )
+                                                            )
+                                                        },
+                                                        Color.DarkGray,
+                                                        Color.White,
+                                                        Icons.Default.Edit,
+                                                        "Edit profile image button",
+                                                        Alignment.BottomEnd
+                                                    )
+
+                                                    if (imageToDisplay != "") {
+                                                        ProfilePictureOptionButton(
+                                                            {
+                                                                onImageRemove()
+                                                            },
+                                                            Color.Red,
+                                                            Color.White,
+                                                            Icons.Default.Close,
+                                                            "Remove profile image button",
+                                                            Alignment.TopEnd
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+
+                                else -> {
+
+                                }
+                            }
+                            if ((currentProfileScreenState == ProfileScreenState.CREATE) || (currentProfileScreenState == ProfileScreenState.EDIT)) {
+                                Column{
+                                    var outlinedTextFieldModifier by remember { mutableStateOf(
+                                        modifier
+                                            .padding(3.dp)
+                                            .fillMaxWidth()
+                                    )}
+                                    OutlinedTextField(
+                                        value = newUserName,
+                                        onValueChange = { newUserName = it },
+                                        modifier = outlinedTextFieldModifier,
+                                        shape = RoundedCornerShape(16.dp),
+                                        placeholder = { Text("Name") },
+                                    )
+                                    OutlinedTextField(
+                                        value = newUserEmail,
+                                        onValueChange = { newUserEmail = it },
+                                        modifier = outlinedTextFieldModifier,
+                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(
+                                            16.dp
+                                        ),
+                                        placeholder = { Text("Email") },
+                                    )
+                                    OutlinedTextField(
+                                        value = newUserPhoneNumber,
+                                        onValueChange = { newUserPhoneNumber = it },
+                                        modifier = outlinedTextFieldModifier,
+                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(
+                                            16.dp
+                                        ),
+                                        placeholder = { Text("Phone Number") },
+                                    )
+                                }
+                                Box(
+                                    modifier = modifier.fillMaxSize()
+                                ) {
+                                    FloatingActionButton(
+                                        {
+                                            if (newUserName != "") {
+                                                scope.launch {
+                                                    //Upload image if one was chosen
+                                                    if (imageUri != null) {
+                                                        imageToDisplay =
+                                                            imageUploadService.uploadImage(
+                                                                context,
+                                                                imageUri!!,
+                                                                deviceId
+                                                            )
+                                                    }
+                                                    //copy values to profile
+                                                    profileToDisplay.deviceId = deviceId
+                                                    profileToDisplay.name = newUserName
+                                                    profileToDisplay.email =
+                                                        newUserEmail
+                                                    profileToDisplay.phone =
+                                                        newUserPhoneNumber
+                                                    profileToDisplay.profileImage =
+                                                        imageToDisplay
+                                                    imageUri = null
+                                                    //Add profile if in create mode
+                                                    if (currentProfileScreenState == ProfileScreenState.CREATE) {
+                                                        profileDatabase.addProfile(
+                                                            profileToDisplay
+                                                        )
+                                                        //Update existing profile if in edit mode
+                                                    } else {
+                                                        profileDatabase.updateProfile(
+                                                            deviceId,
+                                                            profileToDisplay
+                                                        )
+                                                    }
+                                                    //display new/updated profile
+                                                    profileScreenMode = "My Profile"
+                                                    currentProfileScreenState =
+                                                        ProfileScreenState.VIEWOWN
+                                                }
+                                            } else {
+                                                //TODO: write message for if user doesnt give name
+                                            }
+                                        },
+                                        modifier
+                                            .align(Alignment.BottomEnd)
+                                            //.padding(16.dp)
+                                            .size(70.dp)
+                                        ,
+                                        containerColor = Color.DarkGray,
+                                        contentColor = Color.White,
+                                        shape = CircleShape
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Complete button",
+                                            modifier = modifier
+                                                .padding(8.dp)
+                                                .fillMaxSize(),
+                                        )
+                                    }
+                                    //clicking completes editing or creating and uploads image, saves profile info in database
+
+                                }
+                            } else if ((currentProfileScreenState == ProfileScreenState.VIEW) || (currentProfileScreenState == ProfileScreenState.VIEWOWN)) {
+                                //Text is not displayed as editable fields in view mode
+                                //profile name
+                                Row {
+                                    Text(
+                                        profileToDisplay.name,
+                                        textAlign = TextAlign.Center,
+                                        modifier = modifier.fillMaxWidth()
+                                    )
+                                }
+                                //profile email
+                                Row {
+                                    Text(
+                                        profileToDisplay.email,
+                                        textAlign = TextAlign.Left,
+                                        modifier = modifier.fillMaxWidth()
+                                    )
+                                }
+                                //profile phone number
+                                Row {
+                                    Text(
+                                        profileToDisplay.phone,
+                                        textAlign = TextAlign.Left,
+                                        modifier = modifier.fillMaxWidth()
+                                    )
+                                }
+                                //Opt in/out of notifications, view guidelines options if is user's profile
+                                if (currentProfileScreenState == ProfileScreenState.VIEWOWN) {
+                                    Row {
+                                        var buttonText by remember {
+                                            if (profileToDisplay.notificationsEnabled) {
+                                                mutableStateOf("Opt out of notifications")
+                                            } else {
+                                                mutableStateOf("Opt in to notifications")
+                                            }
+                                        }
+                                        Button(
+                                            onClick = {
+                                                //replaces profile with copy
+                                                profileToDisplay.notificationsEnabled = !profileToDisplay.notificationsEnabled
+                                                profileDatabase.updateProfile(deviceId, profileToDisplay)
+                                                //update button text when clicked
+                                                buttonText =
+                                                    if (profileToDisplay.notificationsEnabled) {
+                                                        "Opt out of notifications"
+                                                    } else {
+                                                        "Opt in to notifications"
+                                                    }
+                                            }
+                                        ) {
+                                            Text(buttonText)
+                                        }
+                                    }
+                                    Row {
+                                        //opens View App Policy and Guidelines popup
+                                        Button(
+                                            onClick = {
+                                                viewGuidelines = true
+                                            }
+                                        ) {
+                                            Text("View App Policy and Guidelines")
+                                        }
                                     }
                                 }
                             }
                         }
-
-                        //Do not render anything that is dependent on LaunchedEffect outcomes until it is done
-                        else -> {
-                            //could have loading indicator/animation here, but should be less than a second, so is probably not needed
-                        }
-
                     }
-                }
+                )
 
                 //Popup appears when View App Policy and Guidelines button is clicked
                 if (viewGuidelines) {
@@ -604,13 +569,13 @@ fun ProfileScreen(
                         false,
                         @Composable {
                             Row(
-                                modifier = Modifier
+                                modifier
                                     .fillMaxWidth()
                                     .padding(4.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 Box(
-                                    modifier = Modifier
+                                    modifier
                                         .heightIn(max = 200.dp)
                                         .verticalScroll(rememberScrollState())
                                         .padding(25.dp)
@@ -621,7 +586,7 @@ fun ProfileScreen(
                                 }
                             }
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
                                 //close popup
@@ -629,7 +594,7 @@ fun ProfileScreen(
                                     onClick = {
                                         viewGuidelines = false
                                     },
-                                    modifier = Modifier.padding(4.dp)
+                                    modifier.padding(4.dp)
                                 ) {
                                     Text("Okay")
                                 }
@@ -641,14 +606,14 @@ fun ProfileScreen(
                 //Popup appears when delete button is clicked
                 if (openDeletionConfirmation) {
                     CustomPopup(
-                        modifier = Modifier.Companion,
+                        modifier,
                         "Delete Profile",
                         { openDeletionConfirmation = !openDeletionConfirmation },
                         true,
                         @Composable
                         fun() {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 Text(
@@ -656,19 +621,19 @@ fun ProfileScreen(
                                 )
                             }
                             CancelOrProceedTextButtonsPair(
-                                Modifier.Companion,
+                                modifier,
                                 "Cancel",
                                 "Delete",
                                 { openDeletionConfirmation = false },
                                 {
                                     //delete user's profile and return them to creation prompt
                                     profileDatabase.deleteProfile(profileToDisplay)
-                                    newUserName = "Name"
-                                    newUserEmail = "Email"
-                                    newUserPhoneNumber = "Phone number"
-                                    newUserProfileImage = ""
+                                    newUserName = ""
+                                    newUserEmail = ""
+                                    newUserPhoneNumber = ""
+                                    imageToDisplay = ""
                                     newUserNotificationPreference = true
-                                    profileToDisplay = User()
+                                    profileToDisplay = blankUser
                                     profileScreenMode = "Create Profile"
                                     currentProfileScreenState = ProfileScreenState.CREATEPROMPT
                                     openDeletionConfirmation = false
@@ -691,5 +656,58 @@ fun ProfileScreen(
             }
 
         }
+    }
+}
+
+
+@Composable
+fun TopAppBarButton(
+    onClick: () -> Unit ,
+    backgroundColor: Color,
+    contentColor: Color,
+    icon: ImageVector,
+    contentDescription: String
+){
+    FilledIconButton(
+        onClick = { onClick() },
+        modifier = Modifier.size(36.dp),
+        shape = CircleShape,
+        colors = IconButtonDefaults.filledIconButtonColors(
+            containerColor = backgroundColor,
+            contentColor = contentColor,
+        ),
+    ) {
+        Icon(icon, contentDescription = contentDescription)
+    }
+}
+
+@Composable
+fun BoxScope.ProfilePictureOptionButton(
+    onClick: () -> Unit ,
+    backgroundColor: Color,
+    contentColor: Color,
+    icon: ImageVector,
+    contentDescription: String,
+    alignment: Alignment
+){
+    IconButton(
+        {
+            onClick()
+        },
+        Modifier
+            .size(48.dp)
+            .align(alignment),
+        colors = IconButtonDefaults.filledIconButtonColors(
+            backgroundColor,
+            contentColor
+        )
+    ) {
+        Icon(
+            icon,
+            contentDescription,
+            Modifier
+                .size(40.dp)
+                .padding(8.dp)
+        )
     }
 }
