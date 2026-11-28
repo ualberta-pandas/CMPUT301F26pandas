@@ -1,6 +1,7 @@
 package com.example.campsiteapp.view
 
 
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -14,7 +15,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
@@ -32,11 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
 import com.example.campsiteapp.controller.LotteryController
+import com.example.campsiteapp.controller.OwnerReservationsController
 import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.data.LotteryDatabase
-import com.example.campsiteapp.model.Campsite
-import com.example.campsiteapp.view.OwnerCampsiteListScreen
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -56,17 +60,27 @@ fun OwnerHomeScreen(
         value = DeviceIDs(context).fetchDeviceId() ?: ""
     }
 
-    Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
+      Column(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
             Button(
                 onClick = {
-
+                    onBack()
                 }
             ) { Text("<-") }
             Text(text = "My Campsites")
+
+            IconButton(onClick = {
+
+                context.startActivity(Intent(context, NotificationsActivity::class.java))
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Notifications"
+                )
+            }
         }
 
         SecondaryTabRow(
@@ -97,7 +111,7 @@ fun OwnerHomeScreen(
         }
 
         when (selectedIndex) {
-            0 -> OwnerCampsiteListScreen().CampsitesList(
+            0 -> if (deviceId.isNotEmpty()) OwnerCampsiteListScreen().CampsitesList(
                 campsites = campsitesDatabase.campsites,
                 onAddCampsite = { campsitesDatabase.addCampsite(it) },
                 onEditCampsite = { old, new ->
@@ -112,10 +126,13 @@ fun OwnerHomeScreen(
                 onCreateLottery = { lotteryController.createLottery(it) },
                 onUpdateLottery = { lotteryController.updateLottery(it) }
             )
-            // 2 -> ReservationsContent()
-        }
+            2 -> if (deviceId.isNotEmpty()) OwnerReservationsList().ReservationsList(
+                activeReservations = OwnerReservationsController().getReservationsById(deviceId),
+                pasReservations = OwnerReservationsController().getPastReservationsById(deviceId),
+                cancelledReservations = OwnerReservationsController().getCancelledReservationsById(deviceId)
+            )
     }
-}
+}}
 
 
 
