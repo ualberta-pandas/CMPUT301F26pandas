@@ -1,5 +1,6 @@
 package com.example.campsiteapp.view
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,6 +34,9 @@ import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.model.Lottery
 import com.example.campsiteapp.model.Reservation
 import com.example.campsiteapp.ui.theme.CampsiteAppTheme
+import com.example.campsiteapp.view.components.CampsiteDetailsCard
+import com.example.campsiteapp.view.components.EntrantScreenHeader
+
 private val pill = RoundedCornerShape(50)
 
 class EntrantOfferScreen : ComponentActivity() {
@@ -55,23 +59,9 @@ class EntrantOfferScreen : ComponentActivity() {
             CampsiteAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     if (deviceId.isNotEmpty()) EntrantOfferView(
-                        campsiteSelection = campsite,
                         lottery = lottery,
                         hasOffer = hasOffer,
                         deviceId = deviceId,
-
-                        openProfileScreen = {
-                            EntrantCampsiteController.toggleProfileScreen(this@EntrantOfferScreen)
-                        },
-                        openAdminScreen = {
-                            EntrantCampsiteController.toggleAdminScreen(this@EntrantOfferScreen)
-                        },
-                        openOwnerScreen = {
-                            EntrantCampsiteController.toggleOwnerScreen(this@EntrantOfferScreen)
-                        },
-                        openMenuScreen = {
-                            EntrantCampsiteController.toggleMenuScreen(this@EntrantOfferScreen)
-                        },
 
                         acceptUserOffer = {deviceId, lottery ->
                             EntrantOfferController.entrantAcceptOfferHandler(deviceId, lottery)
@@ -88,7 +78,8 @@ class EntrantOfferScreen : ComponentActivity() {
                             EntrantOfferController.downloadUserOffer(this@EntrantOfferScreen, deviceId, reservation)
                         },
 
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        context = this@EntrantOfferScreen
                     )
                 }
             }
@@ -98,15 +89,10 @@ class EntrantOfferScreen : ComponentActivity() {
 
 @Composable
 fun EntrantOfferView(
-    campsiteSelection: Campsite,
+    context: Activity,
     lottery: Lottery,
     hasOffer: Boolean,
     deviceId: String,
-
-    openProfileScreen: () -> Unit,
-    openOwnerScreen: () -> Unit,
-    openAdminScreen: () -> Unit,
-    openMenuScreen: () -> Unit,
 
     acceptUserOffer: (deviceId: String, lottery: Lottery) -> Reservation,
     rejectUserOffer: (deviceId: String, lottery: Lottery) -> Unit,
@@ -127,165 +113,17 @@ fun EntrantOfferView(
     ) {
         Spacer(modifier = Modifier.height(5.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Box {
-                IconButton(onClick = { menuOpen = true }) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Menu"
-                    )
-                }
-
-                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                    DropdownMenuItem(
-                        text = { Text("Admin") },
-                        onClick = { menuOpen = false
-                            openAdminScreen()
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Owner") },
-                        onClick = { menuOpen = false
-                            openOwnerScreen()
-                        }
-                    )
-
-                    DropdownMenuItem(
-                        text = { Text("Main Menu") },
-                        onClick = { menuOpen = false
-                            openMenuScreen()
-                        }
-                    )
-                }
-            }
-
-
-            IconButton(
-                modifier = Modifier.background(Color(0xFFE8DEF8), CircleShape),
-                onClick = {
-                    openProfileScreen()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Profile",
-                    tint = Color(0xFF4F378B)
-                )
-            }
-        }
-
-        BasicTextField(
-            value = entrantSearch,
-            onValueChange = { entrantSearch = it },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-
-            textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .border(1.dp, Color.LightGray, pill)
-                .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
-            decorationBox = { innerTextField ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (entrantSearch.isEmpty()) {
-                            Text("search campsites", color = Color.Gray, fontSize = 14.sp)
-                        }
-                        innerTextField()
-                    }
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
+        EntrantScreenHeader(
+            context = context,
+            modifier = Modifier,
+            updateByUserSearch = {}
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-
-
-            lottery.let { // if the lottery is not nan then show this
-                Text(
-                    text = "${lottery.lotteryStartDate} - ${lottery.lotteryEndDate}",
-                    modifier = Modifier
-                        .border(1.dp, Color.Black, pill)
-                        .padding(horizontal = 12.dp, vertical = 4.dp),
-                    fontSize = 13.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.width(5.dp))
-
-            lottery.let {
-                Text(
-                    text = "Guest Count: ${campsiteSelection.occupancy.toInt()}",
-                    modifier = Modifier
-                        .border(1.dp, Color.Black, pill)
-                        .padding(horizontal = 12.dp, vertical = 4.dp),
-                    fontSize = 12.sp
-                )
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp)
-        ) {
-        }
-
-        Text(
-            text = """
-                ${campsiteSelection.name}
-                ${campsiteSelection.location}
-                ${campsiteSelection.occupancy} people maximum occupancy
-                ${campsiteSelection.rating}/5 ★
-            """.trimIndent(),
-            fontSize = 12.sp,
-
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp)
-                .border(1.dp, Color.Black, RoundedCornerShape(12.dp))
-                .padding(8.dp)
+        CampsiteDetailsCard(
+            modifier = Modifier.weight(1f),
+            lottery = lottery,
+            ExitHandler = {}
         )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.6f)
-                .padding(horizontal = 16.dp, vertical = 0.dp)
-                .background(Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-                .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = campsiteSelection.name, fontSize = 22.sp)
-
-            Text(
-                text = """
-                
-                
-                IMAGE GOES HERE 
-                
-                
-   
-            """.trimIndent()
-            ) // TODO: promo image
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(text = campsiteSelection.description)
-        }
 
         Row(
             modifier = Modifier

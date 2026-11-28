@@ -1,5 +1,7 @@
 package com.example.campsiteapp.view
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -65,6 +67,9 @@ import com.example.campsiteapp.controller.EntrantWaitlistController.verifyUserOn
 import com.example.campsiteapp.controller.EntrantWaitlistController.removeEntrantFromWaitlist
 
 import com.example.campsiteapp.data.DeviceIDs
+import com.example.campsiteapp.view.components.CampsiteDetailsCard
+import com.example.campsiteapp.view.components.EntrantScreenHeader
+
 private val pill = RoundedCornerShape(50)
 
 class CampsiteDetailsScreen : ComponentActivity() {
@@ -108,11 +113,8 @@ class CampsiteDetailsScreen : ComponentActivity() {
                         },
 
                         onBack = { finish() },
+                        context = this@CampsiteDetailsScreen,
 
-                        openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@CampsiteDetailsScreen) },
-                        openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@CampsiteDetailsScreen) },
-                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@CampsiteDetailsScreen) },
-                        openMenuScreen = {EntrantCampsiteController.toggleMenuScreen(this@CampsiteDetailsScreen)},
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -131,20 +133,11 @@ fun CampsiteView(
     onBack: () -> Unit,
 
     updateByUserSearch: (search: Triple<String, String, String>) -> Unit,
-
-    openProfileScreen: () -> Unit,
-    openOwnerScreen: () -> Unit,
-    openAdminScreen: () -> Unit,
-    openMenuScreen: () -> Unit,
+    context: Activity,
 
     modifier: Modifier = Modifier
 ) {
-    var entrantSearch by remember { mutableStateOf("") }
-    var availableDates by remember { mutableStateOf("Select Dates") }
-    var guestCount by remember { mutableStateOf("Guest Count") }
-    val filters = Triple(entrantSearch,availableDates,guestCount)
 
-    var menuOpen by remember { mutableStateOf(false) }
     var onWaitlist by remember { mutableStateOf(userOnWaitlist()) }
 
     Column(
@@ -154,174 +147,17 @@ fun CampsiteView(
     ) {
         Spacer(modifier = Modifier.height(5.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ){
-            Box {
-                IconButton(onClick = { menuOpen = true }) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Menu"
-                    )
-                }
-
-                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                    DropdownMenuItem(
-                        text = { Text("Admin") },
-                        onClick = { menuOpen = false
-                            openAdminScreen()
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Owner") },
-                        onClick = { menuOpen = false
-                            openOwnerScreen()
-                        }
-                    )
-
-                    DropdownMenuItem(
-                        text = { Text("Main Menu") },
-                        onClick = { menuOpen = false
-                            openMenuScreen()
-                        }
-                    )
-                }
-            }
-
-
-            IconButton(
-                modifier = Modifier.background(Color(0xFFE8DEF8), CircleShape),
-                onClick = {
-                    openProfileScreen()
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Profile",
-                    tint = Color(0xFF4F378B)
-                )
-            }
-        }
-
-        BasicTextField(
-            value = entrantSearch,
-            onValueChange = { entrantSearch = it },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
-            textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .border(1.dp, Color.LightGray, pill)
-                .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
-            decorationBox = { innerTextField ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (entrantSearch.isEmpty()) {
-                            Text("search campsites", color = Color.Gray, fontSize = 14.sp)
-                        }
-                        innerTextField()
-                    }
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
+        EntrantScreenHeader(
+            context = context,
+            modifier = Modifier,
+            updateByUserSearch = updateByUserSearch
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-
-
-            lottery.let { // if the lottery is not nan then show this
-                Text(
-                    text = "${lottery.lotteryStartDate} - ${lottery.lotteryEndDate}",
-                    modifier = Modifier
-                        .border(1.dp, Color.Black, pill)
-                        .padding(horizontal = 12.dp, vertical = 4.dp),
-                    fontSize = 13.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.width(5.dp))
-
-            lottery.let {
-                Text(
-                    text = "Guest Count: ${campsiteSelection.occupancy.toInt()}",
-                    modifier = Modifier
-                        .border(1.dp, Color.Black, pill)
-                        .padding(horizontal = 12.dp, vertical = 4.dp),
-                    fontSize = 12.sp
-                )
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp)
-        ) {
-            Text(
-                "< back to results",
-                fontSize = 10.sp,
-                modifier = Modifier
-                    .clickable { onBack() }
-                    .border(1.dp, Color.Black, RoundedCornerShape(16.dp))
-                    .size(width = 100.dp, height = 30.dp)
-            )
-        }
-
-        Text(
-            text = """
-                ${campsiteSelection.name}
-                ${campsiteSelection.location}
-                ${campsiteSelection.occupancy} people maximum occupancy
-                ${campsiteSelection.rating}/5 ★
-            """.trimIndent(),
-            fontSize = 12.sp,
-
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp)
-                .border(1.dp, Color.Black, RoundedCornerShape(12.dp))
-                .padding(8.dp)
+        CampsiteDetailsCard(
+            modifier = Modifier.weight(1f),
+            lottery = lottery,
+            ExitHandler = onBack
         )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(0.8f)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .background(Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-                .padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = campsiteSelection.name, fontSize = 22.sp)
-
-            AsyncImage(
-                model = campsiteSelection.image,
-                contentDescription = "Campsite image",
-                modifier = Modifier
-                    .testTag("campsiteImage")
-                    .width(200.dp)
-                    .height(200.dp),
-                contentScale = ContentScale.Crop
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(text = campsiteSelection.description)
-        }
 
         Column(
             modifier = Modifier.fillMaxWidth(),

@@ -1,5 +1,7 @@
 package com.example.campsiteapp.view
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,8 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,6 +63,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campsiteapp.controller.EntrantCampsiteController
 import com.example.campsiteapp.controller.EntrantOfferController
+
+import com.example.campsiteapp.view.PastReservationsView
 import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.data.DeviceIDs
 import com.example.campsiteapp.model.Lottery
@@ -74,6 +76,7 @@ import java.util.Locale
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.campsiteapp.model.Reservation
+import com.example.campsiteapp.view.components.EntrantScreenHeader
 
 private val pill = RoundedCornerShape(50)
 
@@ -97,17 +100,19 @@ class EntrantHomeScreen : ComponentActivity() {
                         },
                         deviceId = deviceId,
 
-                        openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@EntrantHomeScreen) },
-                        openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@EntrantHomeScreen) },
-                        openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@EntrantHomeScreen) },
                         openEntrantOfferScreen = {lottery, hasOffer ->
                             EntrantOfferController.toggleOfferScreen(this@EntrantHomeScreen, lottery, hasOffer)
                         },
 
-                        openReservationScreen = {
-                            // TO-DO
-                            // toggle reservation screen
-                        }
+                        openReservationDetailsScreen = {
+                            // TO-DO: toggle reservation screen
+                        },
+
+                        openPastReservationsScreen = {
+                            context.startActivity(Intent(context, PastReservationsScreen::class.java))
+                        },
+
+                        context = this@EntrantHomeScreen,
                     )
                 }
             }
@@ -121,17 +126,13 @@ fun EntrantHomeScreenView(
     updateByUserSearch: (Triple<String, String, String>) -> Unit,
     deviceId: String,
 
-    openProfileScreen: () -> Unit,
-    openOwnerScreen: () -> Unit,
-    openAdminScreen: () -> Unit,
+    context: Activity,
     openEntrantOfferScreen: (lottery: Lottery, hasOffer: Boolean) -> Unit,
-    openReservationScreen: () -> Unit
+    openReservationDetailsScreen: () -> Unit,
+    openPastReservationsScreen: () -> Unit
 ) {
-    var entrantSearch by remember { mutableStateOf("") }
     var availableDates by remember { mutableStateOf("Select Dates") }
     var guestCount by remember { mutableIntStateOf(0) }
-    val filters = Triple(entrantSearch, availableDates, guestCount.toString())
-    var menuOpen by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showGuests by remember { mutableStateOf(false) }
 
@@ -142,85 +143,16 @@ fun EntrantHomeScreenView(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top
         ) {
+
             Spacer(modifier = Modifier.height(5.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Box {
-                    IconButton(onClick = { menuOpen = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu"
-                        )
-                    }
-
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text("Admin") },
-                            onClick = {
-                                menuOpen = false
-                                openAdminScreen()
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Owner") },
-                            onClick = {
-                                menuOpen = false
-                                openOwnerScreen()
-                            }
-                        )
-                    }
-                }
-
-
-                IconButton(
-                    modifier = Modifier.background(Color(0xFFE8DEF8), CircleShape),
-                    onClick = {
-                        openProfileScreen()
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Profile",
-                        tint = Color(0xFF4F378B)
-                    )
-                }
-            }
-
-        BasicTextField(
-            value = entrantSearch,
-            onValueChange = { entrantSearch = it },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
-            textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .border(1.dp, Color.LightGray, pill)
-                .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
-            decorationBox = { innerTextField ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (entrantSearch.isEmpty()) {
-                            Text("search campsites", color = Color.Gray, fontSize = 14.sp)
-                        }
-                        innerTextField()
-                    }
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        modifier = Modifier.size(20.dp)
-                            .clickable(
-                                onClick = { updateByUserSearch(filters) }
-                            )
-                    )
-                }
-            }
-        )
-
+            EntrantScreenHeader(
+                context = context,
+                modifier = Modifier,
+                updateByUserSearch = updateByUserSearch,
+                availableDates = availableDates,
+                guestCount = guestCount.toString()
+            )
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
@@ -341,7 +273,7 @@ fun EntrantHomeScreenView(
         DisplayBookingsAsCards(
             modifier = Modifier.fillMaxWidth(),
             reservations = reservations,
-            onReservationEvent = openReservationScreen
+            onReservationEvent = openReservationDetailsScreen
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -380,11 +312,14 @@ fun EntrantHomeScreenView(
                 text = "See past reservations",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
-                    .clickable { }
+                    .clickable {
+                        openPastReservationsScreen()
+                    }
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
 
-            IconButton(onClick = { }) {
+            IconButton(onClick = {
+            }) {
                 Icon(
                     imageVector = Icons.Outlined.ChatBubbleOutline,
                     contentDescription = "Messages"
