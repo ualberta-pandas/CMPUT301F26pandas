@@ -69,6 +69,8 @@ import com.example.campsiteapp.controller.ImageUploadService
 import com.example.campsiteapp.view.components.CancelOrProceedTextButtonsPair
 import com.example.campsiteapp.view.components.CustomPopup
 import com.example.campsiteapp.view.components.ProfilePicture
+import com.example.campsiteapp.view.components.ProfilePictureOptionButton
+import com.example.campsiteapp.view.components.TopAppBarButton
 import kotlin.text.contains
 
 enum class  ProfileScreenState {
@@ -656,58 +658,5 @@ fun ProfileScreen(
             }
 
         }
-    }
-}
-
-
-@Composable
-fun TopAppBarButton(
-    onClick: () -> Unit ,
-    backgroundColor: Color,
-    contentColor: Color,
-    icon: ImageVector,
-    contentDescription: String
-){
-    FilledIconButton(
-        onClick = { onClick() },
-        modifier = Modifier.size(36.dp),
-        shape = CircleShape,
-        colors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = backgroundColor,
-            contentColor = contentColor,
-        ),
-    ) {
-        Icon(icon, contentDescription = contentDescription)
-    }
-}
-
-@Composable
-fun BoxScope.ProfilePictureOptionButton(
-    onClick: () -> Unit ,
-    backgroundColor: Color,
-    contentColor: Color,
-    icon: ImageVector,
-    contentDescription: String,
-    alignment: Alignment
-){
-    IconButton(
-        {
-            onClick()
-        },
-        Modifier
-            .size(48.dp)
-            .align(alignment),
-        colors = IconButtonDefaults.filledIconButtonColors(
-            backgroundColor,
-            contentColor
-        )
-    ) {
-        Icon(
-            icon,
-            contentDescription,
-            Modifier
-                .size(40.dp)
-                .padding(8.dp)
-        )
     }
 }
