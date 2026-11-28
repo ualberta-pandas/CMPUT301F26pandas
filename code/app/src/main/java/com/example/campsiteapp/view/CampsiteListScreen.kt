@@ -233,7 +233,7 @@ fun CampsiteListView(
             }
         }
 
-        displayCampsitesAsCards(
+        DisplayCampsitesAsCards(
             Modifier, lotteries = lotteries,
             openIfOpen,
             getTextAttributes = { lottery ->
