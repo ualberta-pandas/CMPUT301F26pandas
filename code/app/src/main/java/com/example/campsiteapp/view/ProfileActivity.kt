@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -20,9 +23,19 @@ class ProfileActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val navController = rememberNavController()
-            CampsiteAppTheme {
-                ProfileScreen(navController, "", mutableListOf<String>("Entrant"), null)
+            val context = LocalContext.current
+            val initialDeviceId = intent.getStringExtra("DEVICE_ID")
+            val role = intent.getStringExtra("ROLE")
+            val targetProfileDeviceId = intent.getStringExtra("TARGET_DEVICE_ID")
+
+            val deviceId by produceState<String?>(null, context) {
+                    val deviceIds = DeviceIDs(context)
+                    value = initialDeviceId?: deviceIds.fetchDeviceId() ?: deviceIds.registerDeviceId()
+            }
+            if (deviceId!=null){
+                CampsiteAppTheme {
+                    ProfileScreen(deviceId?:"", role, targetProfileDeviceId, { finish() })
+                }
             }
         }
     }

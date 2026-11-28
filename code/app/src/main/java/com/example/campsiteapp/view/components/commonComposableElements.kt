@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +20,10 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
@@ -158,17 +163,17 @@ fun CancelOrProceedTextButtonsPair(
 }
 
 /**
- * Display a user's profile picture
- *
- * Display profile picture if it is valid
- * Display default profile picture if it is null
- *
- * @param modifier to alter formatting or behavior
- * @param image the image to display
- * @param size the size of the image
- * @param contentDescription the image content description
- * @param customContent content to display within image's parent Box (usually, pass in an anonymous @Composable function)
- */
+* Display a user's profile picture
+*
+* Display profile picture if it is valid
+* Display default profile picture if it is null
+*
+* @param modifier to alter formatting or behavior
+* @param image the image to display
+* @param size the size of the image
+* @param contentDescription the image content description
+* @param customContent content to display within image's parent Box
+*/
 @Composable
 fun ProfilePicture(
     modifier: Modifier,
@@ -181,7 +186,7 @@ fun ProfilePicture(
     Box(
         modifier
             .size(size)
-            .padding(5.dp)
+            .padding(size*(1f/24f))
     ) {
         if((image=="null")or(image=="")){
             Box(
@@ -196,7 +201,7 @@ fun ProfilePicture(
                     imageVector = Icons.Default.AccountCircle,
                     "Default profile image",
                     modifier = Modifier
-                        .size(size+(size*0.5f))
+                        .size(size*1.5f)
                         .align(Alignment.Center),
                     tint = Color.Gray
                 )
@@ -218,5 +223,83 @@ fun ProfilePicture(
             )
         }
         customContent()
+    }
+}
+
+
+
+/**
+ * A small button containing an icon
+ *
+ * Use as button in TopAppBar
+ *
+ * @param onClick action performed when pressing button
+ * @param backgroundColor background color of the button
+ * @param contentColor content color of the button
+ * @param icon icon displayed in the button
+ * @param contentDescription description of button
+ */
+@Composable
+fun TopAppBarButton(
+    onClick: () -> Unit ,
+    backgroundColor: Color,
+    contentColor: Color,
+    icon: ImageVector,
+    contentDescription: String
+){
+    FilledIconButton(
+        onClick = { onClick() },
+        modifier = Modifier.size(36.dp),
+        shape = CircleShape,
+        colors = IconButtonDefaults.filledIconButtonColors(
+            containerColor = backgroundColor,
+            contentColor = contentColor,
+        ),
+    ) {
+        Icon(icon, contentDescription = contentDescription)
+    }
+}
+
+/**
+ * A small button containing an icon
+ *
+ * Use as button in Box
+ * Specifically intended for buttons overlapping with profile picture
+ *
+ * @param onClick action performed when pressing button
+ * @param backgroundColor background color of the button
+ * @param contentColor content color of the button
+ * @param icon icon displayed in the button
+ * @param contentDescription description of button
+ * @param alignment alignment within parent Box
+ */
+@Composable
+fun BoxScope.ProfilePictureOptionButton(
+    onClick: () -> Unit ,
+    backgroundColor: Color,
+    contentColor: Color,
+    icon: ImageVector,
+    contentDescription: String,
+    alignment: Alignment
+){
+    IconButton(
+        {
+            onClick()
+        },
+        Modifier
+            .size(48.dp)
+            .align(alignment),
+        colors = IconButtonDefaults.filledIconButtonColors(
+            backgroundColor,
+            contentColor
+        )
+    ) {
+        Icon(
+            icon,
+            contentDescription,
+            Modifier
+                .size(40.dp)
+                .padding(8.dp)
+        )
     }
 }
