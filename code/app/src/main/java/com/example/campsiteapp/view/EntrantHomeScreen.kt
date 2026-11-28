@@ -341,8 +341,6 @@ fun EntrantHomeScreenView(
             }
 
 
-            Spacer(modifier = Modifier.height(64.dp))
-
             Row() {
                 TextField(
                     value = location,
@@ -356,6 +354,7 @@ fun EntrantHomeScreenView(
             val lotteries = EntrantCampsiteController.getLotteriesById(deviceId)
             Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
 
+            Spacer(modifier = Modifier.height(64.dp))
 
             Text("Your Confirmed Bookings", modifier = Modifier.padding(start = 16.dp))
             DisplayBookingsAsCards(
@@ -367,7 +366,7 @@ fun EntrantHomeScreenView(
             Spacer(modifier = Modifier.height(32.dp))
             Text("Your Pending Bookings", modifier = Modifier.padding(start = 16.dp))
 
-            DisplayCampsitesAsCards(
+            DisplayPendingBookingsAsCards (
                 modifier = Modifier.fillMaxWidth(),
                 lotteries = lotteries,
                 onClickEvent = { lottery ->
@@ -547,6 +546,53 @@ fun DisplayBookingsAsCards(
 
 @Composable
 fun DisplayCampsitesAsCards(modifier: Modifier = Modifier,
+                            campsites: List<Campsite>
+){
+
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        campsites.forEach { campsite ->
+
+            Box(modifier = Modifier
+                .width(350.dp)
+                .heightIn(min = 170.dp)
+                .border(1.dp, Color.LightGray, RoundedCornerShape(14.dp))
+
+            ){
+                Column(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 12.dp)
+                ){
+                    Text(text = campsite.name, fontSize = 18.sp)
+                    Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
+
+                    val averageRating = if(campsite.ratingCount>0){
+                        "%.1f".format(campsite.ratingSum.toDouble()/campsite.ratingCount)
+                    }else{
+                        "0.0"
+                    }
+
+
+                    Text(text = "Maximum ${campsite.occupancy} occupancy - $averageRating stars",
+                        fontSize = 12.sp)
+                    Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
+
+
+
+
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+    }
+}
+
+@Composable
+fun DisplayPendingBookingsAsCards(modifier: Modifier = Modifier,
                             lotteries: List<Lottery>, onClickEvent: (Lottery) -> Unit,
                             getTextAttributes: (Lottery) -> Pair<String, Color>,
 ){

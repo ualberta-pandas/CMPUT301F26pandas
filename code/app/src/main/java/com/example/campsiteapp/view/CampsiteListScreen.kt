@@ -63,6 +63,7 @@ import com.example.campsiteapp.controller.EntrantCampsiteController
 
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleSearchResultsScreen
 import com.example.campsiteapp.controller.EntrantCampsiteController.toggleCampsiteDetailsScreen
+import com.example.campsiteapp.model.Campsite
 import com.example.campsiteapp.model.Quad
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -99,7 +100,7 @@ class CampsiteListScreen : ComponentActivity() {
                             finish()
                         },
 
-                        lotteries = EntrantCampsiteController.getResultsBySearch(searchResult), // Know that campsites is based on the lottery database
+                        campsites = EntrantCampsiteController.getResultsBySearch(searchResult),
                         openProfileScreen = { EntrantCampsiteController.toggleProfileScreen(this@CampsiteListScreen) },
                         openAdminScreen = { EntrantCampsiteController.toggleAdminScreen(this@CampsiteListScreen) },
                         openOwnerScreen = { EntrantCampsiteController.toggleOwnerScreen(this@CampsiteListScreen) },
@@ -126,7 +127,7 @@ fun CampsiteListView(
     openAdminScreen: () -> Unit,
     openMenuScreen: () -> Unit,
 
-    lotteries: List<Lottery>,
+    campsites: List<Campsite>,
 ) {
     var entrantSearch by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
@@ -325,7 +326,6 @@ fun CampsiteListView(
 
         }
 
-        Spacer(modifier = Modifier.height(15.dp))
 
         Row() {
             TextField(
@@ -336,30 +336,14 @@ fun CampsiteListView(
 
         }
 
-        val openIfOpen: (Lottery) -> Unit = { lottery ->
-            if (lottery.lotteryEndDate >= LocalDate.now().toString()) {
-                onLotteryClick(lottery.id)
-            }
-        }
+        Spacer(modifier = Modifier.height(64.dp))
+
 
         DisplayCampsitesAsCards(
-            Modifier, lotteries = lotteries,
-            openIfOpen,
-            getTextAttributes = { lottery ->
-                val currSize = lottery.waitlistMax - lottery.waitlist.size
+            Modifier, campsites = campsites,
+            )
 
-                var localDate: String = LocalDate.now().toString()
-                if (lottery.lotteryEndDate < LocalDate.now().toString()) {
-                    Pair("Lottery is closed", Color(0xFFD9B8B8))
-                } else if (currSize == 0) {
-                    Pair("Closed - No Space Left", Color(0xFFD9B8B8))
-                } else if (currSize < 2) {
-                    Pair("Open - 2 Spaces remaining", Color(0xFFE6DDB0))
-                } else {
-                    Pair("Open - Many Spots", Color(0xFFB5C7BE))
-                }
 
-            })
 
         Spacer(modifier = Modifier.height(12.dp))
     }

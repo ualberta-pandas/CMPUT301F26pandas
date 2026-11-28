@@ -365,7 +365,7 @@ fun CampsiteView(
 
         }
 
-        Spacer(modifier= Modifier.height(8.dp))
+
 
         Row() {
             TextField(
@@ -376,6 +376,7 @@ fun CampsiteView(
 
         }
 
+        Spacer(modifier = Modifier.height(64.dp))
 
 
         Row(
