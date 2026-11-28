@@ -79,6 +79,7 @@ import java.util.Locale
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.campsiteapp.controller.ReservationController
+import com.example.campsiteapp.data.CampsitesDatabase
 import com.example.campsiteapp.model.Quad
 import com.example.campsiteapp.model.Reservation
 
@@ -142,7 +143,9 @@ fun EntrantHomeScreenView(
     var showDatePicker by remember { mutableStateOf(false) }
     var showGuests by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxSize().padding(top = 5.dp)) {
+    Column(modifier = modifier
+        .fillMaxSize()
+        .padding(top = 5.dp)) {
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -196,37 +199,38 @@ fun EntrantHomeScreenView(
                 }
             }
 
-        BasicTextField(
-            value = entrantSearch,
-            onValueChange = { entrantSearch = it },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
-            textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .border(1.dp, Color.LightGray, pill)
-                .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
-            decorationBox = { innerTextField ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (entrantSearch.isEmpty()) {
-                            Text("search campsites", color = Color.Gray, fontSize = 14.sp)
+            BasicTextField(
+                value = entrantSearch,
+                onValueChange = { entrantSearch = it },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = { updateByUserSearch(filters) }),
+                textStyle = TextStyle(fontSize = 14.sp, color = Color.Black),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .border(1.dp, Color.LightGray, pill)
+                    .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+                decorationBox = { innerTextField ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            if (entrantSearch.isEmpty()) {
+                                Text("search campsites", color = Color.Gray, fontSize = 14.sp)
+                            }
+                            innerTextField()
                         }
-                        innerTextField()
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clickable(
+                                    onClick = { updateByUserSearch(filters) }
+                                )
+                        )
                     }
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        modifier = Modifier.size(20.dp)
-                            .clickable(
-                                onClick = { updateByUserSearch(filters) }
-                            )
-                    )
                 }
-            }
-        )
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -237,150 +241,150 @@ fun EntrantHomeScreenView(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-            Text(
-                text = availableDates,
-                modifier = Modifier
-                    .border(1.dp, Color.Black, pill)
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
-                    .clickable(
-                        onClick = { showDatePicker = true }
-                    )
-            )
+                Text(
+                    text = availableDates,
+                    modifier = Modifier
+                        .border(1.dp, Color.Black, pill)
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .clickable(
+                            onClick = { showDatePicker = true }
+                        )
+                )
 
 
-            val dateRangePickerState = rememberDateRangePickerState()
-            var startDate by remember { mutableStateOf("") }
-            var endDate by remember { mutableStateOf("") }
+                val dateRangePickerState = rememberDateRangePickerState()
+                var startDate by remember { mutableStateOf("") }
+                var endDate by remember { mutableStateOf("") }
 
-            if (showDatePicker) {
-                DatePickerDialog(
-                    onDismissRequest = { showDatePicker = false },
+                if (showDatePicker) {
+                    DatePickerDialog(
+                        onDismissRequest = { showDatePicker = false },
 
-                    confirmButton = {
-                        Button(
-                            onClick = {
+                        confirmButton = {
+                            Button(
+                                onClick = {
 
-                                val start = dateRangePickerState.selectedStartDateMillis
-                                val end = dateRangePickerState.selectedEndDateMillis
+                                    val start = dateRangePickerState.selectedStartDateMillis
+                                    val end = dateRangePickerState.selectedEndDateMillis
 
-                                if (start != null && end != null) {
-                                    val formatter = SimpleDateFormat(
-                                        "dd/MM/yyyy",
-                                        Locale.getDefault()
-                                    )
+                                    if (start != null && end != null) {
+                                        val formatter = SimpleDateFormat(
+                                            "dd/MM/yyyy",
+                                            Locale.getDefault()
+                                        )
 
-                                    availableDates =
-                                        "${formatter.format(Date(start))} - " +
-                                                formatter.format(Date(end))
+                                        availableDates =
+                                            "${formatter.format(Date(start))} - " +
+                                                    formatter.format(Date(end))
 
-                                    startDate = "${formatter.format(Date(start))}"
-                                    endDate = "${formatter.format(Date(end))}"
+                                        startDate = "${formatter.format(Date(start))}"
+                                        endDate = "${formatter.format(Date(end))}"
 
 
+                                    }
+
+
+                                    showDatePicker = false
                                 }
+                            ) { Text("Ok") }
+                        },
 
-
-                                showDatePicker = false
+                        dismissButton = {
+                            Button(
+                                onClick = {
+                                    showDatePicker = false
+                                }
+                            ) {
+                                Text("Cancel")
                             }
-                        ) { Text("Ok") }
-                    },
-
-                    dismissButton = {
-                        Button(
-                            onClick = {
-                                showDatePicker = false
-                            }
-                        ) {
-                            Text("Cancel")
                         }
-                    }
-                ) {
+                    ) {
 
-                    DateRangePicker(state = dateRangePickerState)
+                        DateRangePicker(state = dateRangePickerState)
+                    }
                 }
-            }
 
                 Spacer(modifier = Modifier.width(6.dp))
 
-            Text(
-                text = "Guest Count: $guestCount",
-                modifier = Modifier
-                    .border(1.dp, Color.Black, pill)
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
-                    .clickable(
-                        onClick = { showGuests = true }
-                    )
-            )
+                Text(
+                    text = "Guest Count: $guestCount",
+                    modifier = Modifier
+                        .border(1.dp, Color.Black, pill)
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .clickable(
+                            onClick = { showGuests = true }
+                        )
+                )
                 TextField(
                     value = location,
                     onValueChange = {location = it},
                     label = { Text("Location") }
                 )
 
-            if (showGuests) {
-                Dialog(
+                if (showGuests) {
+                    Dialog(
 
-                    onDismissRequest = { showGuests = false },
-                    properties = DialogProperties(
-                        usePlatformDefaultWidth = false
-                    )
-                ) {
-                    Surface(shape = RoundedCornerShape(16.dp)) {
-                        Box(modifier = Modifier.padding(26.dp)) {
+                        onDismissRequest = { showGuests = false },
+                        properties = DialogProperties(
+                            usePlatformDefaultWidth = false
+                        )
+                    ) {
+                        Surface(shape = RoundedCornerShape(16.dp)) {
+                            Box(modifier = Modifier.padding(26.dp)) {
 
-                            CounterView(
-                                count = guestCount,
-                                onCountChange = { guestCount = it },
-                                min = 1,
-                                max = 100
-                            )
+                                CounterView(
+                                    count = guestCount,
+                                    onCountChange = { guestCount = it },
+                                    min = 1,
+                                    max = 100
+                                )
+                            }
+
                         }
-
                     }
                 }
+
             }
 
-        }
+
+            Spacer(modifier = Modifier.height(64.dp))
+
+            val reservations = EntrantCampsiteController.getReservationsById(deviceId)
+            val lotteries = EntrantCampsiteController.getLotteriesById(deviceId)
+            Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
 
 
-        Spacer(modifier = Modifier.height(64.dp))
+            Text("Your Confirmed Bookings", modifier = Modifier.padding(start = 16.dp))
+            DisplayBookingsAsCards(
+                modifier = Modifier.fillMaxWidth(),
+                reservations = reservations,
+                onReservationEvent = openReservationScreen
+            )
 
-        val reservations = EntrantCampsiteController.getReservationsById(deviceId)
-        val lotteries = EntrantCampsiteController.getLotteriesById(deviceId)
-        Log.d("HOME", "deviceId=$deviceId lotteries=${lotteries.size}")
+            Spacer(modifier = Modifier.height(32.dp))
+            Text("Your Pending Bookings", modifier = Modifier.padding(start = 16.dp))
 
-
-        Text("Your Confirmed Bookings", modifier = Modifier.padding(start = 16.dp))
-        DisplayBookingsAsCards(
-            modifier = Modifier.fillMaxWidth(),
-            reservations = reservations,
-            onReservationEvent = openReservationScreen
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-        Text("Your Pending Bookings", modifier = Modifier.padding(start = 16.dp))
-
-        DisplayCampsitesAsCards(
-            modifier = Modifier.fillMaxWidth(),
-            lotteries = lotteries,
-            onClickEvent = { lottery ->
-                val hasOffer: Boolean = deviceId in lottery.winners
-                openEntrantOfferScreen(lottery, hasOffer)
-            },
-            getTextAttributes = { lottery ->
-                if (deviceId in lottery.winners) {
-                    Pair(
-                        "Campsite won - respond before ${lottery.bookingEndDate}",
-                        Color(0xFFE6DDB0)
-                    )
-                } else if (lottery.lotteryEndDate <= LocalDate.now().toString()) {
-                    Pair("Entered in lottery", Color(0xFFD9D9D9))
-                } else {
-                    Pair("Entered in lottery", Color(0xFFD9D9D9))
+            DisplayCampsitesAsCards(
+                modifier = Modifier.fillMaxWidth(),
+                lotteries = lotteries,
+                onClickEvent = { lottery ->
+                    val hasOffer: Boolean = deviceId in lottery.winners
+                    openEntrantOfferScreen(lottery, hasOffer)
+                },
+                getTextAttributes = { lottery ->
+                    if (deviceId in lottery.winners) {
+                        Pair(
+                            "Campsite won - respond before ${lottery.bookingEndDate}",
+                            Color(0xFFE6DDB0)
+                        )
+                    } else if (lottery.lotteryEndDate <= LocalDate.now().toString()) {
+                        Pair("Entered in lottery", Color(0xFFD9D9D9))
+                    } else {
+                        Pair("Entered in lottery", Color(0xFFD9D9D9))
+                    }
                 }
-            }
-        )
-    }
+            )
+        }
 
         Row(
             modifier = Modifier
@@ -394,7 +398,7 @@ fun EntrantHomeScreenView(
                 text = "See past reservations",
                 modifier = Modifier
                     .border(1.dp, Color.Black, pill)
-                    .clickable { openReservationScreen()}
+                    .clickable { openReservationScreen() }
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             )
 
@@ -428,6 +432,7 @@ fun EntrantHomeScreenView(
         }
     }
 }
+
 
 
 @Composable
@@ -472,15 +477,18 @@ fun DisplayBookingsAsCards(
         reservationDB needs to fetch the campsite using the campsiteId as a column
     */
 
+
+    val campsitesDb = remember { CampsitesDatabase() }
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
 
-    ){
+        ){
         reservations.forEach { reservation ->
-            val campsite: Campsite = reservation.campsite // Reservation needs to fetch the campsite, and then I need to call
-
+            val campsite = campsitesDb.campsites
+                .find { it.id == reservation.campsite.id } ?: reservation.campsite
             Box(
                 modifier = Modifier
                     .size(width = 350.dp, height = 170.dp)
@@ -496,8 +504,15 @@ fun DisplayBookingsAsCards(
                 ) {
                     Text(text = campsite.name, fontSize = 18.sp)
                     Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
+
+                    val averageRating = if (campsite.ratingCount > 0) {
+                        "%.1f".format(campsite.ratingSum.toDouble() / campsite.ratingCount)
+                    } else {
+                        "0.0"
+                    }
+
                     Text(
-                        text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
+                        text = "Maximum ${campsite.occupancy} occupancy - $averageRating stars",
                         fontSize = 12.sp
                     )
                     Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
@@ -530,13 +545,17 @@ fun DisplayCampsitesAsCards(modifier: Modifier = Modifier,
                             lotteries: List<Lottery>, onClickEvent: (Lottery) -> Unit,
                             getTextAttributes: (Lottery) -> Pair<String, Color>,
 ){
+
+    val campsitesDb = remember { CampsitesDatabase() }
+
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         lotteries.forEach { lottery ->
-            val campsite: Campsite = lottery.campsite
+            val campsite = campsitesDb.campsites
+                .find { it.id == lottery.campsite.id } ?: lottery.campsite
             val status: Pair<String, Color> = getTextAttributes(lottery)
 
             Box(modifier = Modifier
@@ -553,7 +572,15 @@ fun DisplayCampsitesAsCards(modifier: Modifier = Modifier,
                 ){
                     Text(text = campsite.name, fontSize = 18.sp)
                     Text(text = campsite.address, fontSize = 12.sp, color = Color.Gray)
-                    Text(text = "Maximum ${campsite.occupancy} - ${campsite.rating} stars",
+
+                    val averageRating = if(campsite.ratingCount>0){
+                        "%.1f".format(campsite.ratingSum.toDouble()/campsite.ratingCount)
+                    }else{
+                        "0.0"
+                    }
+
+
+                    Text(text = "Maximum ${campsite.occupancy} occupancy - $averageRating stars",
                         fontSize = 12.sp)
                     Text(text = "Available from ${campsite.startDate}", fontSize = 12.sp)
 
@@ -576,4 +603,3 @@ fun DisplayCampsitesAsCards(modifier: Modifier = Modifier,
         }
     }
 }
-

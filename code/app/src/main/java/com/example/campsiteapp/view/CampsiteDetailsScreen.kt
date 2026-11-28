@@ -418,12 +418,18 @@ fun CampsiteView(
             )
         }
 
+        val averageRating = if (campsiteSelection.ratingCount > 0) {
+            "%.1f".format(campsiteSelection.ratingSum.toDouble() / campsiteSelection.ratingCount)
+        } else {
+            "0.0"
+        }
+
         Text(
             text = """
                 ${campsiteSelection.name}
                 ${campsiteSelection.location}
                 ${campsiteSelection.occupancy} people maximum occupancy
-                ${campsiteSelection.rating}/5 ★
+                $averageRating/5 ★
             """.trimIndent(),
             fontSize = 12.sp,
 

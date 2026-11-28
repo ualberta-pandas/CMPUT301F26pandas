@@ -68,7 +68,7 @@ class ReservationController(entrantId: String) {
 
     private fun completeFinishedReservations(entrantId: String) {
         val db = Firebase.firestore
-        val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         db.collection("reservations")
             .whereEqualTo("entrantId", entrantId)
             .get()

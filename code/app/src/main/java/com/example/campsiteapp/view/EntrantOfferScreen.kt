@@ -19,13 +19,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.IntentCompat
+import coil.compose.AsyncImage
 import com.example.campsiteapp.controller.EntrantCampsiteController
 import com.example.campsiteapp.controller.EntrantOfferController
 import com.example.campsiteapp.data.DeviceIDs
@@ -244,12 +247,18 @@ fun EntrantOfferView(
         ) {
         }
 
+        val averageRating = if (campsiteSelection.ratingCount > 0) {
+            "%.1f".format(campsiteSelection.ratingSum.toDouble() / campsiteSelection.ratingCount)
+        } else {
+            "0.0"
+        }
+
         Text(
             text = """
                 ${campsiteSelection.name}
                 ${campsiteSelection.location}
                 ${campsiteSelection.occupancy} people maximum occupancy
-                ${campsiteSelection.rating}/5 ★
+                $averageRating/5 ★
             """.trimIndent(),
             fontSize = 12.sp,
 
@@ -271,16 +280,15 @@ fun EntrantOfferView(
         ) {
             Text(text = campsiteSelection.name, fontSize = 22.sp)
 
-            Text(
-                text = """
-                
-                
-                IMAGE GOES HERE 
-                
-                
-   
-            """.trimIndent()
-            ) // TODO: promo image
+            AsyncImage(
+                model = campsiteSelection.image,
+                contentDescription = "Campsite image",
+                modifier = Modifier
+                    .testTag("campsiteImage")
+                    .width(200.dp)
+                    .height(200.dp),
+                contentScale = ContentScale.Crop
+            )
 
             Spacer(Modifier.height(10.dp))
 
